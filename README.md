@@ -29,3 +29,8 @@ ActiveModel::GlobalLocator.locate(person_gid) # => <#Person id:5 ...
 ## Under development as a gem, targeted for Rails inclusion
 
 GlobalID is being developed in a gem, but is intended to be included in Active Model as part of Rails 4.2.
+
+
+## License
+
+Active Model: GlobalID is released under the MIT license.
