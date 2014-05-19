@@ -1,4 +1,4 @@
-= Active Model: GlobalID -- find models by string references
+# Active Model: GlobalID -- find models by string references
 
 GlobalID is a way of serializing a model into a string, which can then be used to look it up later,
 without the caller having to know the class. This is helpful in many cases where you accept different
@@ -14,17 +14,18 @@ GlobalID, we can make a receiver that simply takes a GlobalID -- or in the case 
 exposed to the world, a SignedGlobalID -- and we can deal easily with objects of both classes.
 
 
-== Usage
+## Usage
 
 You can mix in ActiveModel::GlobalIdentification into any model that supports being found with a #find(id)
 method. This gem will automatically include that module into ActiveRecord::Base, so all records will
 be able to use the following methods:
 
-	person_gid = Person.find(5).global_id         # => <#ActiveModel::GlobalID ...
-	person_gid.to_s 					          # => "Person-5"
-	ActiveModel::GlobalLocator.locate(person_gid) # => <#Person id:5 ...
+```ruby
+person_gid = Person.find(5).global_id         # => <#ActiveModel::GlobalID ...
+person_gid.to_s 					          # => "Person-5"
+ActiveModel::GlobalLocator.locate(person_gid) # => <#Person id:5 ...
+```
 
-
-== Under development as a gem, targeted for Rails inclusion
+## Under development as a gem, targeted for Rails inclusion
 
 GlobalID is being developed in a gem, but is intended to be included in Active Model as part of Rails 4.2.
