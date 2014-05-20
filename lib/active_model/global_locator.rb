@@ -18,7 +18,7 @@ module ActiveModel
         if sgid.is_a? SignedGlobalID
           sgid.model_class.find(sgid.model_id)
         else
-          locate SignedGlobalID.new(sgid)
+          locate_signed SignedGlobalID.new(sgid)
         end
       end
       
