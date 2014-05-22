@@ -16,7 +16,7 @@ module ActiveModel
     end
 
     def model_id
-      @model_id ||= @gid.split("-").third
+      @model_id ||= @gid.split('-')[2..-1].join('-')
     end
 
     def ==(other_global_id)
