@@ -9,3 +9,5 @@ class Person
     @id = id
   end
 end
+
+class Person::Child < Person; end
