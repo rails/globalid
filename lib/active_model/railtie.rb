@@ -1,3 +1,4 @@
+require 'rails/railtie'
 require 'active_model/global_identification'
 
 module ActiveModel
