@@ -1,5 +1,6 @@
 require 'rails/railtie'
 require 'active_model/global_identification'
+require 'active_model/global_locator'
 
 module ActiveModel
   # = Active Model GlobalID Railtie
