@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    activemodel-globalid (0.1.2)
+    activemodel-globalid (0.2.0.uri)
       activemodel (>= 4.1.0)
       activesupport (>= 4.1.0)
 

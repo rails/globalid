@@ -22,10 +22,6 @@ class SignedGlobalLocatorTest < ActiveSupport::TestCase
   end
 
   test 'failure to locate via non-SGID string' do
-    # should this return nil? Should SignedGlobalId initializer check for a
-    # valid sgid before trying to verify it?
-    assert_raises ActiveSupport::MessageVerifier::InvalidSignature do
-      ActiveModel::GlobalLocator.locate_signed "This is not a SGID"
-    end
+    assert_nil ActiveModel::GlobalLocator.locate_signed("This is not a SGID")
   end
 end

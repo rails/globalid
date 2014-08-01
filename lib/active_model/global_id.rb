@@ -1,34 +1,53 @@
 require 'active_support/core_ext/string/inflections'
 require 'active_support/core_ext/array/access'
-require 'active_model/global_id/railtie'
+require 'active_support/core_ext/object/try'
+require 'uri'
 
 module ActiveModel
   autoload :GlobalLocator,  'active_model/global_locator'
   autoload :SignedGlobalID, 'active_model/signed_global_id'
 
   class GlobalID
-    def self.create(model)
-      new "GlobalID-#{model.class.name}-#{model.id}"
+    class << self
+      attr_accessor :app
+
+      def create(model)
+        new URI("gid://#{GlobalID.app}/#{model.class.name}/#{model.id}")
+      end
+
+      def find(gid)
+        parse(gid).try :find
+      end
+
+      def parse(gid)
+        gid.is_a?(self) ? gid : new(gid)
+      rescue URI::InvalidURIError
+        nil
+      end
     end
 
+    attr_reader :uri, :app, :model_name, :model_id
+
     def initialize(gid)
-      @gid = gid
+      @uri = gid.is_a?(URI) ? gid : URI.parse(gid)
+      @app = @uri.host
+      @model_name, @model_id = @uri.path.split('/')[1, 2]
+    end
+
+    def find
+      model_class.find model_id
     end
 
     def model_class
-      @model_klass ||= @gid.split("-").second.constantize
+      model_name.constantize
     end
 
-    def model_id
-      @model_id ||= @gid.split('-')[2..-1].join('-')
-    end
-
-    def ==(other_global_id)
-      other_global_id.is_a?(GlobalID) && to_s == other_global_id.to_s
+    def ==(other)
+      other.is_a?(GlobalID) && uri == other.uri
     end
 
     def to_s
-      @gid
+      uri.to_s
     end
   end
 end

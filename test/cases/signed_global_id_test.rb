@@ -11,7 +11,7 @@ class SignedGlobalIDTest < ActiveSupport::TestCase
   end
 
   test 'string representation' do
-    assert_equal 'BAhJIhZHbG9iYWxJRC1QZXJzb24tNQY6BkVU--391ec38a7b004f46caa1acd75bb0f5078e91b4ea', @person_sgid.to_s
+    assert_equal 'BAhJIhdnaWQ6Ly9iY3gvUGVyc29uLzUGOgZFVA==--c89e90838414d1fee59545b1bd85cfd400ea3362', @person_sgid.to_s
   end
 
   test 'model id' do
@@ -22,7 +22,11 @@ class SignedGlobalIDTest < ActiveSupport::TestCase
     assert_equal Person, @person_sgid.model_class
   end
 
-  test 'signed global ids equality' do
+  test 'value equality' do
     assert_equal ActiveModel::SignedGlobalID.create(Person.new(5)), ActiveModel::SignedGlobalID.create(Person.new(5))
+  end
+
+  test 'value equality with an unsigned id' do
+    assert_equal ActiveModel::GlobalID.create(Person.new(5)), ActiveModel::SignedGlobalID.create(Person.new(5))
   end
 end

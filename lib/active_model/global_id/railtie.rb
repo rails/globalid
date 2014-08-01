@@ -8,6 +8,8 @@ module ActiveModel
   # #global_id and #signed_global_id.
   class Railtie < Rails::Railtie # :nodoc:
     initializer "active_model.globalid" do
+      ActiveModel::GlobalID.app = Rails.application.railtie_name.remove('_application')
+
       config.after_initialize do |app|
         ActiveModel::SignedGlobalID.verifier = app.message_verifier(:signed_global_ids)
       end

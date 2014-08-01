@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.name        = 'activemodel-globalid'
-  s.version     = '0.1.2'
+  s.version     = '0.2.0.uri'
   s.summary     = 'Serialize models that can be found by id again (will be part of Active Model).'
   s.description = 'Serializing models to a single string makes it easy to pass references around.'
 

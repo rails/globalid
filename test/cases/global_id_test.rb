@@ -1,7 +1,4 @@
 require 'helper'
-require 'active_model/global_id'
-
-require 'models/person'
 
 class GlobalIDTest < ActiveSupport::TestCase
   setup do
@@ -12,15 +9,27 @@ class GlobalIDTest < ActiveSupport::TestCase
   end
 
   test 'string representation' do
-    assert_equal 'GlobalID-Person-5', @person_gid.to_s
+    assert_equal 'gid://bcx/Person/5', @person_gid.to_s
   end
 
   test 'string representation (uuid)' do
-    assert_equal "GlobalID-Person-#{@uuid}", @person_uuid_gid.to_s
+    assert_equal "gid://bcx/Person/#{@uuid}", @person_uuid_gid.to_s
   end
 
   test 'string representation (namespaced)' do
-    assert_equal 'GlobalID-Person::Child-4', @person_namespaced_gid.to_s
+    assert_equal 'gid://bcx/Person::Child/4', @person_namespaced_gid.to_s
+  end
+
+  test 'uri representation' do
+    assert_equal URI('gid://bcx/Person/5'), @person_gid.uri
+  end
+
+  test 'uri representation (uuid)' do
+    assert_equal URI("gid://bcx/Person/#{@uuid}"), @person_uuid_gid.uri
+  end
+
+  test 'uri representation (namespaced)' do
+    assert_equal URI('gid://bcx/Person::Child/4'), @person_namespaced_gid.uri
   end
 
   test 'model id' do
@@ -33,6 +42,18 @@ class GlobalIDTest < ActiveSupport::TestCase
 
   test 'model id (namespaced)' do
     assert_equal '4', @person_namespaced_gid.model_id
+  end
+
+  test 'model name' do
+    assert_equal 'Person', @person_gid.model_name
+  end
+
+  test 'model name (uuid)' do
+    assert_equal 'Person', @person_uuid_gid.model_name
+  end
+
+  test 'model name (namespaced)' do
+    assert_equal 'Person::Child', @person_namespaced_gid.model_name
   end
 
   test 'model class' do
