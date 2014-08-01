@@ -1,10 +1,8 @@
-require 'active_model/global_id'
-require 'active_support/core_ext/module/attribute_accessors'
-
-
 module ActiveModel
   class SignedGlobalID < GlobalID
-    cattr_accessor :verifier
+    class << self
+      attr_accessor :verifier
+    end
 
     def self.create(model)
       new verifier.generate("GlobalID-#{model.class.name}-#{model.id}")

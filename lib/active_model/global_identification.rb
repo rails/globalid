@@ -1,6 +1,3 @@
-require 'active_model/global_id'
-require 'active_model/signed_global_id'
-
 module ActiveModel
   module GlobalIdentification
     extend ActiveSupport::Concern

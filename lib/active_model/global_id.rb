@@ -1,7 +1,11 @@
 require 'active_support/core_ext/string/inflections'
 require 'active_support/core_ext/array/access'
+require 'active_model/global_id/railtie'
 
 module ActiveModel
+  autoload :GlobalLocator,  'active_model/global_locator'
+  autoload :SignedGlobalID, 'active_model/signed_global_id'
+
   class GlobalID
     def self.create(model)
       new "GlobalID-#{model.class.name}-#{model.id}"

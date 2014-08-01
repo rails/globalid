@@ -1,9 +1,11 @@
+begin
 require 'rails/railtie'
-require 'active_model/global_identification'
-require 'active_model/global_locator'
+rescue LoadError
+else
 
 module ActiveModel
-  # = Active Model GlobalID Railtie
+  # Set up the signed GlobalID verifier and include Active Record support for
+  # #global_id and #signed_global_id.
   class Railtie < Rails::Railtie # :nodoc:
     initializer "active_model.globalid" do
       config.after_initialize do |app|
@@ -11,9 +13,11 @@ module ActiveModel
       end
 
       ActiveSupport.on_load(:active_record) do
+        require 'active_model/global_identification'
         send :include, ActiveModel::GlobalIdentification
       end
     end
   end
 end
 
+end

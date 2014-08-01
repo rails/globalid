@@ -1,29 +1,29 @@
 PATH
   remote: .
   specs:
-    activemodel-globalid (0.1.0)
+    activemodel-globalid (0.1.2)
       activemodel (>= 4.1.0)
       activesupport (>= 4.1.0)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    activemodel (4.1.1)
-      activesupport (= 4.1.1)
+    activemodel (4.1.4)
+      activesupport (= 4.1.4)
       builder (~> 3.1)
-    activesupport (4.1.1)
+    activesupport (4.1.4)
       i18n (~> 0.6, >= 0.6.9)
       json (~> 1.7, >= 1.7.7)
       minitest (~> 5.1)
       thread_safe (~> 0.1)
       tzinfo (~> 1.1)
     builder (3.2.2)
-    i18n (0.6.9)
+    i18n (0.6.11)
     json (1.8.1)
-    minitest (5.3.4)
+    minitest (5.4.0)
     rake (10.3.2)
-    thread_safe (0.3.3)
-    tzinfo (1.1.0)
+    thread_safe (0.3.4)
+    tzinfo (1.2.1)
       thread_safe (~> 0.1)
 
 PLATFORMS
