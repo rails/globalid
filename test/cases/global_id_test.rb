@@ -3,9 +3,9 @@ require 'helper'
 class GlobalIDTest < ActiveSupport::TestCase
   setup do
     @uuid = '7ef9b614-353c-43a1-a203-ab2307851990'
-    @person_gid = ActiveModel::GlobalID.create(Person.new(5))
-    @person_uuid_gid = ActiveModel::GlobalID.create(Person.new(@uuid))
-    @person_namespaced_gid = ActiveModel::GlobalID.create(Person::Child.new(4))
+    @person_gid = GlobalID.create(Person.new(5))
+    @person_uuid_gid = GlobalID.create(Person.new(@uuid))
+    @person_namespaced_gid = GlobalID.create(Person::Child.new(4))
   end
 
   test 'string representation' do
@@ -69,14 +69,14 @@ class GlobalIDTest < ActiveSupport::TestCase
   end
 
   test 'global ids are values' do
-    assert_equal ActiveModel::GlobalID.create(Person.new(5)), ActiveModel::GlobalID.create(Person.new(5))
+    assert_equal GlobalID.create(Person.new(5)), GlobalID.create(Person.new(5))
   end
 
   test 'global ids are values (uuid)' do
-    assert_equal ActiveModel::GlobalID.create(Person.new(@uuid)), ActiveModel::GlobalID.create(Person.new(@uuid))
+    assert_equal GlobalID.create(Person.new(@uuid)), GlobalID.create(Person.new(@uuid))
   end
 
   test 'global ids are values (name_spaced)' do
-    assert_equal ActiveModel::GlobalID.create(Person::Child.new(4)), ActiveModel::GlobalID.create(Person::Child.new(4))
+    assert_equal GlobalID.create(Person::Child.new(4)), GlobalID.create(Person::Child.new(4))
   end
 end

@@ -5,7 +5,7 @@ require 'models/person'
 
 class GlobalLocatorTest < ActiveSupport::TestCase
   setup do
-    @person_gid = ActiveModel::GlobalID.create(Person.new(5))
+    @person_gid = GlobalID.create(Person.new(5))
   end
 
   test 'locate via actual GID' do

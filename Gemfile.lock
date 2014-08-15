@@ -1,8 +1,7 @@
 PATH
   remote: .
   specs:
-    activemodel-globalid (0.2.0.uri)
-      activemodel (>= 4.1.0)
+    globalid (0.2.0)
       activesupport (>= 4.1.0)
 
 GEM
@@ -30,5 +29,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  activemodel-globalid!
+  activemodel (>= 4.1.0)
+  globalid!
   rake

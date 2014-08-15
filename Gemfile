@@ -2,4 +2,4 @@ source 'https://rubygems.org'
 
 gemspec
 
-gem 'rake'
+gem 'activemodel', '>= 4.1.0'

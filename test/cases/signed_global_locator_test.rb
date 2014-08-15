@@ -4,7 +4,7 @@ require 'models/person'
 
 class SignedGlobalLocatorTest < ActiveSupport::TestCase
   setup do
-    @person_sgid = ActiveModel::SignedGlobalID.create(Person.new(5))
+    @person_sgid = SignedGlobalID.create(Person.new(5))
   end
 
   test 'locate_signed via actual SGID' do
