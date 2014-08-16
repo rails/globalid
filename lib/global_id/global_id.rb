@@ -27,8 +27,7 @@ class GlobalID
 
   def initialize(gid)
     @uri = gid.is_a?(URI) ? gid : URI.parse(gid)
-    @app = @uri.host
-    @model_name, @model_id = @uri.path.split('/')[1, 2]
+    @app, @model_name, @model_id = extract_uri_components(@uri)
   end
 
   def find
@@ -47,4 +46,18 @@ class GlobalID
     uri.to_s
   end
 
+  private
+    PATH_REGEXP = %r(\A/([^/]+)/([^/]+)\z)
+
+    # Pending a URI::GID to handle validation
+    def extract_uri_components(uri)
+      raise ArgumentError, "Not a gid:// URI scheme: #{uri.inspect}" unless @uri.scheme == 'gid'
+      raise ArgumentError, "Missing app name: #{uri.inspect}" unless @uri.host
+
+      if @uri.path =~ PATH_REGEXP
+        [ @uri.host, $1, $2 ]
+      else
+        raise ArgumentError, "Expected a /Model/id URI path: #{uri.inspect}"
+      end
+    end
 end

@@ -6,6 +6,30 @@ class GlobalIDTest < ActiveSupport::TestCase
   end
 end
 
+class URIValidationTest < ActiveSupport::TestCase
+  test 'scheme' do
+    assert_raise ArgumentError do
+      GlobalID.new('gyd://app/Person/1')
+    end
+  end
+
+  test 'app' do
+    assert_raise ArgumentError do
+      GlobalID.new('gid://Person/1')
+    end
+  end
+
+  test 'path' do
+    assert_raise ArgumentError do
+      GlobalID.new('gid://app/Person')
+    end
+
+    assert_raise ArgumentError do
+      GlobalID.new('gid://app/Person/1/2')
+    end
+  end
+end
+
 class GlobalIDCreationTest < ActiveSupport::TestCase
   setup do
     @uuid = '7ef9b614-353c-43a1-a203-ab2307851990'
