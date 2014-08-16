@@ -1,9 +1,7 @@
 require 'helper'
-require 'active_model/global_identification'
-
 require 'models/person'
 
-Person.send :include, ActiveModel::GlobalIdentification
+Person.send :include, GlobalID::Identification
 
 class GlobalIDTest < ActiveSupport::TestCase
   test 'global id' do

@@ -1,2 +1,2 @@
 require 'global_id'
-require 'active_model/global_id/railtie'
+require 'global_id/railtie'

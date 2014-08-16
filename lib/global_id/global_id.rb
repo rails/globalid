@@ -46,8 +46,5 @@ class GlobalID
   def to_s
     uri.to_s
   end
-end
 
-ActiveSupport.on_load :active_model do
-  require 'active_model/global_id'
 end

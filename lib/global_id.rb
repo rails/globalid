@@ -1,8 +1,8 @@
-autoload :GlobalID, 'global_id/global_id'
-autoload :SignedGlobalID, 'global_id/signed_global_id'
+require 'global_id/global_id'
 
-# Active Model load hook
-require 'active_support'
-ActiveSupport.on_load :active_model do
-  require 'active_model/global_id'
+class GlobalID
+  autoload :Locator, 'global_id/locator'
+  autoload :Identification, 'global_id/identification'
 end
+
+autoload :SignedGlobalID, 'global_id/signed_global_id'
