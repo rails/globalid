@@ -1,7 +1,7 @@
 require 'active_support/concern'
 
-module ActiveModel
-  module GlobalIdentification
+class GlobalID
+  module Identification
     extend ActiveSupport::Concern
 
     def global_id

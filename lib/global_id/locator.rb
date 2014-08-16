@@ -1,5 +1,5 @@
-module ActiveModel
-  class GlobalLocator
+class GlobalID
+  module Locator
     class << self
       # Takes either a GlobalID or a string that can be turned into a GlobalID
       def locate(gid)
