@@ -1,29 +1,40 @@
-# GlobalID -- reference models by URI
+# Global ID - Reference models by URI
 
-GlobalID is a way of identifying a model with a URI, which can then be used to look it up later,
-without the caller having to know the class. This is helpful in many cases where you accept different
-classes of objects, but want to do so through a universal reference.
+A Global ID is a URI that uniquely identifies a model instance:
 
-One example is jobs. We don't want to pass in full model objects to a job queue because the marshaling
-of this object might well not be safe (given that the model object can hold references to database 
-connections or other assets). So instead we pass a GlobalID that can use used to look up the model when
-its time to perform the job.
+  gid://YourApp/Some::Model/id
 
-Another example is a drop-down list of options with Users and Groups. By referencing both models as
-GlobalIDs, we can make a receiver that simply takes a GlobalID -- or in the case of data that's being
-exposed to the world, a tamper-proof SignedGlobalID -- and we can easily deal with objects of both classes.
+This is helpful when you need a single identifier to reference different
+classes of objects.
+
+One example is job scheduling. We need to reference a model object rather than
+serialize the object itself, so we pass a Global ID that can be used to locate
+the model when it's time to perform the job. The job scheduler needn't know
+the details of model naming and IDs, just that it has a global identifier that
+references a model.
+
+Another example is a drop-down list of options with Users and Groups. Normally
+we'd need to come up with our own ad hoc scheme to reference them. With Global
+IDs, we have a universal identifier that works for objects both classes.
 
 
 ## Usage
 
-You can mix in ActiveModel::GlobalIdentification into any model that supports being found with a #find(id)
-method. This gem will automatically include that module into ActiveRecord::Base, so all records will
-be able to use the following methods:
+Mix `GlobalID::Identification` in to any model with a #find(id) class method.
+Support is automatically included in Active Record.
 
 ```ruby
-person_gid = Person.find(5).global_id         # => <#GlobalID ...
-person_gid.to_s 					          # => "Person-5"
-ActiveModel::GlobalLocator.locate(person_gid) # => <#Person id:5 ...
+>> person_gid = Person.find(1).global_id
+=> #<GlobalID ...
+
+>> person_gid.uri
+=> #<URI ...
+
+>> person_gid.to_s
+=> "gid://app/Person/1"
+
+>> GlobalID::Locator.locate person_gid
+=> #<Person:0x007fae94bf6298 @id="1">
 ```
 
 ## License
