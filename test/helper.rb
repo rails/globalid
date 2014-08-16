@@ -4,6 +4,7 @@ require 'active_support/testing/autorun'
 
 require 'global_id'
 require 'models/person'
+require 'models/person_model'
 
 GlobalID.app = 'bcx'
 

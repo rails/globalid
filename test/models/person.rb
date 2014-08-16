@@ -1,11 +1,13 @@
 class Person
+  include GlobalID::Identification
+
   attr_reader :id
-  
+
   def self.find(id)
     new(id)
   end
-  
-  def initialize(id)
+
+  def initialize(id = 1)
     @id = id
   end
 end

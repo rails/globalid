@@ -5,7 +5,7 @@ class SignedGlobalIDTest < ActiveSupport::TestCase
     @person_sgid = SignedGlobalID.create(Person.new(5))
   end
 
-  test 'string representation' do
+  test 'as string' do
     assert_equal 'BAhJIhdnaWQ6Ly9iY3gvUGVyc29uLzUGOgZFVA==--c89e90838414d1fee59545b1bd85cfd400ea3362', @person_sgid.to_s
   end
 

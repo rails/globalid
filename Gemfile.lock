@@ -29,6 +29,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  activemodel (>= 4.1.0)
+  activemodel
   globalid!
   rake

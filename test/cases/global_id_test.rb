@@ -1,82 +1,52 @@
 require 'helper'
 
 class GlobalIDTest < ActiveSupport::TestCase
+  test 'value equality' do
+    assert_equal GlobalID.new('gid://app/model/id'), GlobalID.new('gid://app/model/id')
+  end
+end
+
+class GlobalIDCreationTest < ActiveSupport::TestCase
   setup do
     @uuid = '7ef9b614-353c-43a1-a203-ab2307851990'
     @person_gid = GlobalID.create(Person.new(5))
     @person_uuid_gid = GlobalID.create(Person.new(@uuid))
     @person_namespaced_gid = GlobalID.create(Person::Child.new(4))
+    @person_model_gid = GlobalID.create(PersonModel.new(id: 1))
   end
 
-  test 'string representation' do
+  test 'as string' do
     assert_equal 'gid://bcx/Person/5', @person_gid.to_s
-  end
-
-  test 'string representation (uuid)' do
     assert_equal "gid://bcx/Person/#{@uuid}", @person_uuid_gid.to_s
-  end
-
-  test 'string representation (namespaced)' do
     assert_equal 'gid://bcx/Person::Child/4', @person_namespaced_gid.to_s
+    assert_equal 'gid://bcx/PersonModel/1', @person_model_gid.to_s
   end
 
-  test 'uri representation' do
+  test 'as URI' do
     assert_equal URI('gid://bcx/Person/5'), @person_gid.uri
-  end
-
-  test 'uri representation (uuid)' do
     assert_equal URI("gid://bcx/Person/#{@uuid}"), @person_uuid_gid.uri
-  end
-
-  test 'uri representation (namespaced)' do
     assert_equal URI('gid://bcx/Person::Child/4'), @person_namespaced_gid.uri
+    assert_equal URI('gid://bcx/PersonModel/1'), @person_model_gid.uri
   end
 
   test 'model id' do
     assert_equal '5', @person_gid.model_id
-  end
-
-  test 'model id (uuid)' do
     assert_equal @uuid, @person_uuid_gid.model_id
-  end
-
-  test 'model id (namespaced)' do
     assert_equal '4', @person_namespaced_gid.model_id
+    assert_equal '1', @person_model_gid.model_id
   end
 
   test 'model name' do
     assert_equal 'Person', @person_gid.model_name
-  end
-
-  test 'model name (uuid)' do
     assert_equal 'Person', @person_uuid_gid.model_name
-  end
-
-  test 'model name (namespaced)' do
     assert_equal 'Person::Child', @person_namespaced_gid.model_name
+    assert_equal 'PersonModel', @person_model_gid.model_name
   end
 
   test 'model class' do
     assert_equal Person, @person_gid.model_class
-  end
-
-  test 'model class (uuid)' do
     assert_equal Person, @person_uuid_gid.model_class
-  end
-
-  test 'model class (namespaced)' do
     assert_equal Person::Child, @person_namespaced_gid.model_class
-  end
-
-  test 'global ids are values' do
-    assert_equal GlobalID.create(Person.new(5)), GlobalID.create(Person.new(5))
-  end
-
-  test 'global ids are values (uuid)' do
-    assert_equal GlobalID.create(Person.new(@uuid)), GlobalID.create(Person.new(@uuid))
-  end
-
-  test 'global ids are values (name_spaced)' do
-    assert_equal GlobalID.create(Person::Child.new(4)), GlobalID.create(Person::Child.new(4))
+    assert_equal PersonModel, @person_model_gid.model_class
   end
 end
