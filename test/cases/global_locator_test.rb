@@ -38,4 +38,11 @@ class GlobalLocatorTest < ActiveSupport::TestCase
   test 'by non-SGID returns nil' do
     assert_nil GlobalID::Locator.locate_signed 'This is not a SGID'
   end
+
+  test 'by invalid GID URI returns nil' do
+    assert_nil GlobalID::Locator.locate 'http://app/Person/1'
+    assert_nil GlobalID::Locator.locate 'gid://Person/1'
+    assert_nil GlobalID::Locator.locate 'gid://app/Person'
+    assert_nil GlobalID::Locator.locate 'gid://app/Person/1/2'
+  end
 end

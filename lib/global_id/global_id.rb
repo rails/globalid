@@ -18,7 +18,7 @@ class GlobalID
 
     def parse(gid)
       gid.is_a?(self) ? gid : new(gid)
-    rescue URI::InvalidURIError
+    rescue URI::Error
       nil
     end
   end
@@ -51,13 +51,12 @@ class GlobalID
 
     # Pending a URI::GID to handle validation
     def extract_uri_components(uri)
-      raise ArgumentError, "Not a gid:// URI scheme: #{uri.inspect}" unless @uri.scheme == 'gid'
-      raise ArgumentError, "Missing app name: #{uri.inspect}" unless @uri.host
+      raise URI::BadURIError, "Not a gid:// URI scheme: #{uri.inspect}" unless @uri.scheme == 'gid'
 
       if @uri.path =~ PATH_REGEXP
         [ @uri.host, $1, $2 ]
       else
-        raise ArgumentError, "Expected a /Model/id URI path: #{uri.inspect}"
+        raise URI::InvalidURIError, "Expected a URI like gid://app/Person/1234: #{uri.inspect}"
       end
     end
 end
