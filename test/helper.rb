@@ -8,4 +8,11 @@ require 'models/person_model'
 
 GlobalID.app = 'bcx'
 
-SignedGlobalID.verifier = ActiveSupport::MessageVerifier.new('muchSECRETsoHIDDEN')
+# Default serializers is Marshal, whose format changed 1.9 -> 2.0,
+# so use a trivial serializer for our tests.
+class StringSerializer
+  def dump(gid) gid.to_s end
+  def load(data) data end
+end
+
+SignedGlobalID.verifier = ActiveSupport::MessageVerifier.new('muchSECRETsoHIDDEN', serializer: StringSerializer.new)

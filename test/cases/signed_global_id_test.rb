@@ -6,7 +6,7 @@ class SignedGlobalIDTest < ActiveSupport::TestCase
   end
 
   test 'as string' do
-    assert_equal 'BAhJIhdnaWQ6Ly9iY3gvUGVyc29uLzUGOgZFVA==--c89e90838414d1fee59545b1bd85cfd400ea3362', @person_sgid.to_s
+    assert_equal 'Z2lkOi8vYmN4L1BlcnNvbi81--bd2dab1418d8577e10cf93f8ec055b4b61690755', @person_sgid.to_s
   end
 
   test 'model id' do
