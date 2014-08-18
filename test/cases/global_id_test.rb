@@ -81,11 +81,14 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
     person_gid = GlobalID.create(Person.new(5), app: "foo")
     assert_equal 'gid://foo/Person/5', person_gid.to_s
 
-    origin_app = GlobalID.app
-    GlobalID.app = nil
-    assert_raise ArgumentError do
-      GlobalID.create(Person.new(5))
+    begin
+      origin_app = GlobalID.app
+      GlobalID.app = nil
+      assert_raise ArgumentError do
+        GlobalID.create(Person.new(5))
+      end
+    ensure
+      GlobalID.app = origin_app
     end
-    GlobalID.app = origin_app
   end
 end
