@@ -13,9 +13,7 @@ class GlobalID
     end
 
     def find(gid, options = {})
-      if global_id = parse(gid)
-        global_id.find if find_allowed_for?(global_id.model_class, options[:only])
-      end
+      parse(gid).try(:find, options)
     end
 
     def parse(gid)
@@ -24,14 +22,6 @@ class GlobalID
       nil
     end
 
-    private
-      def find_allowed_for?(klass, only = nil)
-        if only
-          Array(only).any? { |c| klass <= c }
-        else
-          true
-        end
-      end
   end
 
   attr_reader :uri, :app, :model_name, :model_id
@@ -40,8 +30,8 @@ class GlobalID
     extract_uri_components gid
   end
 
-  def find
-    model_class.find model_id
+  def find(options = {})
+    model_class.find model_id if find_allowed?(options[:only])
   end
 
   def model_class
@@ -71,5 +61,9 @@ class GlobalID
       else
         raise URI::InvalidURIError, "Expected a URI like gid://app/Person/1234: #{@uri.inspect}"
       end
+    end
+
+    def find_allowed?(only = nil)
+      only ? Array(only).any? { |c| model_class <= c } : true
     end
 end
