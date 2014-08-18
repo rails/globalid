@@ -25,10 +25,15 @@ class GlobalID
     end
 
     def parse_encoded_gid(gid)
-      padding_chars = 4 - gid.length % 4
-      gid += '=' * padding_chars
-      new(Base64.urlsafe_decode64(gid)) rescue nil
+      new Base64.urlsafe_decode64(repad_gid(gid)) rescue nil
     end
+    
+    private
+      # We removed the base64 padding character = during #to_param, now we're adding it back so decoding will work
+      def repad_gid(gid)
+        padding_chars = 4 - gid.length % 4
+        gid + '=' * padding_chars
+      end
   end
 
   attr_reader :uri, :app, :model_name, :model_id
@@ -54,6 +59,7 @@ class GlobalID
   end
 
   def to_param
+    # remove the = padding character for a prettier param -- it'll be added back in parse_encoded_gid
     Base64.urlsafe_encode64(to_s).sub(/=+$/, '')
   end
 
