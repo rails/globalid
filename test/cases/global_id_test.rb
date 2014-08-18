@@ -39,6 +39,54 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
     @person_model_gid = GlobalID.create(PersonModel.new(id: 1))
   end
 
+  test 'find' do
+    assert_equal Person.find(@person_gid.model_id), @person_gid.find
+    assert_equal Person.find(@person_uuid_gid.model_id), @person_uuid_gid.find
+    assert_equal Person::Child.find(@person_namespaced_gid.model_id), @person_namespaced_gid.find
+    assert_equal PersonModel.find(@person_model_gid.model_id), @person_model_gid.find
+  end
+
+  test 'find with class' do
+    assert_equal Person.find(@person_gid.model_id), @person_gid.find(only: Person)
+    assert_equal Person.find(@person_uuid_gid.model_id), @person_uuid_gid.find(only: Person)
+    assert_equal PersonModel.find(@person_model_gid.model_id), @person_model_gid.find(only: PersonModel)
+  end
+
+  test 'find with subclass' do
+    assert_equal Person::Child.find(@person_namespaced_gid.model_id),
+                 @person_namespaced_gid.find(only: Person)
+  end
+
+  test 'find with module' do
+    assert_equal Person.find(@person_gid.model_id), @person_gid.find(only: GlobalID::Identification)
+    assert_equal Person.find(@person_uuid_gid.model_id),
+                 @person_uuid_gid.find(only: GlobalID::Identification)
+    assert_equal PersonModel.find(@person_model_gid.model_id),
+                 @person_model_gid.find(only: ActiveModel::Model)
+    assert_equal Person::Child.find(@person_namespaced_gid.model_id),
+                 @person_namespaced_gid.find(only: GlobalID::Identification)
+  end
+
+  test 'find with multiple class' do
+    assert_equal Person.find(@person_gid.model_id), @person_gid.find(only: [Fixnum, Person])
+    assert_equal Person.find(@person_uuid_gid.model_id), @person_uuid_gid.find(only: [Fixnum, Person])
+    assert_equal PersonModel.find(@person_model_gid.model_id),
+                 @person_model_gid.find(only: [Float, PersonModel])
+    assert_equal Person::Child.find(@person_namespaced_gid.model_id),
+                 @person_namespaced_gid.find(only: [Person, Person::Child])
+  end
+
+  test 'find with multiple module' do
+    assert_equal Person.find(@person_gid.model_id),
+                 @person_gid.find(only: [Enumerable, GlobalID::Identification])
+    assert_equal Person.find(@person_uuid_gid.model_id),
+                 @person_uuid_gid.find(only: [Bignum, GlobalID::Identification])
+    assert_equal PersonModel.find(@person_model_gid.model_id),
+                 @person_model_gid.find(only: [String, ActiveModel::Model])
+    assert_equal Person::Child.find(@person_namespaced_gid.model_id),
+                 @person_namespaced_gid.find(only: [Integer, GlobalID::Identification])
+  end
+
   test 'as string' do
     assert_equal 'gid://bcx/Person/5', @person_gid.to_s
     assert_equal "gid://bcx/Person/#{@uuid}", @person_uuid_gid.to_s

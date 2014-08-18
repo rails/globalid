@@ -9,4 +9,8 @@ class PersonModel
   def self.find(id)
     new id: id
   end
+
+  def ==(other)
+    id == other.try(:id)
+  end
 end
