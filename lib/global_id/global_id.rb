@@ -21,7 +21,6 @@ class GlobalID
     rescue URI::Error
       nil
     end
-
   end
 
   attr_reader :uri, :app, :model_name, :model_id
