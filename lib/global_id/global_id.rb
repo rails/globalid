@@ -9,8 +9,8 @@ class GlobalID
     attr_accessor :app
 
     def create(model, options = {})
-      raise ArgumentError, "Required an app to be set before creating a GlobalID" unless app
       app = options.fetch :app, GlobalID.app
+      raise ArgumentError, "An app is required to create a GlobalID. Pass the :app option or set the default GlobalID.app." unless app
       new URI("gid://#{app}/#{model.class.name}/#{model.id}")
     end
 
