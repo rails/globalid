@@ -53,7 +53,7 @@ class GlobalID
 
   def initialize(gid, options = {})
     @uri = gid.is_a?(URI) ? gid : URI.parse(gid)
-    raise URI::BadURIError, "Not a gid:// URI scheme: #{@uri.inspect}" unless @uri.is_a? URI::GlobalID
+    raise URI::BadURIError, "Not a gid:// URI scheme: #{@uri.inspect}" unless @uri.is_a?(URI::GlobalID)
   end
 
   def find(options = {})

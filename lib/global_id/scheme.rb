@@ -11,10 +11,18 @@ module URI
     alias_attribute :app, :host
     attr_reader :model_name, :model_id
 
-    def initialize(scheme, userinfo, host, port, registry, path, opaque, query,
-                   fragment, parser = DEFAULT_PARSER, arg_check = true)
-      super(scheme, userinfo, host, port, registry, path, opaque, query,
-            fragment, parser, arg_check)
+    def self.build(scheme, userinfo, host, port, registry, path, opaque, query, fragment)
+      parser = DEFAULT_PARSER
+      arg_check = true
+
+      new(scheme, userinfo, host, port, registry, path, opaque, query, fragment, parser, arg_check)
+    end
+
+    def initialize(*args)
+      super(*args)
+
+      path = args[5]
+      arg_check = args[10] || args[10].nil?
 
       _, model_name, model_id = *(path.match(PATH_REGEXP))
 
@@ -40,7 +48,7 @@ module URI
     end
 
     def to_s
-      "#{@scheme}://#{@host}/#{@model_name}/#{@model_id}"
+      "#{@scheme}://#{@app}/#{@model_name}/#{@model_id}"
     end
 
     protected
