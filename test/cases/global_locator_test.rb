@@ -13,8 +13,92 @@ class GlobalLocatorTest < ActiveSupport::TestCase
     assert_equal @gid.model_id, found.id
   end
 
+  test 'by GID with only: restriction with match' do
+    found = GlobalID::Locator.locate(@gid, only: Person)
+    assert_kind_of @gid.model_class, found
+    assert_equal @gid.model_id, found.id
+  end
+
+  test 'by GID with only: restriction with match subclass' do
+    instance = Person::Child.new
+    gid = instance.gid
+    found = GlobalID::Locator.locate(gid, only: Person)
+    assert_kind_of gid.model_class, found
+    assert_equal gid.model_id, found.id
+  end
+
+  test 'by GID with only: restriction with no match' do
+    found = GlobalID::Locator.locate(@gid, only: String)
+    assert_nil found
+  end
+
+  test 'by GID with only: restriction by multiple types' do
+    found = GlobalID::Locator.locate(@gid, only: [String, Person])
+    assert_kind_of @gid.model_class, found
+    assert_equal @gid.model_id, found.id
+  end
+
+  test 'by GID with only: restriction by module' do
+    found = GlobalID::Locator.locate(@gid, only: GlobalID::Identification)
+    assert_kind_of @gid.model_class, found
+    assert_equal @gid.model_id, found.id
+  end
+
+  test 'by GID with only: restriction by module no match' do
+    found = GlobalID::Locator.locate(@gid, only: Forwardable)
+    assert_nil found
+  end
+
+  test 'by GID with only: restriction by multiple types w/module' do
+    found = GlobalID::Locator.locate(@gid, only: [String, GlobalID::Identification])
+    assert_kind_of @gid.model_class, found
+    assert_equal @gid.model_id, found.id
+  end
+
   test 'by SGID' do
     found = GlobalID::Locator.locate_signed(@sgid)
+    assert_kind_of @sgid.model_class, found
+    assert_equal @sgid.model_id, found.id
+  end
+
+  test 'by SGID with only: restriction with match' do
+    found = GlobalID::Locator.locate_signed(@sgid, only: Person)
+    assert_kind_of @sgid.model_class, found
+    assert_equal @sgid.model_id, found.id
+  end
+
+  test 'by SGID with only: restriction with match subclass' do
+    instance = Person::Child.new
+    sgid = instance.sgid
+    found = GlobalID::Locator.locate_signed(sgid, only: Person)
+    assert_kind_of sgid.model_class, found
+    assert_equal sgid.model_id, found.id
+  end
+
+  test 'by SGID with only: restriction with no match' do
+    found = GlobalID::Locator.locate_signed(@sgid, only: String)
+    assert_nil found
+  end
+
+  test 'by SGID with only: restriction by multiple types' do
+    found = GlobalID::Locator.locate_signed(@sgid, only: [String, Person])
+    assert_kind_of @sgid.model_class, found
+    assert_equal @sgid.model_id, found.id
+  end
+
+  test 'by SGID with only: restriction by module' do
+    found = GlobalID::Locator.locate_signed(@sgid, only: GlobalID::Identification)
+    assert_kind_of @sgid.model_class, found
+    assert_equal @sgid.model_id, found.id
+  end
+
+  test 'by SGID with only: restriction by module no match' do
+    found = GlobalID::Locator.locate_signed(@sgid, only: Enumerable)
+    assert_nil found
+  end
+
+  test 'by SGID with only: restriction by multiple types w/module' do
+    found = GlobalID::Locator.locate_signed(@sgid, only: [String, GlobalID::Identification])
     assert_kind_of @sgid.model_class, found
     assert_equal @sgid.model_id, found.id
   end

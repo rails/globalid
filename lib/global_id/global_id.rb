@@ -14,8 +14,8 @@ class GlobalID
       new URI("gid://#{app}/#{model.class.name}/#{model.id}")
     end
 
-    def find(gid)
-      parse(gid).try :find
+    def find(gid, options = {})
+      parse(gid).try(:find, options)
     end
 
     def parse(gid)
@@ -31,8 +31,8 @@ class GlobalID
     extract_uri_components gid
   end
 
-  def find
-    model_class.find model_id
+  def find(options = {})
+    model_class.find model_id if find_allowed?(options[:only])
   end
 
   def model_class
@@ -62,5 +62,9 @@ class GlobalID
       else
         raise URI::InvalidURIError, "Expected a URI like gid://app/Person/1234: #{@uri.inspect}"
       end
+    end
+
+    def find_allowed?(only = nil)
+      only ? Array(only).any? { |c| model_class <= c } : true
     end
 end

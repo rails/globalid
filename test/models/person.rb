@@ -10,6 +10,10 @@ class Person
   def initialize(id = 1)
     @id = id
   end
+
+  def ==(other)
+    id == other.try(:id)
+  end
 end
 
 class Person::Child < Person; end
