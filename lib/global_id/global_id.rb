@@ -8,8 +8,9 @@ class GlobalID
   class << self
     attr_accessor :app
 
-    def create(model)
-      new URI("gid://#{GlobalID.app}/#{model.class.name}/#{model.id}")
+    def create(model, options={app: GlobalID.app})
+      raise ArgumentError, "optional :app argument can't be nil" if options[:app].nil?
+      new URI("gid://#{options[:app]}/#{model.class.name}/#{model.id}")
     end
 
     def find(gid)

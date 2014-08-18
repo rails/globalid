@@ -73,4 +73,18 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
     assert_equal Person::Child, @person_namespaced_gid.model_class
     assert_equal PersonModel, @person_model_gid.model_class
   end
+
+  test ':app argument' do
+    assert_raise ArgumentError do
+      GlobalID.create(Person.new(5), app: nil)
+    end
+
+    GlobalID.app = nil
+    assert_raise ArgumentError do
+      GlobalID.create(Person.new(5))
+    end
+    GlobalID.app = 'bcx'
+
+    assert_equal GlobalID.create(Person.new(5)), GlobalID.new('gid://bcx/Person/5')
+  end
 end
