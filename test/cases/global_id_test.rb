@@ -145,9 +145,16 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
 
   test 'as param' do
     assert_equal 'Z2lkOi8vYmN4L1BlcnNvbi81', @person_gid.to_param
+    assert_equal @person_gid, GlobalID.parse('Z2lkOi8vYmN4L1BlcnNvbi81')
+
     assert_equal 'Z2lkOi8vYmN4L1BlcnNvbi83ZWY5YjYxNC0zNTNjLTQzYTEtYTIwMy1hYjIzMDc4NTE5OTA', @person_uuid_gid.to_param
+    assert_equal @person_uuid_gid, GlobalID.parse('Z2lkOi8vYmN4L1BlcnNvbi83ZWY5YjYxNC0zNTNjLTQzYTEtYTIwMy1hYjIzMDc4NTE5OTA')
+
     assert_equal 'Z2lkOi8vYmN4L1BlcnNvbjo6Q2hpbGQvNA', @person_namespaced_gid.to_param
+    assert_equal @person_namespaced_gid, GlobalID.parse('Z2lkOi8vYmN4L1BlcnNvbjo6Q2hpbGQvNA')
+
     assert_equal 'Z2lkOi8vYmN4L1BlcnNvbk1vZGVsLzE', @person_model_gid.to_param
+    assert_equal @person_model_gid, GlobalID.parse('Z2lkOi8vYmN4L1BlcnNvbk1vZGVsLzE')
   end
 
   test 'as URI' do
