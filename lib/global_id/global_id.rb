@@ -12,8 +12,11 @@ class GlobalID
       new URI("gid://#{GlobalID.app}/#{model.class.name}/#{model.id}")
     end
 
-    def find(gid)
-      parse(gid).try :find
+    def find(gid, options = {})
+      global_id = parse(gid)
+      if global_id
+        allowed_class?(global_id.model_class, options) ? global_id.find : nil
+      end
     end
 
     def parse(gid)
@@ -21,6 +24,13 @@ class GlobalID
     rescue URI::Error
       nil
     end
+
+    private
+
+      def allowed_class?(clazz, options)
+        only = [options.fetch(:only, clazz)].flatten
+        only.any? { |c| clazz <= c }
+      end
   end
 
   attr_reader :uri, :app, :model_name, :model_id
