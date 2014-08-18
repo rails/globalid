@@ -8,8 +8,10 @@ class GlobalID
   class << self
     attr_accessor :app
 
-    def create(model)
-      new URI("gid://#{GlobalID.app}/#{model.class.name}/#{model.id}")
+    def create(model, options = {})
+      app = options.fetch :app, GlobalID.app
+      raise ArgumentError, "An app is required to create a GlobalID. Pass the :app option or set the default GlobalID.app." unless app
+      new URI("gid://#{app}/#{model.class.name}/#{model.id}")
     end
 
     def find(gid)
