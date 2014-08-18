@@ -15,4 +15,5 @@ class SignedGlobalID < GlobalID
   def to_s
     @sgid ||= self.class.verifier.generate(super)
   end
+  alias to_param to_s
 end
