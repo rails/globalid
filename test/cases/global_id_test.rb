@@ -52,9 +52,20 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
     assert_equal PersonModel.find(@person_model_gid.model_id), @person_model_gid.find(only: PersonModel)
   end
 
+  test 'find with class no match' do
+    assert_nil @person_gid.find(only: Hash)
+    assert_nil @person_uuid_gid.find(only: Array)
+    assert_nil @person_namespaced_gid.find(only: String)
+    assert_nil @person_model_gid.find(only: Float)
+  end
+
   test 'find with subclass' do
     assert_equal Person::Child.find(@person_namespaced_gid.model_id),
                  @person_namespaced_gid.find(only: Person)
+  end
+
+  test 'find with subclass no match' do
+    assert_nil @person_namespaced_gid.find(only: String)
   end
 
   test 'find with module' do
@@ -67,6 +78,13 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
                  @person_namespaced_gid.find(only: GlobalID::Identification)
   end
 
+  test 'find with module no match' do
+    assert_nil @person_gid.find(only: Enumerable)
+    assert_nil @person_uuid_gid.find(only: Forwardable)
+    assert_nil @person_namespaced_gid.find(only: Base64)
+    assert_nil @person_model_gid.find(only: Enumerable)
+  end
+
   test 'find with multiple class' do
     assert_equal Person.find(@person_gid.model_id), @person_gid.find(only: [Fixnum, Person])
     assert_equal Person.find(@person_uuid_gid.model_id), @person_uuid_gid.find(only: [Fixnum, Person])
@@ -74,6 +92,13 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
                  @person_model_gid.find(only: [Float, PersonModel])
     assert_equal Person::Child.find(@person_namespaced_gid.model_id),
                  @person_namespaced_gid.find(only: [Person, Person::Child])
+  end
+
+  test 'find with multiple class no match' do
+    assert_nil @person_gid.find(only: [Fixnum, Numeric])
+    assert_nil @person_uuid_gid.find(only: [Fixnum, String])
+    assert_nil @person_model_gid.find(only: [Array, Hash])
+    assert_nil @person_namespaced_gid.find(only: [String, Set])
   end
 
   test 'find with multiple module' do
@@ -85,6 +110,13 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
                  @person_model_gid.find(only: [String, ActiveModel::Model])
     assert_equal Person::Child.find(@person_namespaced_gid.model_id),
                  @person_namespaced_gid.find(only: [Integer, GlobalID::Identification])
+  end
+
+  test 'find with multiple module no match' do
+    assert_nil @person_gid.find(only: [Enumerable, Base64])
+    assert_nil @person_uuid_gid.find(only: [Enumerable, Forwardable])
+    assert_nil @person_model_gid.find(only: [Base64, Enumerable])
+    assert_nil @person_namespaced_gid.find(only: [Enumerable, Forwardable])
   end
 
   test 'as string' do
