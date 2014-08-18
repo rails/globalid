@@ -5,39 +5,17 @@ class GlobalIDTest < ActiveSupport::TestCase
     assert_equal GlobalID.new('gid://app/model/id'), GlobalID.new('gid://app/model/id')
   end
 
-  test 'empty hostname' do
+  test 'invalid app name' do
     assert_raises ArgumentError do
       GlobalID.app = ''
     end
-  end
 
-  test 'invalid hostname' do
     assert_raises ArgumentError do
       GlobalID.app = 'blog_app'
     end
-  end
-end
 
-class URIValidationTest < ActiveSupport::TestCase
-  test 'scheme' do
-    assert_raise URI::BadURIError do
-      GlobalID.new('gyd://app/Person/1')
-    end
-  end
-
-  test 'app' do
-    assert_raise URI::InvalidURIError do
-      GlobalID.new('gid://Person/1')
-    end
-  end
-
-  test 'path' do
-    assert_raise URI::InvalidURIError do
-      GlobalID.new('gid://app/Person')
-    end
-
-    assert_raise URI::InvalidURIError do
-      GlobalID.new('gid://app/Person/1/2')
+    assert_raises ArgumentError do
+      GlobalID.app = nil
     end
   end
 end
@@ -206,20 +184,6 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
 
     assert_raise ArgumentError do
       person_gid = GlobalID.create(Person.new(5), app: nil)
-    end
-
-    begin
-      origin_app = GlobalID.app
-      GlobalID.app = nil
-
-      assert_raise ArgumentError do
-        GlobalID.create(Person.new(5))
-      end
-
-      person_gid = GlobalID.create(Person.new(5), app: "foo")
-      assert_equal 'gid://foo/Person/5', person_gid.to_s
-    ensure
-      GlobalID.app = origin_app
     end
   end
 end
