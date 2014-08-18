@@ -31,7 +31,7 @@ class GlobalID
     private
       # We removed the base64 padding character = during #to_param, now we're adding it back so decoding will work
       def repad_gid(gid)
-        padding_chars = 4 - gid.length % 4
+        padding_chars = gid.length.modulo(4).zero? ? 0 : (4 - gid.length.modulo(4))
         gid + ('=' * padding_chars)
       end
   end
