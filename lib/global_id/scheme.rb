@@ -56,11 +56,11 @@ module URI
     private
 
     def check_model_name(value)
-      raise URI::InvalidURIError, "Expected a URI like gid://app/Person/1234: #{self.inspect}" if value.nil?
+      raise URI::InvalidComponentError, "Expected a URI like gid://app/Person/1234: #{self.inspect}" if value.nil?
     end
 
     def check_model_id(value)
-      raise URI::InvalidURIError, "Expected a URI like gid://app/Person/1234: #{self.inspect}" if value.nil?
+      raise URI::InvalidComponentError, "Expected a URI like gid://app/Person/1234: #{self.inspect}" if value.nil?
     end
   end
 

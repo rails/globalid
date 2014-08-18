@@ -26,17 +26,17 @@ class URIValidationTest < ActiveSupport::TestCase
   end
 
   test 'app' do
-    assert_raise URI::InvalidURIError do
+    assert_raise URI::InvalidComponentError do
       GlobalID.new('gid://Person/1')
     end
   end
 
   test 'path' do
-    assert_raise URI::InvalidURIError do
+    assert_raise URI::InvalidComponentError do
       GlobalID.new('gid://app/Person')
     end
 
-    assert_raise URI::InvalidURIError do
+    assert_raise URI::InvalidComponentError do
       GlobalID.new('gid://app/Person/1/2')
     end
   end
