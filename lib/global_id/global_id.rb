@@ -9,6 +9,7 @@ class GlobalID
     attr_accessor :app
 
     def create(model)
+      raise ArgumentError, "GlobalID.app must be set before creating a GlobalID" unless GlobalID.app
       new URI("gid://#{GlobalID.app}/#{model.class.name}/#{model.id}")
     end
 
