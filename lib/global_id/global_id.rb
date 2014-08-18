@@ -3,13 +3,14 @@ require 'active_support/core_ext/string/inflections'  # For #model_class constan
 require 'active_support/core_ext/array/access'
 require 'active_support/core_ext/object/try'          # For #find
 require 'uri'
+require 'global_id/uri/gid'
 
 class GlobalID
   class << self
     attr_accessor :app
 
     def create(model)
-      new URI("gid://#{GlobalID.app}/#{model.class.name}/#{model.id}")
+      new URI::GID.create(GlobalID.app, model)
     end
 
     def find(gid)
@@ -46,19 +47,11 @@ class GlobalID
   end
 
   private
-    PATH_REGEXP = %r(\A/([^/]+)/([^/]+)\z)
-
-    # Pending a URI::GID to handle validation
     def extract_uri_components(gid)
-      @uri = gid.is_a?(URI) ? gid : URI.parse(gid)
-      raise URI::BadURIError, "Not a gid:// URI scheme: #{@uri.inspect}" unless @uri.scheme == 'gid'
+      @uri = gid.is_a?(URI) ? gid : URI::GID.parse(gid)
 
-      if @uri.path =~ PATH_REGEXP
-        @app = @uri.host
-        @model_name = $1
-        @model_id = $2
-      else
-        raise URI::InvalidURIError, "Expected a URI like gid://app/Person/1234: #{@uri.inspect}"
-      end
+      @app = @uri.app
+      @model_name = @uri.model_name
+      @model_id = @uri.model_id
     end
 end

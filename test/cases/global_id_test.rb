@@ -12,22 +12,6 @@ class URIValidationTest < ActiveSupport::TestCase
       GlobalID.new('gyd://app/Person/1')
     end
   end
-
-  test 'app' do
-    assert_raise URI::InvalidURIError do
-      GlobalID.new('gid://Person/1')
-    end
-  end
-
-  test 'path' do
-    assert_raise URI::InvalidURIError do
-      GlobalID.new('gid://app/Person')
-    end
-
-    assert_raise URI::InvalidURIError do
-      GlobalID.new('gid://app/Person/1/2')
-    end
-  end
 end
 
 class GlobalIDCreationTest < ActiveSupport::TestCase
