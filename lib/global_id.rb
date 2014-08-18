@@ -1,4 +1,5 @@
 require 'global_id/global_id'
+require 'global_id/scheme'
 autoload :SignedGlobalID, 'global_id/signed_global_id'
 
 class GlobalID

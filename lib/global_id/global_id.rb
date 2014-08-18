@@ -2,6 +2,7 @@ require 'active_support'
 require 'active_support/core_ext/string/inflections'  # For #model_class constantize
 require 'active_support/core_ext/array/access'
 require 'active_support/core_ext/object/try'          # For #find
+require 'active_support/core_ext/module/delegation'
 require 'uri'
 
 class GlobalID
@@ -47,10 +48,12 @@ class GlobalID
       end
   end
 
-  attr_reader :uri, :app, :model_name, :model_id
+  attr_reader :uri
+  delegate :app, :model_name, :model_id, :to_s, to: :uri
 
   def initialize(gid, options = {})
-    extract_uri_components gid
+    @uri = gid.is_a?(URI) ? gid : URI.parse(gid)
+    raise URI::BadURIError, "Not a gid:// URI scheme: #{@uri.inspect}" unless @uri.scheme == 'gid'
   end
 
   def find(options = {})
@@ -58,15 +61,11 @@ class GlobalID
   end
 
   def model_class
-    model_name.constantize
+    @uri.model_name.constantize
   end
 
   def ==(other)
     other.is_a?(GlobalID) && @uri == other.uri
-  end
-
-  def to_s
-    @uri.to_s
   end
 
   def to_param
