@@ -13,9 +13,8 @@ class GlobalID
     end
 
     def find(gid, options = {})
-      global_id = parse(gid)
-      if global_id
-        allowed_class?(global_id.model_class, options) ? global_id.find : nil
+      if global_id = parse(gid)
+        global_id.find if find_allowed_for?(global_id.model_class, options[:only])
       end
     end
 
@@ -26,10 +25,12 @@ class GlobalID
     end
 
     private
-
-      def allowed_class?(clazz, options)
-        only = [options.fetch(:only, clazz)].flatten
-        only.any? { |c| clazz <= c }
+      def find_allowed_for?(klass, only = nil)
+        if only
+          Array(only).any? { |c| klass <= c }
+        else
+          true
+        end
       end
   end
 
