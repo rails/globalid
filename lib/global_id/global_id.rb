@@ -19,7 +19,13 @@ class GlobalID
     def parse(gid)
       gid.is_a?(self) ? gid : new(gid)
     rescue URI::Error
-      nil
+      parse_encoded_gid(gid)
+    end
+
+    def parse_encoded_gid(gid)
+      padding_chars = 4 - gid.length % 4
+      gid += '=' * padding_chars
+      new(Base64.urlsafe_decode64(gid)) rescue nil
     end
   end
 
@@ -43,6 +49,10 @@ class GlobalID
 
   def to_s
     @uri.to_s
+  end
+
+  def to_param
+    Base64.urlsafe_encode64(to_s).sub(/=+$/, '')
   end
 
   private

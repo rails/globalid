@@ -24,4 +24,8 @@ class SignedGlobalIDTest < ActiveSupport::TestCase
   test 'value equality with an unsigned id' do
     assert_equal GlobalID.create(Person.new(5)), SignedGlobalID.create(Person.new(5))
   end
+
+  test 'to param' do
+    assert_equal @person_sgid.to_s, @person_sgid.to_param
+  end
 end

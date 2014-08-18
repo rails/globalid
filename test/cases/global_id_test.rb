@@ -30,6 +30,23 @@ class URIValidationTest < ActiveSupport::TestCase
   end
 end
 
+class GlobalIDParamEncodedTest < ActiveSupport::TestCase
+  setup do
+    model = Person.new('id')
+    @gid = GlobalID.create(model)
+  end
+
+  test 'parsing' do
+    assert_equal GlobalID.parse(@gid.to_param), @gid
+  end
+
+  test 'finding' do
+    found = GlobalID.find(@gid.to_param)
+    assert_kind_of @gid.model_class, found
+    assert_equal @gid.model_id, found.id
+  end
+end
+
 class GlobalIDCreationTest < ActiveSupport::TestCase
   setup do
     @uuid = '7ef9b614-353c-43a1-a203-ab2307851990'
@@ -44,6 +61,13 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
     assert_equal "gid://bcx/Person/#{@uuid}", @person_uuid_gid.to_s
     assert_equal 'gid://bcx/Person::Child/4', @person_namespaced_gid.to_s
     assert_equal 'gid://bcx/PersonModel/1', @person_model_gid.to_s
+  end
+
+  test 'as param' do
+    assert_equal 'Z2lkOi8vYmN4L1BlcnNvbi81', @person_gid.to_param
+    assert_equal 'Z2lkOi8vYmN4L1BlcnNvbi83ZWY5YjYxNC0zNTNjLTQzYTEtYTIwMy1hYjIzMDc4NTE5OTA', @person_uuid_gid.to_param
+    assert_equal 'Z2lkOi8vYmN4L1BlcnNvbjo6Q2hpbGQvNA', @person_namespaced_gid.to_param
+    assert_equal 'Z2lkOi8vYmN4L1BlcnNvbk1vZGVsLzE', @person_model_gid.to_param
   end
 
   test 'as URI' do

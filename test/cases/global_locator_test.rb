@@ -2,7 +2,7 @@ require 'helper'
 
 class GlobalLocatorTest < ActiveSupport::TestCase
   setup do
-    model = Person.new
+    model = Person.new('id')
     @gid  = model.gid
     @sgid = model.sgid
   end
@@ -29,6 +29,12 @@ class GlobalLocatorTest < ActiveSupport::TestCase
     found = GlobalID::Locator.locate_signed(@sgid.to_s)
     assert_kind_of @sgid.model_class, found
     assert_equal @sgid.model_id, found.id
+  end
+
+  test 'by to_param encoding' do
+    found = GlobalID::Locator.locate(@gid.to_param)
+    assert_kind_of @gid.model_class, found
+    assert_equal @gid.model_id, found.id
   end
 
   test 'by non-GID returns nil' do
