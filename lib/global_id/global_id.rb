@@ -24,9 +24,15 @@ class GlobalID
       parse_encoded_gid(gid, options)
     end
 
-    def app=(value)
-      validate_hostname(value)
-      @app = value
+    def app=(app)
+      @app = validate_app(app)
+    end
+
+    def validate_app(app)
+      URI.parse('gid:///').hostname = app
+    rescue URI::InvalidComponentError
+      raise ArgumentError, 'Invalid app name. ' \
+        'App names must be valid URI hostnames: alphanumeric and hyphen characters only.'
     end
 
     private
@@ -39,17 +45,6 @@ class GlobalID
         padding_chars = gid.length.modulo(4).zero? ? 0 : (4 - gid.length.modulo(4))
         gid + ('=' * padding_chars)
       end
-
-      def validate_hostname(hostname)
-        begin
-          URI.parse('gid:///').hostname = hostname
-        rescue URI::InvalidComponentError
-          raise ArgumentError,
-                'Invalid app name. App names must be valid URI hostnames: ' \
-                'alphanumeric and hyphen characters only.'
-        end
-      end
-
   end
 
   attr_reader :uri, :app, :model_name, :model_id
@@ -59,7 +54,7 @@ class GlobalID
   end
 
   def find(options = {})
-    model_class.find model_id if find_allowed?(options[:only])
+    Locator.locate self, options
   end
 
   def model_class
@@ -94,9 +89,5 @@ class GlobalID
       else
         raise URI::InvalidURIError, "Expected a URI like gid://app/Person/1234: #{@uri.inspect}"
       end
-    end
-
-    def find_allowed?(only = nil)
-      only ? Array(only).any? { |c| model_class <= c } : true
     end
 end
