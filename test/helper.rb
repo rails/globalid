@@ -15,4 +15,5 @@ class StringSerializer
   def load(data) data end
 end
 
-SignedGlobalID.verifier = ActiveSupport::MessageVerifier.new('muchSECRETsoHIDDEN', serializer: StringSerializer.new)
+VERIFIER = ActiveSupport::MessageVerifier.new('muchSECRETsoHIDDEN', serializer: StringSerializer.new)
+SignedGlobalID.verifier = VERIFIER
