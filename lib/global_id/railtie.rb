@@ -16,7 +16,11 @@ class GlobalID
       GlobalID.app = app.config.global_id.app
 
       config.after_initialize do
-        app.config.global_id.verifier ||= app.message_verifier(:signed_global_ids) rescue nil
+        app.config.global_id.verifier ||= begin
+          app.message_verifier(:signed_global_ids)
+        rescue ArgumentError
+          nil
+        end
         SignedGlobalID.verifier = app.config.global_id.verifier
       end
 
