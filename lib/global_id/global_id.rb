@@ -15,7 +15,7 @@ class GlobalID
     end
 
     def find(gid, options = {})
-      parse(gid).try(:find, options)
+      parse(gid, options).try(:find, options)
     end
 
     def parse(gid, options = {})

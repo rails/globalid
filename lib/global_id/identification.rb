@@ -9,8 +9,8 @@ class GlobalID
     end
     alias gid global_id
 
-    def signed_global_id
-      @signed_global_id ||= SignedGlobalID.create(self)
+    def signed_global_id(options = {})
+      @signed_global_id ||= SignedGlobalID.create(self, options)
     end
     alias sgid signed_global_id
   end

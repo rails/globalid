@@ -6,7 +6,7 @@ class SignedGlobalIDTest < ActiveSupport::TestCase
   end
 
   test 'as string' do
-    assert_equal 'Z2lkOi8vYmN4L1BlcnNvbi81--bd2dab1418d8577e10cf93f8ec055b4b61690755', @person_sgid.to_s
+    assert_equal 'WyJnaWQ6Ly9iY3gvUGVyc29uLzUiLCJkZWZhdWx0Il0=--f0af635d1faf1268ba291d1f8f66c2153015e75d', @person_sgid.to_s
   end
 
   test 'model id' do
@@ -71,5 +71,49 @@ class SignedGlobalIDVerifierTest < ActiveSupport::TestCase
     yield
   ensure
     SignedGlobalID.verifier = original
+  end
+end
+
+class SignedGlobalIDPurposeTest < ActiveSupport::TestCase
+  setup do
+    @login_sgid = SignedGlobalID.create(Person.new(5), for: 'login')
+  end
+
+  test 'sign with purpose when :for is provided' do
+    assert_equal @login_sgid.to_s, "WyJnaWQ6Ly9iY3gvUGVyc29uLzUiLCJsb2dpbiJd--217c197af088520af3332374185c536b2542abaa"
+  end
+
+  test 'sign with default purpose when no :for is provided' do
+    sgid = SignedGlobalID.create(Person.new(5))
+    default_sgid = SignedGlobalID.create(Person.new(5), for: "default")
+
+    assert_equal sgid.to_s, "WyJnaWQ6Ly9iY3gvUGVyc29uLzUiLCJkZWZhdWx0Il0=--f0af635d1faf1268ba291d1f8f66c2153015e75d"
+    assert_equal sgid, default_sgid
+  end
+
+  test 'create accepts a :for' do
+    expected = SignedGlobalID.create(Person.new(5), for: "login")
+    assert_equal @login_sgid, expected
+  end
+
+  test 'new accepts a :for' do
+    expected = SignedGlobalID.new(Person.new(5).gid.uri, for: 'login')
+    assert_equal @login_sgid, expected
+  end
+
+  test 'parse returns nil when purpose mismatch' do
+    sgid = @login_sgid.to_s
+    assert_nil SignedGlobalID.parse sgid
+    assert_nil SignedGlobalID.parse sgid, for: 'like_button'
+  end
+
+  test 'equal only with same purpose' do
+    expected = SignedGlobalID.create(Person.new(5), for: 'login')
+    like_sgid = SignedGlobalID.create(Person.new(5), for: 'like_button')
+    no_purpose_sgid = SignedGlobalID.create(Person.new(5))
+
+    assert_equal @login_sgid, expected
+    assert_not_equal @login_sgid, like_sgid
+    assert_not_equal @login_sgid, no_purpose_sgid
   end
 end

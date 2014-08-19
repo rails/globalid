@@ -174,6 +174,22 @@ class GlobalLocatorTest < ActiveSupport::TestCase
     end
   end
 
+  test "by valid purpose returns right model" do
+    instance = Person.new
+    login_sgid = instance.signed_global_id(for: 'login')
+
+    found = GlobalID::Locator.locate_signed(login_sgid.to_s, for: 'login')
+    assert_kind_of login_sgid.model_class, found
+    assert_equal login_sgid.model_id, found.id
+  end
+
+  test "by invalid purpose returns nil" do
+    instance = Person.new
+    login_sgid = instance.signed_global_id(for: 'login')
+
+    assert_nil GlobalID::Locator.locate_signed(login_sgid.to_s, for: 'like_button')
+  end
+
   private
     def with_app(app)
       old_app, GlobalID.app = GlobalID.app, app
