@@ -5,12 +5,34 @@ class SignedGlobalIDTest < ActiveSupport::TestCase
     @person_sgid = SignedGlobalID.create(Person.new(5))
   end
 
-  test 'raises when verifier is nil' do
+  test '.parse raises when verifier is nil' do
+    begin
+      gid = @person_sgid.to_s
+      SignedGlobalID.verifier = nil
+      assert_raise ArgumentError do
+        SignedGlobalID.parse(gid)
+      end
+    ensure
+      SignedGlobalID.verifier = VERIFIER
+    end
+  end
+
+  test '.create raises when verifier is nil' do
     begin
       SignedGlobalID.verifier = nil
       assert_raise ArgumentError do
         SignedGlobalID.create(Person.new(5))
       end
+    ensure
+      SignedGlobalID.verifier = VERIFIER
+    end
+  end
+
+  test 'accepts a verifier on .create' do
+    begin
+      SignedGlobalID.verifier = nil
+      expected = SignedGlobalID.create(Person.new(5), verifier: VERIFIER)
+      assert_equal @person_sgid, expected
     ensure
       SignedGlobalID.verifier = VERIFIER
     end
