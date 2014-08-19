@@ -5,6 +5,14 @@ class SignedGlobalIDTest < ActiveSupport::TestCase
     @person_sgid = SignedGlobalID.create(Person.new(5))
   end
 
+  test 'raises when verifier is nil' do
+    assert_raise ArgumentError do
+      SignedGlobalID.verifier = nil
+      SignedGlobalID.create(Person.new(5))
+    end
+    SignedGlobalID.verifier = VERIFIER
+  end
+
   test 'as string' do
     assert_equal 'Z2lkOi8vYmN4L1BlcnNvbi81--bd2dab1418d8577e10cf93f8ec055b4b61690755', @person_sgid.to_s
   end

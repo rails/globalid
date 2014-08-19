@@ -6,6 +6,11 @@ class SignedGlobalID < GlobalID
     attr_accessor :verifier
   end
 
+  def self.create(model, options = {})
+    raise ArgumentError, "#{name}.verifier is nil. Set a verifier before creating a #{name}" unless verifier
+    super
+  end
+
   def self.parse(sgid)
     sgid.is_a?(self) ? sgid : super(verifier.verify(sgid))
   rescue ActiveSupport::MessageVerifier::InvalidSignature
