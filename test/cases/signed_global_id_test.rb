@@ -6,11 +6,14 @@ class SignedGlobalIDTest < ActiveSupport::TestCase
   end
 
   test 'raises when verifier is nil' do
-    SignedGlobalID.verifier = nil
-    assert_raise ArgumentError do
-      SignedGlobalID.create(Person.new(5))
+    begin
+      SignedGlobalID.verifier = nil
+      assert_raise ArgumentError do
+        SignedGlobalID.create(Person.new(5))
+      end
+    ensure
+      SignedGlobalID.verifier = VERIFIER
     end
-    SignedGlobalID.verifier = VERIFIER
   end
 
   test 'as string' do
