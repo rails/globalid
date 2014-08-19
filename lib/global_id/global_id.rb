@@ -11,24 +11,24 @@ class GlobalID
     def create(model, options = {})
       app = options.fetch :app, GlobalID.app
       raise ArgumentError, "An app is required to create a GlobalID. Pass the :app option or set the default GlobalID.app." unless app
-      new URI("gid://#{app}/#{model.class.name}/#{model.id}")
+      new URI("gid://#{app}/#{model.class.name}/#{model.id}"), options
     end
 
     def find(gid, options = {})
       parse(gid).try(:find, options)
     end
 
-    def parse(gid)
-      gid.is_a?(self) ? gid : new(gid)
+    def parse(gid, options = {})
+      gid.is_a?(self) ? gid : new(gid, options)
     rescue URI::Error
-      parse_encoded_gid(gid)
+      parse_encoded_gid(gid, options)
     end
 
-    def parse_encoded_gid(gid)
-      new Base64.urlsafe_decode64(repad_gid(gid)) rescue nil
-    end
-    
     private
+      def parse_encoded_gid(gid, options)
+        new(Base64.urlsafe_decode64(repad_gid(gid)), options) rescue nil
+      end
+
       # We removed the base64 padding character = during #to_param, now we're adding it back so decoding will work
       def repad_gid(gid)
         padding_chars = gid.length.modulo(4).zero? ? 0 : (4 - gid.length.modulo(4))
@@ -38,7 +38,7 @@ class GlobalID
 
   attr_reader :uri, :app, :model_name, :model_id
 
-  def initialize(gid)
+  def initialize(gid, options = {})
     extract_uri_components gid
   end
 
