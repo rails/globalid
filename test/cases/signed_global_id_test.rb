@@ -6,8 +6,8 @@ class SignedGlobalIDTest < ActiveSupport::TestCase
   end
 
   test 'raises when verifier is nil' do
+    SignedGlobalID.verifier = nil
     assert_raise ArgumentError do
-      SignedGlobalID.verifier = nil
       SignedGlobalID.create(Person.new(5))
     end
     SignedGlobalID.verifier = VERIFIER

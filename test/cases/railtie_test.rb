@@ -39,8 +39,7 @@ class RailtieTest < ActiveModel::TestCase
 
   test 'SignedGlobalID.verifier defaults to nil when secret_token is not present' do
     @app.initialize!
-    message = {id: 42}
-    assert_equal SignedGlobalID.verifier, nil
+    assert_nil SignedGlobalID.verifier
   end
 
   test 'SignedGlobalID.verifier can be set with config.global_id.verifier =' do
