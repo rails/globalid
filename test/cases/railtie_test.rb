@@ -7,7 +7,7 @@ module Blog
   class Application < Rails::Application; end
 end
 
-class RailtieTest < ActiveModel::TestCase
+class RailtieTest < ActiveSupport::TestCase
   include ActiveSupport::Testing::Isolation
 
   def setup
