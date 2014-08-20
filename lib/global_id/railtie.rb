@@ -12,7 +12,7 @@ class GlobalID
 
     initializer 'global_id' do |app|
 
-      app.config.global_id.app ||= app.railtie_name.remove('_application')
+      app.config.global_id.app ||= app.railtie_name.remove('_application').gsub!('_','-')
       GlobalID.app = app.config.global_id.app
 
       config.after_initialize do

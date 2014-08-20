@@ -6,7 +6,7 @@ require 'uri'
 
 class GlobalID
   class << self
-    attr_accessor :app
+    attr_reader :app
 
     def create(model, options = {})
       app = options.fetch :app, GlobalID.app
@@ -24,6 +24,11 @@ class GlobalID
       parse_encoded_gid(gid, options)
     end
 
+    def app=(value)
+      validate_hostname(value)
+      @app = value
+    end
+
     private
       def parse_encoded_gid(gid, options)
         new(Base64.urlsafe_decode64(repad_gid(gid)), options) rescue nil
@@ -34,6 +39,17 @@ class GlobalID
         padding_chars = gid.length.modulo(4).zero? ? 0 : (4 - gid.length.modulo(4))
         gid + ('=' * padding_chars)
       end
+
+      def validate_hostname(hostname)
+        begin
+          URI.parse('gid:///').hostname = hostname
+        rescue URI::InvalidComponentError
+          raise ArgumentError,
+                'Invalid app name. App names must be valid URI hostnames: ' \
+                'alphanumeric and hyphen characters only.'
+        end
+      end
+
   end
 
   attr_reader :uri, :app, :model_name, :model_id

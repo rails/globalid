@@ -4,6 +4,18 @@ class GlobalIDTest < ActiveSupport::TestCase
   test 'value equality' do
     assert_equal GlobalID.new('gid://app/model/id'), GlobalID.new('gid://app/model/id')
   end
+
+  test 'empty hostname' do
+    assert_raises ArgumentError do
+      GlobalID.app = ''
+    end
+  end
+
+  test 'invalid hostname' do
+    assert_raises ArgumentError do
+      GlobalID.app = 'blog_app'
+    end
+  end
 end
 
 class URIValidationTest < ActiveSupport::TestCase

@@ -3,7 +3,7 @@ require 'global_id/railtie'
 require 'active_support/testing/isolation'
 
 
-module Blog
+module BlogApp
   class Application < Rails::Application; end
 end
 
@@ -12,7 +12,7 @@ class RailtieTest < ActiveSupport::TestCase
 
   def setup
     Rails.env = 'development'
-    @app = Blog::Application.new do
+    @app = BlogApp::Application.new do
       config.eager_load = false
       config.logger = Logger.new(nil)
     end
@@ -20,7 +20,7 @@ class RailtieTest < ActiveSupport::TestCase
 
   test 'GlobalID.app for Blog::Application defaults to blog' do
     @app.initialize!
-    assert_equal 'blog', GlobalID.app
+    assert_equal 'blog-app', GlobalID.app
   end
 
   test 'GlobalID.app can be set with config.global_id.app =' do
