@@ -15,7 +15,7 @@ references a model.
 
 Another example is a drop-down list of options with Users and Groups. Normally
 we'd need to come up with our own ad hoc scheme to reference them. With Global
-IDs, we have a universal identifier that works for objects both classes.
+IDs, we have a universal identifier that works for objects of both classes.
 
 
 ## Usage
