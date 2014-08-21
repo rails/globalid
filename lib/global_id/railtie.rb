@@ -3,6 +3,7 @@ require 'rails/railtie'
 rescue LoadError
 else
 require 'global_id'
+require 'active_support/core_ext/string/inflections'
 
 class GlobalID
   # = GlobalID Railtie
@@ -12,7 +13,7 @@ class GlobalID
 
     initializer 'global_id' do |app|
 
-      app.config.global_id.app ||= app.railtie_name.remove('_application').gsub!('_','-')
+      app.config.global_id.app ||= app.railtie_name.remove('_application').dasherize
       GlobalID.app = app.config.global_id.app
 
       config.after_initialize do
