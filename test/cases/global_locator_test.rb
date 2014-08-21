@@ -135,4 +135,50 @@ class GlobalLocatorTest < ActiveSupport::TestCase
     assert_nil GlobalID::Locator.locate 'gid://app/Person'
     assert_nil GlobalID::Locator.locate 'gid://app/Person/1/2'
   end
+
+  test 'use locator with block' do
+    GlobalID::Locator.use :foo do |gid|
+      :foo
+    end
+
+    with_app 'foo' do
+      assert_equal :foo, GlobalID::Locator.locate('gid://foo/Person/1')
+    end
+  end
+
+  test 'use locator with class' do
+    class BarLocator
+      def locate(gid); :bar; end
+    end
+
+    GlobalID::Locator.use :bar, BarLocator.new
+
+    with_app 'bar' do
+      assert_equal :bar, GlobalID::Locator.locate('gid://bar/Person/1')
+    end
+  end
+
+  test 'app locator is case insensitive' do
+    GlobalID::Locator.use :insensitive do |gid|
+      :insensitive
+    end
+
+    with_app 'insensitive' do
+      assert_equal :insensitive, GlobalID::Locator.locate('gid://InSeNsItIvE/Person/1')
+    end
+  end
+
+  test 'locator name cannot have underscore' do
+    assert_raises ArgumentError do
+      GlobalID::Locator.use('under_score') { |gid| 'will never be found' }
+    end
+  end
+
+  private
+    def with_app(app)
+      old_app, GlobalID.app = GlobalID.app, app
+      yield
+    ensure
+      GlobalID.app = old_app
+    end
 end
