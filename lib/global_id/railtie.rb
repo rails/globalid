@@ -17,6 +17,9 @@ class GlobalID
       app.config.global_id.app ||= app.railtie_name.remove('_application').dasherize
       GlobalID.app = app.config.global_id.app
 
+      app.config.global_id.expires_in ||= 1.month
+      SignedGlobalID.expires_in = app.config.global_id.expires_in
+
       config.after_initialize do
         app.config.global_id.verifier ||= begin
           app.message_verifier(:signed_global_ids)

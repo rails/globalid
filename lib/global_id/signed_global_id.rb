@@ -2,6 +2,8 @@ require 'global_id'
 require 'active_support/message_verifier'
 
 class SignedGlobalID < GlobalID
+  class ExpiredMessage < StandardError; end
+
   class << self
     attr_accessor :verifier
 
@@ -9,7 +11,7 @@ class SignedGlobalID < GlobalID
       if sgid.is_a? self
         sgid
       else
-        super verify(sgid, options)
+        super verify(sgid, options), options
       end
     end
 
@@ -21,6 +23,8 @@ class SignedGlobalID < GlobalID
       end
     end
 
+    attr_accessor :expires_in
+
     DEFAULT_PURPOSE = "default"
 
     def pick_purpose(options)
@@ -30,18 +34,28 @@ class SignedGlobalID < GlobalID
     private
       def verify(sgid, options)
         metadata = pick_verifier(options).verify(sgid)
+
+        raise_if_expired(metadata['expires_at'])
+
         metadata['gid'] if pick_purpose(options) == metadata['purpose']
-      rescue ActiveSupport::MessageVerifier::InvalidSignature
+      rescue ActiveSupport::MessageVerifier::InvalidSignature, ExpiredMessage
         nil
+      end
+
+      def raise_if_expired(expires_at)
+        if expires_at && Time.now > expires_at
+          raise ExpiredMessage, 'This signed global id has expired.'
+        end
       end
   end
 
-  attr_reader :verifier, :purpose
+  attr_reader :verifier, :purpose, :expires_at
 
   def initialize(gid, options = {})
     super
     @verifier = self.class.pick_verifier(options)
     @purpose = self.class.pick_purpose(options)
+    @expires_at = pick_expiration(options)
   end
 
   def to_s
@@ -52,10 +66,19 @@ class SignedGlobalID < GlobalID
   def to_h
     # Some serializers decodes symbol keys to symbols, others to strings.
     # Using string keys remedies that.
-    { 'gid' => @uri.to_s, 'purpose' => purpose }
+    { 'gid' => @uri.to_s, 'purpose' => purpose, 'expires_at' => expires_at }
   end
 
   def ==(other)
     super && @purpose == other.purpose
   end
+
+  private
+    def pick_expiration(options)
+      return options[:expires_at] if options[:expires_at]
+
+      if expires_in = options.fetch(:expires_in) { self.class.expires_in }
+        expires_in.from_now
+      end
+    end
 end
