@@ -29,8 +29,8 @@ class SignedGlobalID < GlobalID
 
     private
       def verify(sgid, options)
-        gid, parsed_purpose = pick_verifier(options).verify(sgid)
-        gid if pick_purpose(options) == parsed_purpose
+        metadata = pick_verifier(options).verify(sgid)
+        metadata['gid'] if pick_purpose(options) == metadata['purpose']
       rescue ActiveSupport::MessageVerifier::InvalidSignature
         nil
       end
@@ -45,9 +45,13 @@ class SignedGlobalID < GlobalID
   end
 
   def to_s
-    @sgid ||= @verifier.generate([super, @purpose])
+    @sgid ||= @verifier.generate(to_h)
   end
   alias to_param to_s
+
+  def to_h
+    { gid: @uri.to_s, purpose: purpose }
+  end
 
   def ==(other)
     super && @purpose == other.purpose
