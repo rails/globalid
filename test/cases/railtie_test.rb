@@ -43,7 +43,7 @@ class RailtieTest < ActiveSupport::TestCase
   end
 
   test 'SignedGlobalID.verifier can be set with config.global_id.verifier =' do
-    custom_verifier = @app.config.global_id.verifier = ActiveSupport::MessageVerifier.new('muchSECRETsoHIDDEN', serializer: StringSerializer.new)
+    custom_verifier = @app.config.global_id.verifier = ActiveSupport::MessageVerifier.new('muchSECRETsoHIDDEN', serializer: SERIALIZER)
     @app.initialize!
     message = {id: 42}
     signed_message = SignedGlobalID.verifier.generate(message)

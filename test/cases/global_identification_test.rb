@@ -14,4 +14,9 @@ class GlobalIdentificationTest < ActiveSupport::TestCase
     assert_equal SignedGlobalID.create(@model), @model.signed_global_id
     assert_equal SignedGlobalID.create(@model), @model.sgid
   end
+
+  test 'creates a signed Global ID with purpose ' do
+    assert_equal SignedGlobalID.create(@model, for: 'login'), @model.signed_global_id(for: 'login')
+    assert_equal SignedGlobalID.create(@model, for: 'login'), @model.sgid(for: 'login')
+  end
 end
