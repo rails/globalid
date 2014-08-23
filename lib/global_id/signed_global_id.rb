@@ -50,7 +50,9 @@ class SignedGlobalID < GlobalID
   alias to_param to_s
 
   def to_h
-    { gid: @uri.to_s, purpose: purpose }
+    # Some serializers decodes symbol keys to symbols, others to strings.
+    # Using string keys remedies that.
+    { 'gid' => @uri.to_s, 'purpose' => purpose }
   end
 
   def ==(other)
