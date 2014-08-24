@@ -6,7 +6,7 @@ class SignedGlobalIDTest < ActiveSupport::TestCase
   end
 
   test 'as string' do
-    assert_equal 'WyJnaWQ6Ly9iY3gvUGVyc29uLzUiLCJkZWZhdWx0Il0=--f0af635d1faf1268ba291d1f8f66c2153015e75d', @person_sgid.to_s
+    assert_equal 'eyJnaWQiOiJnaWQ6Ly9iY3gvUGVyc29uLzUiLCJwdXJwb3NlIjoiZGVmYXVsdCJ9--5cbdd043da53ae22418ed64605825e69ca2521fc', @person_sgid.to_s
   end
 
   test 'model id' do
@@ -80,14 +80,14 @@ class SignedGlobalIDPurposeTest < ActiveSupport::TestCase
   end
 
   test 'sign with purpose when :for is provided' do
-    assert_equal @login_sgid.to_s, "WyJnaWQ6Ly9iY3gvUGVyc29uLzUiLCJsb2dpbiJd--217c197af088520af3332374185c536b2542abaa"
+    assert_equal "eyJnaWQiOiJnaWQ6Ly9iY3gvUGVyc29uLzUiLCJwdXJwb3NlIjoibG9naW4ifQ==--9e834bc725a12a807e94141754f6d00eecb4925d", @login_sgid.to_s
   end
 
   test 'sign with default purpose when no :for is provided' do
     sgid = SignedGlobalID.create(Person.new(5))
     default_sgid = SignedGlobalID.create(Person.new(5), for: "default")
 
-    assert_equal sgid.to_s, "WyJnaWQ6Ly9iY3gvUGVyc29uLzUiLCJkZWZhdWx0Il0=--f0af635d1faf1268ba291d1f8f66c2153015e75d"
+    assert_equal "eyJnaWQiOiJnaWQ6Ly9iY3gvUGVyc29uLzUiLCJwdXJwb3NlIjoiZGVmYXVsdCJ9--5cbdd043da53ae22418ed64605825e69ca2521fc", sgid.to_s
     assert_equal sgid, default_sgid
   end
 
