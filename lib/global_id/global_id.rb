@@ -12,7 +12,7 @@ class GlobalID
     def create(model, options = {})
       app = options.fetch :app, GlobalID.app
       raise ArgumentError, "An app is required to create a GlobalID. Pass the :app option or set the default GlobalID.app." unless app
-      new URI("gid://#{app}/#{model.class.name}/#{model.id}"), options
+      new URI::GlobalID.parse("gid://#{app}/#{model.class.name}/#{model.id}"), options
     end
 
     def find(gid, options = {})
@@ -30,10 +30,10 @@ class GlobalID
     end
 
     def validate_app(app)
-      URI.parse('gid:///').hostname = app
-    rescue URI::InvalidComponentError
-      raise ArgumentError, 'Invalid app name. ' \
-        'App names must be valid URI hostnames: alphanumeric and hyphen characters only.'
+      URI::GlobalID.parse("gid://#{app}/Model/id").app
+    rescue URI::InvalidComponentError, URI::InvalidURIError
+      raise ArgumentError, 'Invalid app name. App names must be valid URI '\
+                           'hostnames: alphanumeric and hypen characters only.'
     end
 
     private
@@ -52,8 +52,7 @@ class GlobalID
   delegate :app, :model_name, :model_id, :to_s, to: :uri
 
   def initialize(gid, options = {})
-    @uri = gid.is_a?(URI) ? gid : URI.parse(gid)
-    raise URI::BadURIError, "Not a gid:// URI scheme: #{@uri.inspect}" unless @uri.is_a?(URI::GlobalID)
+    @uri = gid.is_a?(URI::GlobalID) ? gid : URI::GlobalID.parse(gid)
   end
 
   def find(options = {})
@@ -72,21 +71,4 @@ class GlobalID
     # remove the = padding character for a prettier param -- it'll be added back in parse_encoded_gid
     Base64.urlsafe_encode64(to_s).sub(/=+$/, '')
   end
-
-  private
-    PATH_REGEXP = %r(\A/([^/]+)/([^/]+)\z)
-
-    # Pending a URI::GID to handle validation
-    def extract_uri_components(gid)
-      @uri = gid.is_a?(URI) ? gid : URI.parse(gid)
-      raise URI::BadURIError, "Not a gid:// URI scheme: #{@uri.inspect}" unless @uri.scheme == 'gid'
-
-      if @uri.path =~ PATH_REGEXP
-        @app = @uri.host
-        @model_name = $1
-        @model_id = $2
-      else
-        raise URI::InvalidURIError, "Expected a URI like gid://app/Person/1234: #{@uri.inspect}"
-      end
-    end
 end

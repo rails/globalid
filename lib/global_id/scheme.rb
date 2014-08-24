@@ -1,75 +1,82 @@
 require 'uri/generic'
 require 'active_support/core_ext/module/aliasing'
+require 'active_support/core_ext/object/blank'
 
 module URI
   class GlobalID < Generic
 
     COMPONENT = [ :scheme, :app, :model_name, :model_id ].freeze
 
-    PATH_REGEXP = %r(\A/([^/]+)/([^/]+)\z)
+    PATH_REGEXP = %r(\A/([^/]+)/?([^/]+)?\z)
 
-    alias_attribute :app, :host
-    attr_reader :model_name, :model_id
+    attr_reader :app, :model_name, :model_id
 
-    def self.build(scheme, userinfo, host, port, registry, path, opaque, query, fragment)
-      parser = DEFAULT_PARSER
-      arg_check = true
+    def self.parse(uri)
+      uri_components = URI.split(uri)
+      build(*uri_components)
+    end
 
-      new(scheme, userinfo, host, port, registry, path, opaque, query, fragment, parser, arg_check)
+    def self.build(*args)
+      args << nil   # parser
+      args << true  # arg_check
+
+      new(*args)
     end
 
     def initialize(*args)
+      @arg_check = args[10]
+      args[10] = validate_components?
+
       super(*args)
 
-      path = args[5]
-      arg_check = args[10] || args[10].nil?
+      _, model_name, model_id = *(@path.match(PATH_REGEXP))
 
-      _, model_name, model_id = *(path.match(PATH_REGEXP))
+      self.app = @host
+      self.model_name = model_name
+      self.model_id = model_id
+    end
 
-      if arg_check
-        self.model_name = model_name
-        self.model_id = model_id
-      else
-        set_model_name(model_name)
-        set_model_id(model_id)
-      end
+    def app=(value)
+      validate_component(value) if validate_components?
+      check_host(value) if validate_components?
+      @app = value
     end
 
     def model_name=(value)
-      check_model_name(value)
-      set_model_name(value)
-      value
-    end
-
-    def model_id=(value)
-      check_model_id(value)
-      set_model_id(value)
-      value
-    end
-
-    def to_s
-      "#{@scheme}://#{@app}/#{@model_name}/#{@model_id}"
-    end
-
-    protected
-
-    def set_model_name(value)
+      validate_component(value) if validate_components?
       @model_name = value
     end
 
-    def set_model_id(value)
+    def model_id=(value)
+      validate_component(value) if validate_components?
       @model_id = value
+    end
+
+    def to_s
+      "#{scheme}://#{app}/#{model_name}/#{model_id}"
     end
 
     private
 
-    def check_model_name(value)
-      raise URI::InvalidComponentError, "Expected a URI like gid://app/Person/1234: #{self.inspect}" if value.nil?
-    end
+      def validate_components?
+        return false if @arg_check == false
+        true
+      end
 
-    def check_model_id(value)
-      raise URI::InvalidComponentError, "Expected a URI like gid://app/Person/1234: #{self.inspect}" if value.nil?
-    end
+      def validate_component(component)
+        if component.blank?
+          raise URI::InvalidComponentError,
+                "Expected a URI like gid://app/Person/1234: #{self.inspect}"
+        end
+      end
+
+      def check_scheme(value)
+        super(value)
+
+        if value != 'gid'
+          raise URI::BadURIError, "Not a gid:// URI scheme: #{self.inspect}"
+        end
+      end
   end
 
   @@schemes['GID'] =  GlobalID
