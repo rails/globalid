@@ -6,7 +6,7 @@ class SignedGlobalIDTest < ActiveSupport::TestCase
   end
 
   test 'as string' do
-    assert_equal 'eyJnaWQiOiJnaWQ6Ly9iY3gvUGVyc29uLzUiLCJwdXJwb3NlIjoiZGVmYXVsdCJ9--5cbdd043da53ae22418ed64605825e69ca2521fc', @person_sgid.to_s
+    assert_equal 'eyJnaWQiOiJnaWQ6Ly9iY3gvUGVyc29uLzUiLCJwdXJwb3NlIjoiZGVmYXVsdCIsImV4cGlyZXNfYXQiOm51bGx9--04a6f59140259756b22008c8c0f76ea5ed485579', @person_sgid.to_s
   end
 
   test 'model id' do
@@ -80,14 +80,14 @@ class SignedGlobalIDPurposeTest < ActiveSupport::TestCase
   end
 
   test 'sign with purpose when :for is provided' do
-    assert_equal "eyJnaWQiOiJnaWQ6Ly9iY3gvUGVyc29uLzUiLCJwdXJwb3NlIjoibG9naW4ifQ==--9e834bc725a12a807e94141754f6d00eecb4925d", @login_sgid.to_s
+    assert_equal "eyJnaWQiOiJnaWQ6Ly9iY3gvUGVyc29uLzUiLCJwdXJwb3NlIjoibG9naW4iLCJleHBpcmVzX2F0IjpudWxsfQ==--4b9630f3a1fb3d7d6584d95d4fac96433ec2deef", @login_sgid.to_s
   end
 
   test 'sign with default purpose when no :for is provided' do
     sgid = SignedGlobalID.create(Person.new(5))
     default_sgid = SignedGlobalID.create(Person.new(5), for: "default")
 
-    assert_equal "eyJnaWQiOiJnaWQ6Ly9iY3gvUGVyc29uLzUiLCJwdXJwb3NlIjoiZGVmYXVsdCJ9--5cbdd043da53ae22418ed64605825e69ca2521fc", sgid.to_s
+    assert_equal "eyJnaWQiOiJnaWQ6Ly9iY3gvUGVyc29uLzUiLCJwdXJwb3NlIjoiZGVmYXVsdCIsImV4cGlyZXNfYXQiOm51bGx9--04a6f59140259756b22008c8c0f76ea5ed485579", sgid.to_s
     assert_equal sgid, default_sgid
   end
 
@@ -116,4 +116,90 @@ class SignedGlobalIDPurposeTest < ActiveSupport::TestCase
     assert_not_equal @login_sgid, like_sgid
     assert_not_equal @login_sgid, no_purpose_sgid
   end
+end
+
+class SignedGlobalIDExpirationTest < ActiveSupport::TestCase
+  setup do
+    @uri = Person.new(5).gid.uri
+  end
+
+  test 'expires_in defaults to class level expiration' do
+    with_expiration_in 1.hour do
+      encoded_sgid = SignedGlobalID.new(@uri).to_s
+
+      travel 59.minutes
+      assert SignedGlobalID.parse(encoded_sgid)
+
+      travel 1.minute
+      assert_not SignedGlobalID.parse(encoded_sgid)
+    end
+  end
+
+  test 'passing in expires_in overrides class level expiration' do
+    with_expiration_in 1.hour do
+      encoded_sgid = SignedGlobalID.new(@uri, expires_in: 2.hours).to_s
+
+      travel 1.hour
+      assert SignedGlobalID.parse(encoded_sgid)
+
+      travel 1.hour
+      assert_not SignedGlobalID.parse(encoded_sgid)
+    end
+  end
+
+  test 'passing expires_in nil turns off expiration checking' do
+    with_expiration_in 1.hour do
+      encoded_sgid = SignedGlobalID.new(@uri, expires_in: nil).to_s
+
+      travel 1.hour
+      assert SignedGlobalID.parse(encoded_sgid)
+
+      travel 1.hour
+      assert SignedGlobalID.parse(encoded_sgid)
+    end
+  end
+
+  test 'passing expires_at sets expiration date' do
+    date = Date.today.end_of_day
+    sgid = SignedGlobalID.new(@uri, expires_at: date)
+
+    assert_equal date, sgid.expires_at
+
+    travel 1.day
+    assert_not SignedGlobalID.parse(sgid.to_s)
+  end
+
+  test 'passing nil expires_at' do
+    encoded_sgid = SignedGlobalID.new(@uri, expires_at: nil).to_s
+
+    travel 4.hours
+    assert SignedGlobalID.parse(encoded_sgid)
+  end
+
+  test 'passing expires_at overrides class level expires_in' do
+    with_expiration_in 1.hour do
+      date = Date.today.end_of_day
+      sgid = SignedGlobalID.new(@uri, expires_at: date)
+
+      assert_equal date, sgid.expires_at
+
+      travel 2.hour
+      assert SignedGlobalID.parse(sgid.to_s)
+    end
+  end
+
+  test 'favor expires_at over expires_in' do
+    sgid = SignedGlobalID.new(@uri, expires_at: Date.tomorrow.end_of_day, expires_in: 1.hour)
+
+    travel 1.hour
+    assert SignedGlobalID.parse(sgid.to_s)
+  end
+
+  private
+    def with_expiration_in(expires_in)
+      old_expires, SignedGlobalID.expires_in = SignedGlobalID.expires_in, expires_in
+      yield
+    ensure
+      SignedGlobalID.expires_in = old_expires
+    end
 end
