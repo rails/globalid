@@ -75,7 +75,7 @@ class SignedGlobalID < GlobalID
 
   private
     def pick_expiration(options)
-      return options[:expires_at] if options[:expires_at]
+      return options[:expires_at] if options.key?(:expires_at)
 
       if expires_in = options.fetch(:expires_in) { self.class.expires_in }
         expires_in.from_now
