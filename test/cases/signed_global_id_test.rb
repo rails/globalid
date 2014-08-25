@@ -169,11 +169,13 @@ class SignedGlobalIDExpirationTest < ActiveSupport::TestCase
     assert_not SignedGlobalID.parse(sgid.to_s)
   end
 
-  test 'passing nil expires_at' do
-    encoded_sgid = SignedGlobalID.new(@uri, expires_at: nil).to_s
+  test 'passing nil expires_at turns off expiration checking' do
+    with_expiration_in 1.hour do
+      encoded_sgid = SignedGlobalID.new(@uri, expires_at: nil).to_s
 
-    travel 4.hours
-    assert SignedGlobalID.parse(encoded_sgid)
+      travel 4.hours
+      assert SignedGlobalID.parse(encoded_sgid)
+    end
   end
 
   test 'passing expires_at overrides class level expires_in' do
