@@ -61,7 +61,7 @@ class SignedGlobalIDVerifierTest < ActiveSupport::TestCase
 
   test 'new accepts a :verifier' do
     with_default_verifier nil do
-      expected = SignedGlobalID.new(Person.new(5).gid.uri, verifier: VERIFIER)
+      expected = SignedGlobalID.new(Person.new(5).to_gid.uri, verifier: VERIFIER)
       assert_equal @person_sgid, expected
     end
   end
@@ -97,7 +97,7 @@ class SignedGlobalIDPurposeTest < ActiveSupport::TestCase
   end
 
   test 'new accepts a :for' do
-    expected = SignedGlobalID.new(Person.new(5).gid.uri, for: 'login')
+    expected = SignedGlobalID.new(Person.new(5).to_gid.uri, for: 'login')
     assert_equal @login_sgid, expected
   end
 
@@ -120,7 +120,7 @@ end
 
 class SignedGlobalIDExpirationTest < ActiveSupport::TestCase
   setup do
-    @uri = Person.new(5).gid.uri
+    @uri = Person.new(5).to_gid.uri
   end
 
   test 'expires_in defaults to class level expiration' do

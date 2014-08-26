@@ -3,8 +3,8 @@ require 'helper'
 class GlobalLocatorTest < ActiveSupport::TestCase
   setup do
     model = Person.new('id')
-    @gid  = model.gid
-    @sgid = model.sgid
+    @gid  = model.to_gid
+    @sgid = model.to_sgid
   end
 
   test 'by GID' do
@@ -21,7 +21,7 @@ class GlobalLocatorTest < ActiveSupport::TestCase
 
   test 'by GID with only: restriction with match subclass' do
     instance = Person::Child.new
-    gid = instance.gid
+    gid = instance.to_gid
     found = GlobalID::Locator.locate(gid, only: Person)
     assert_kind_of gid.model_class, found
     assert_equal gid.model_id, found.id
@@ -69,7 +69,7 @@ class GlobalLocatorTest < ActiveSupport::TestCase
 
   test 'by SGID with only: restriction with match subclass' do
     instance = Person::Child.new
-    sgid = instance.sgid
+    sgid = instance.to_sgid
     found = GlobalID::Locator.locate_signed(sgid, only: Person)
     assert_kind_of sgid.model_class, found
     assert_equal sgid.model_id, found.id
@@ -176,7 +176,7 @@ class GlobalLocatorTest < ActiveSupport::TestCase
 
   test "by valid purpose returns right model" do
     instance = Person.new
-    login_sgid = instance.signed_global_id(for: 'login')
+    login_sgid = instance.to_sgid(for: 'login')
 
     found = GlobalID::Locator.locate_signed(login_sgid.to_s, for: 'login')
     assert_kind_of login_sgid.model_class, found
@@ -185,7 +185,7 @@ class GlobalLocatorTest < ActiveSupport::TestCase
 
   test "by invalid purpose returns nil" do
     instance = Person.new
-    login_sgid = instance.signed_global_id(for: 'login')
+    login_sgid = instance.to_sgid(for: 'login')
 
     assert_nil GlobalID::Locator.locate_signed(login_sgid.to_s, for: 'like_button')
   end
