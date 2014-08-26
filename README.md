@@ -24,7 +24,7 @@ Mix `GlobalID::Identification` in to any model with a #find(id) class method.
 Support is automatically included in Active Record.
 
 ```ruby
->> person_gid = Person.find(1).global_id
+>> person_gid = Person.find(1).to_global_id
 => #<GlobalID ...
 
 >> person_gid.uri
