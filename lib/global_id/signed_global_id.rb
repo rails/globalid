@@ -1,5 +1,6 @@
 require 'global_id'
 require 'active_support/message_verifier'
+require 'time'
 
 class SignedGlobalID < GlobalID
   class ExpiredMessage < StandardError; end
@@ -43,7 +44,7 @@ class SignedGlobalID < GlobalID
       end
 
       def raise_if_expired(expires_at)
-        if expires_at && Time.now > expires_at
+        if expires_at && Time.now.utc > Time.iso8601(expires_at)
           raise ExpiredMessage, 'This signed global id has expired.'
         end
       end
@@ -66,7 +67,7 @@ class SignedGlobalID < GlobalID
   def to_h
     # Some serializers decodes symbol keys to symbols, others to strings.
     # Using string keys remedies that.
-    { 'gid' => @uri.to_s, 'purpose' => purpose, 'expires_at' => expires_at }
+    { 'gid' => @uri.to_s, 'purpose' => purpose, 'expires_at' => encoded_expiration }
   end
 
   def ==(other)
@@ -74,6 +75,10 @@ class SignedGlobalID < GlobalID
   end
 
   private
+    def encoded_expiration
+      expires_at.utc.iso8601(3) if expires_at
+    end
+
     def pick_expiration(options)
       return options[:expires_at] if options.key?(:expires_at)
 
