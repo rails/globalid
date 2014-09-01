@@ -1,2 +1,2 @@
 /.ruby-version
-/Gemfile.lock
+*.lock
