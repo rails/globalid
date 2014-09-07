@@ -11,6 +11,10 @@ module URI
 
     attr_reader :app, :model_name, :model_id
 
+    def self.create(app, model)
+      parse("gid://#{app}/#{model.class.name}/#{model.id}")
+    end
+
     def self.parse(uri)
       uri_components = URI.split(uri)
       build(*uri_components)

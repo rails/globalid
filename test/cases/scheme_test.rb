@@ -151,22 +151,33 @@ end
 
 class URI::GlobalIDTestParsing <  ActiveSupport::TestCase
   test 'parse' do
-    assert_instance_of URI::GlobalID, URI::GlobalID.parse('gid://bxc/Person/1')
+    assert_instance_of URI::GlobalID, URI::GlobalID.parse('gid://bcx/Person/1')
 
     assert_raise URI::InvalidComponentError do
       URI::GlobalID.parse('gid:///Person/1')
     end
 
     assert_raise URI::InvalidComponentError do
-      URI::GlobalID.parse('gid://bxc/Person')
+      URI::GlobalID.parse('gid://bcx/Person')
     end
 
     assert_raise URI::InvalidComponentError do
-      URI::GlobalID.parse('gid://bxc/')
+      URI::GlobalID.parse('gid://bcx/')
     end
 
     assert_raise URI::InvalidComponentError do
       URI::GlobalID.parse('gid:///')
     end
+  end
+end
+
+class URI::GlobalIDTestCreating < ActiveSupport::TestCase
+  test 'create' do
+    app = 'bcx'
+    model = Person.new('1')
+
+    assert_instance_of URI::GlobalID, URI::GlobalID.create(app, model)
+
+    assert_equal 'gid://bcx/Person/1', URI::GlobalID.create(app, model).to_s
   end
 end

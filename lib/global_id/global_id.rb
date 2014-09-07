@@ -12,7 +12,7 @@ class GlobalID
     def create(model, options = {})
       app = options.fetch :app, GlobalID.app
       raise ArgumentError, "An app is required to create a GlobalID. Pass the :app option or set the default GlobalID.app." unless app
-      new URI::GlobalID.parse("gid://#{app}/#{model.class.name}/#{model.id}"), options
+      new URI::GlobalID.create(app, model), options
     end
 
     def find(gid, options = {})
