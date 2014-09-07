@@ -11,6 +11,13 @@ module URI
 
     attr_reader :app, :model_name, :model_id
 
+    def self.validate_app(value)
+      parse("gid://#{value}/Person/1234").app
+    rescue URI::InvalidComponentError, URI::InvalidURIError
+      raise ArgumentError, 'Invalid app name. App names must be valid URI '\
+                           'hostnames: alphanumeric and hypen characters only.'
+    end
+
     def self.create(app, model)
       parse("gid://#{app}/#{model.class.name}/#{model.id}")
     end

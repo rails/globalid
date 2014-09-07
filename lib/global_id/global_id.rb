@@ -30,10 +30,7 @@ class GlobalID
     end
 
     def validate_app(app)
-      URI::GlobalID.parse("gid://#{app}/Model/id").app
-    rescue URI::InvalidComponentError, URI::InvalidURIError
-      raise ArgumentError, 'Invalid app name. App names must be valid URI '\
-                           'hostnames: alphanumeric and hypen characters only.'
+      URI::GlobalID.validate_app(app)
     end
 
     private

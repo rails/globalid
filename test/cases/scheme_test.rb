@@ -181,3 +181,27 @@ class URI::GlobalIDTestCreating < ActiveSupport::TestCase
     assert_equal 'gid://bcx/Person/1', URI::GlobalID.create(app, model).to_s
   end
 end
+
+class URI::GlobalIDTestValidatingApp < ActiveSupport::TestCase
+  test 'validate_app' do
+    assert_raise ArgumentError do
+      URI::GlobalID.validate_app(nil)
+    end
+
+    assert_raise ArgumentError do
+      URI::GlobalID.validate_app('foo/bar')
+    end
+
+    assert_raise ArgumentError do
+      URI::GlobalID.validate_app('foo:bar')
+    end
+
+    assert_raise ArgumentError do
+      URI::GlobalID.validate_app('foo_bar')
+    end
+
+    assert_equal 'foo-bar', URI::GlobalID.validate_app('foo-bar')
+
+    assert_equal 'bar', URI::GlobalID.validate_app('foo@bar')
+  end
+end
