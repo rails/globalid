@@ -51,14 +51,16 @@ module URI
     #
     #   app = 'bcx'
     #   person = Person.create(id: 1234)
-    #   URI::GlobalID.create('bcx', person) #=> #<URI::GlobalID:0x007ff0b5979138 URL:gid://bcx/Person/1234>
+    #   URI::GlobalID.create('bcx', person)
+    #   #=> #<URI::GlobalID:0x007ff0b5979138 URL:gid://bcx/Person/1234>
     def self.create(app, model)
       parse("gid://#{app}/#{model.class.name}/#{model.id}")
     end
 
     # Returns a URI::GlobalID instance from the String passed as an argument
     #
-    #   URI::GlobalID.parse('gid://bcx/Person/1234) #=> #<URI::GlobalID:0x007ff0b5979138 URL:gid://bcx/Person/1234>
+    #   URI::GlobalID.parse('gid://bcx/Person/1234)
+    #   #=> #<URI::GlobalID:0x007ff0b5979138 URL:gid://bcx/Person/1234>
     def self.parse(uri)
       uri_components = URI.split(uri)
       build(*uri_components)
@@ -87,7 +89,8 @@ module URI
     #   false
     #
     #   uri_components = URI.split('gid://bcx/Person/1234')
-    #   URI::GlobalID.new(*uri_components) #=> #=> #<URI::GlobalID:0x007ff0b5979138 URL:gid://bcx/Person/1234>
+    #   URI::GlobalID.new(*uri_components)
+    #   #=> #<URI::GlobalID:0x007ff0b5979138 URL:gid://bcx/Person/1234>
     def initialize(*args)
       # Set args[10] (arg_check) to true when its value is nil
       args[10] = args[10].nil? ? true : args[10]
