@@ -46,7 +46,7 @@ module URI
       parse("gid://#{value}/Person/1234").app
     rescue URI::InvalidComponentError, URI::InvalidURIError
       raise ArgumentError, 'Invalid app name. App names must be valid URI '\
-                           'hostnames: alphanumeric and hypen characters only.'
+                           'hostnames: alphanumeric and hyphen characters only.'
     end
 
     # Returns an instance of URI::GlobalID created from the :app and :model

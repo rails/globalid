@@ -57,7 +57,7 @@ class GlobalID
   end
 
   def model_class
-    @uri.model_name.constantize
+    model_name.constantize
   end
 
   def ==(other)
