@@ -16,6 +16,10 @@ module URI
     #
     PATH_REGEXP = %r(\A/([^/]+)/?([^/]+)?\z)
 
+    # A String that represents the scheme component for GlobalID URIs
+    #
+    SCHEME = 'gid'
+
     # Returns the app component of the URI.
     #
     #   URI("gid://bcx/Person/1234").app #=> "bcx"
@@ -139,7 +143,7 @@ module URI
     #   gid.to_s #=> "gid://bcx/Person/1234"
     #
     def to_s
-      "#{scheme}://#{app}/#{model_name}/#{model_id}"
+      "#{SCHEME}://#{app}/#{model_name}/#{model_id}"
     end
 
     private
@@ -151,15 +155,15 @@ module URI
       def validate_component(component)
         if component.blank?
           raise URI::InvalidComponentError,
-                "Expected a URI like gid://app/Person/1234: #{self.inspect}"
+                "Expected a URI like #{SCHEME}://app/Person/1234: #{self.inspect}"
         end
       end
 
       def check_scheme(value)
         super(value)
 
-        if value != 'gid'
-          raise URI::BadURIError, "Not a gid:// URI scheme: #{self.inspect}"
+        if value != SCHEME
+          raise URI::BadURIError, "Not a #{SCHEME}:// URI scheme: #{self.inspect}"
         end
       end
   end
