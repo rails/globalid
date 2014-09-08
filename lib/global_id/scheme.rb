@@ -168,10 +168,6 @@ module URI
 
     private
 
-      def validate_components?
-        @arg_check.nil? ? true : @arg_check
-      end
-
       def validate_component(component)
         if component.blank?
           raise URI::InvalidComponentError,
