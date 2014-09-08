@@ -83,9 +83,15 @@ module URI
 
       _, model_name, model_id = *(@path.match(PATH_REGEXP))
 
-      self.app = @host
-      self.model_name = model_name
-      self.model_id = model_id
+      if validate_components?
+        self.app = @host
+        self.model_name = model_name
+        self.model_id = model_id
+      else
+        self.set_app(@host)
+        self.set_model_name(model_name)
+        self.set_model_id(model_id)
+      end
     end
 
     # Public setter for app component with check. When the String passed as an
@@ -95,9 +101,9 @@ module URI
     #   gid = URI::GlobalID.parse('gid://bcx/Person/1234')
     #   gid.app = 'app' #=>  "app"
     def app=(value)
-      validate_component(value) if validate_components?
-      check_host(value) if validate_components?
-      @app = value
+      validate_component(value)
+      check_host(value)
+      set_app(value)
     end
 
     # Public setter for model_name component with check. When the String
@@ -106,8 +112,8 @@ module URI
     #   gid = URI::GlobalID.parse('gid://bcx/Person/1234')
     #   gid.model_name = 'Person' #=>  "Person"
     def model_name=(value)
-      validate_component(value) if validate_components?
-      @model_name = value
+      validate_component(value)
+      set_model_name(value)
     end
 
     # Public setter for model_id component with check. When the String passed
@@ -116,8 +122,8 @@ module URI
     #   gid = URI::GlobalID.parse('gid://bcx/Person/1234')
     #   gid.model_id = '1234' #=>  "1234"
     def model_id=(value)
-      validate_component(value) if validate_components?
-      @model_id = value
+      validate_component(value)
+      set_model_id(value)
     end
 
     # Returns a String representation of URI::GlobalID
@@ -126,10 +132,23 @@ module URI
     #   person = Person.create(id: 1234)
     #   gid = URI::GlobalID.create('bcx', person)
     #   gid.to_s #=> "gid://bcx/Person/1234"
-    #
     def to_s
       "#{SCHEME}://#{app}/#{model_name}/#{model_id}"
     end
+
+    protected
+
+      def set_app(value)
+        @app = value
+      end
+
+      def set_model_name(value)
+        @model_name = value
+      end
+
+      def set_model_id(value)
+        @model_id = value
+      end
 
     private
 
