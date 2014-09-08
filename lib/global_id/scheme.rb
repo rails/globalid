@@ -74,16 +74,29 @@ module URI
       new(*args)
     end
 
-    # Creates a new URI::Generic instance from generic components without check
+    # Creates a new URI::Generic instance from generic components with check
+    # from the Array with the URI::Generic components that receives as an
+    # argument, plus 2 other optional arguments
+    #
+    # The last 2 arguments are optional
+    #   - The second to last is the +parser+ for interntal use, which defaults
+    #   to nil. If an object is passed it should behave similar to
+    #   URI::DEFAULT_PARSER
+    #   - The last argument is +arg_check+ wich, defaults to true. The values of
+    #   URI::GlobalID::Components won't be validated only when the value is
+    #   false
+    #
+    #   uri_components = URI.split('gid://bcx/Person/1234')
+    #   URI::GlobalID.new(*uri_components) #=> #=> #<URI::GlobalID:0x007ff0b5979138 URL:gid://bcx/Person/1234>
     def initialize(*args)
-      @arg_check = args[10]
-      args[10] = validate_components?
+      # Set args[10] (arg_check) to true when its value is nil
+      args[10] = args[10].nil? ? true : args[10]
 
       super(*args)
 
       _, model_name, model_id = *(@path.match(PATH_REGEXP))
 
-      if validate_components?
+      if args[10]
         self.app = @host
         self.model_name = model_name
         self.model_id = model_id
