@@ -3,17 +3,17 @@ require 'active_support/core_ext/module/aliasing'
 require 'active_support/core_ext/object/blank'
 
 module URI
-  # The GlobalID URI scheme
+  # The GlobalID URI scheme.
   class GlobalID < Generic
 
-    # An Array of the available components for URI::GlobalID
+    # An Array of the available components for URI::GlobalID.
     COMPONENT = [ :scheme, :app, :model_name, :model_id ].freeze
 
     # A Regexp to match on the URI's path to get :model_name and :model_id out
-    # of it
+    # of it.
     PATH_REGEXP = %r(\A/([^/]+)/?([^/]+)?\z)
 
-    # A String that represents the scheme component for GlobalID URIs
+    # A String that represents the scheme component for GlobalID URIs.
     SCHEME = 'gid'
 
     # Returns the app component of the URI.
@@ -32,7 +32,10 @@ module URI
     attr_reader :model_id
 
     # If the value passed as an argument is invalid ArgumentError will be raised
-    # otherwise the value that would be assigned to app is returned
+    # otherwise the value that would be assigned to app is returne.
+    #
+    # Valid +value+'s contain only alphanumeric characters and hyphens.
+    # If +value+ is valid it is returned, otherwise an ArgumentError is raised.
     #
     #   URI::GlobalID.validate_app(nil) #=> ArgumentError
     #   URI::GlobalID.validate_app('foo/bar') #=> ArgumentError
@@ -47,17 +50,17 @@ module URI
     end
 
     # Returns an instance of URI::GlobalID created from the :app and :model
-    # passed as arguments
+    # passed as arguments.
     #
     #   app = 'bcx'
-    #   person = Person.create(id: 1234)
+    #   person = Person.find(1234)
     #   URI::GlobalID.create('bcx', person)
     #   #=> #<URI::GlobalID:0x007ff0b5979138 URL:gid://bcx/Person/1234>
     def self.create(app, model)
       parse("gid://#{app}/#{model.class.name}/#{model.id}")
     end
 
-    # Returns a URI::GlobalID instance from the String passed as an argument
+    # Returns a URI::GlobalID instance from the String passed as an argument.
     #
     #   URI::GlobalID.parse('gid://bcx/Person/1234)
     #   #=> #<URI::GlobalID:0x007ff0b5979138 URL:gid://bcx/Person/1234>
@@ -68,7 +71,7 @@ module URI
 
     # Creates a new URI::GlobalID instance from components of URI::Generic
     # with check. Generic components are: scheme, userinfo, host, port,
-    # registry, path, opaque, query and fragment
+    # registry, path, opaque, query and fragment.
     def self.build(*args)
       args << nil   # parser
       args << true  # arg_check
@@ -78,15 +81,15 @@ module URI
 
     # Creates a new URI::Generic instance from generic components with check
     # from the Array with the URI::Generic components that receives as an
-    # argument, plus 2 other optional arguments
+    # argument, plus 2 other optional arguments.
     #
-    # The last 2 arguments are optional
+    # The last 2 arguments are optional:
     #   - The second to last is the +parser+ for interntal use, which defaults
     #   to nil. If an object is passed it should behave similar to
-    #   URI::DEFAULT_PARSER
+    #   URI::DEFAULT_PARSER.
     #   - The last argument is +arg_check+ wich, defaults to true. The values of
     #   URI::GlobalID::Components won't be validated only when the value is
-    #   false
+    #   false.
     #
     #   uri_components = URI.split('gid://bcx/Person/1234')
     #   URI::GlobalID.new(*uri_components)
@@ -112,7 +115,9 @@ module URI
 
     # Public setter for app component with check. When the String passed as an
     # argument is invalid it can raise URI::InvalidURIError or
-    # URI::InvalidComponentError
+    # URI::InvalidComponentError.
+    #
+    # Valid +value+'s contain only alphanumeric characters and hyphens.
     #
     #   gid = URI::GlobalID.parse('gid://bcx/Person/1234')
     #   gid.app = 'app' #=>  "app"
@@ -122,8 +127,10 @@ module URI
       set_app(value)
     end
 
-    # Public setter for model_name component with check. When the String
-    # passed as an argument is invalid it raises URI::InvalidComponentError
+    # Public setter for model_name component with check.
+    #
+    # Valid +value+ should be a String. If nil is passed as an argument
+    # URI::InvalidComponentError is raised.
     #
     #   gid = URI::GlobalID.parse('gid://bcx/Person/1234')
     #   gid.model_name = 'Person' #=>  "Person"
@@ -132,8 +139,10 @@ module URI
       set_model_name(value)
     end
 
-    # Public setter for model_id component with check. When the String passed
-    # as an argument is invalid it raises URI::InvalidComponentError
+    # Public setter for model_id component with check.
+    #
+    # Valid +value+ should be a String. If nil is passed as an argument
+    # URI::InvalidComponentError is raised.
     #
     #   gid = URI::GlobalID.parse('gid://bcx/Person/1234')
     #   gid.model_id = '1234' #=>  "1234"
@@ -142,7 +151,7 @@ module URI
       set_model_id(value)
     end
 
-    # Returns a String representation of URI::GlobalID
+    # Returns a String representation of URI::GlobalID.
     #
     #   app = 'bcx'
     #   person = Person.create(id: 1234)
