@@ -127,10 +127,8 @@ module URI
       set_app(value)
     end
 
-    # Public setter for model_name component with check.
-    #
-    # Valid +value+ should be a String. If nil is passed as an argument
-    # URI::InvalidComponentError is raised.
+    # Validates and sets the +value+. URI::InvalidComponentError is raised if
+    # +value+ is blank.
     #
     #   gid = URI::GlobalID.parse('gid://bcx/Person/1234')
     #   gid.model_name = 'Person' #=>  "Person"
@@ -139,10 +137,8 @@ module URI
       set_model_name(value)
     end
 
-    # Public setter for model_id component with check.
-    #
-    # Valid +value+ should be a String. If nil is passed as an argument
-    # URI::InvalidComponentError is raised.
+    # Validates and sets the +value+. URI::InvalidComponentError is raised if
+    # +value+ is blank.
     #
     #   gid = URI::GlobalID.parse('gid://bcx/Person/1234')
     #   gid.model_id = '1234' #=>  "1234"
