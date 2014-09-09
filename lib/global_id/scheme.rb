@@ -113,9 +113,8 @@ module URI
       end
     end
 
-    # Public setter for app component with check. When the String passed as an
-    # argument is invalid it can raise URI::InvalidURIError or
-    # URI::InvalidComponentError.
+    # Validates and sets the +app+. URI::InvalidComponentError is raised if
+    # +value+ is invalid.
     #
     # Valid +value+'s contain only alphanumeric characters and hyphens.
     #
@@ -125,10 +124,12 @@ module URI
       validate_component(value)
       check_host(value)
       set_app(value)
+    rescue URI::InvalidURIError => e
+      raise URI::InvalidComponentError, e.message
     end
 
-    # Validates and sets the +value+. URI::InvalidComponentError is raised if
-    # +value+ is blank.
+    # Validates and sets the +model_name+. URI::InvalidComponentError is raised
+    # if +value+ is blank.
     #
     #   gid = URI::GlobalID.parse('gid://bcx/Person/1234')
     #   gid.model_name = 'Person' #=>  "Person"
@@ -137,7 +138,7 @@ module URI
       set_model_name(value)
     end
 
-    # Validates and sets the +value+. URI::InvalidComponentError is raised if
+    # Validates and sets the +model_id+. URI::InvalidComponentError is raised if
     # +value+ is blank.
     #
     #   gid = URI::GlobalID.parse('gid://bcx/Person/1234')
