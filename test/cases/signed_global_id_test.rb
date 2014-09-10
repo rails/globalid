@@ -147,6 +147,16 @@ class SignedGlobalIDExpirationTest < ActiveSupport::TestCase
     end
   end
 
+  test 'passing expires_in less than a second is not expired' do
+    encoded_sgid = SignedGlobalID.new(@uri, expires_in: 1.second).to_s
+
+    travel 0.5.second
+    assert SignedGlobalID.parse(encoded_sgid)
+
+    travel 0.5.second
+    assert_not SignedGlobalID.parse(encoded_sgid)
+  end
+
   test 'passing expires_in nil turns off expiration checking' do
     with_expiration_in 1.hour do
       encoded_sgid = SignedGlobalID.new(@uri, expires_in: nil).to_s
