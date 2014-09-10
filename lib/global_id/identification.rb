@@ -4,14 +4,14 @@ class GlobalID
   module Identification
     extend ActiveSupport::Concern
 
-    def global_id
+    def to_global_id
       @global_id ||= GlobalID.create(self)
     end
-    alias gid global_id
+    alias to_gid to_global_id
 
-    def signed_global_id(options = {})
+    def to_signed_global_id(options = {})
       @signed_global_id ||= SignedGlobalID.create(self, options)
     end
-    alias sgid signed_global_id
+    alias to_sgid to_signed_global_id
   end
 end
