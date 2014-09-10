@@ -180,12 +180,12 @@ class SignedGlobalIDExpirationTest < ActiveSupport::TestCase
 
   test 'passing expires_at overrides class level expires_in' do
     with_expiration_in 1.hour do
-      date = Date.today.end_of_day
+      date = Date.tomorrow.end_of_day
       sgid = SignedGlobalID.new(@uri, expires_at: date)
 
       assert_equal date, sgid.expires_at
 
-      travel 2.hour
+      travel 2.hours
       assert SignedGlobalID.parse(sgid.to_s)
     end
   end
