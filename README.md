@@ -37,6 +37,65 @@ Support is automatically included in Active Record.
 => #<Person:0x007fae94bf6298 @id="1">
 ```
 
+### Signed ID
+
+To have secure forms, we advise to pass signed GID on the client side:
+
+```ruby
+>> person_gid = Person.find(1).to_signed_global_id
+=> #<SignedGlobalID:0x007fea1944b410
+
+# short alias
+>> person_sgid = Person.find(1).to_sgid
+=> #<SignedGlobalID:0x007fea1944b410
+
+>> person_sgid.to_s
+=> "BAhJIh5naWQ6Ly9pZGluYWlkaS9Vc2VyLzM5NTk5BjoGRVQ=--81d7358dd5ee2ca33189bb404592df5e8d11420e"
+
+>> GlobalID::Locator.locate_signed person_sgid
+=> #<Person:0x007fae94bf6298 @id="1">
+
+# `for: 'purpose'` argument to secure the usage of the sgid. Ensures a sgid generated for one purpose can't be maliciously reused someplace else.
+>> signup_person_sgid = Person.find(1).to_sgid(for: 'signup_form')
+=> #<SignedGlobalID:0x007fea1984b520
+
+>> GlobalID::Locator.locate_signed signup_person_sgid
+=> #<Person:0x007fae94bf6298 @id="1">
+```
+
+### Custom locator
+
+Useful when different apps collaborate and reference each others' Global IDs.
+The locator can be either a block or a class.
+
+`GlobalID::Locator.locate` finds an app based on the app in the `gid://` url. So a use call binds a locator to a specific app that the locator can find.
+
+Using a block:
+
+```ruby
+GlobalID::Locator.use :foo do |gid|
+  FooRemote.const_get(gid.model_name).find(gid.model_id)
+end
+```
+
+Using a class:
+
+```ruby
+GlobalID::Locator.use :bar, BarLocator.new
+class BarLocator
+  def locate(gid)
+    @search_client.search name: gid.model_name, id: gid.model_id
+  end
+end
+```
+
+Here is Locator behaviour after declaring `:bar`:
+
+```ruby
+>> GlobalID::Locator.locate "gid://bar/User/39599"
+=> your_model_found_with @search_client
+```
+
 ## License
 
 GlobalID is released under the MIT license.
