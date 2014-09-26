@@ -1,17 +1,32 @@
 require 'uri/generic'
 require 'active_support/core_ext/module/aliasing'
 require 'active_support/core_ext/object/blank'
+require 'active_support/core_ext/hash/indifferent_access'
 
 module URI
   class GID < Generic
     # URI::GID encodes an app unique reference to a specific model as an URI.
-    # It has three components: the app name, the model's class name and the
-    # model's id.
+    # It has the components: app name, model class name, model id and params.
+    # All components except params are required.
+    #
     # The URI format looks like "gid://app/model_name/model_id".
+    #
+    # Simple metadata can be stored in params. Useful if your app has multiple databases,
+    # for instance, and you need to find out which one to look up the model in.
+    #
+    # Params will be encoded as query parameters like so
+    # "gid://app/model_name/model_id?key=value&another_key=another_value".
+    #
+    # Params won't be typecast, they're always strings.
+    # For convenience params can be accessed using both strings and symbol keys.
+    #
+    # Multi value params aren't supported. Any params encoding multiple values under
+    # the same key will return only the last value. For example, when decoding
+    # params like "key=first_value&key=last_value" key will only be last_value.
     #
     # Read the documentation for +parse+, +create+ and +build+ for more.
     alias :app :host
-    attr_reader :model_name, :model_id
+    attr_reader :model_name, :model_id, :params
 
     class << self
       # Validates +app+'s as URI hostnames containing only alphanumeric characters
@@ -31,7 +46,7 @@ module URI
 
       # Create a new URI::GID by parsing a gid string with argument check.
       #
-      #   URI::GID.parse 'gid://bcx/Person/1'
+      #   URI::GID.parse 'gid://bcx/Person/1?key=value'
       #
       # This differs from URI() and URI.parse which do not check arguments.
       #
@@ -43,29 +58,30 @@ module URI
         new *generic_components
       end
 
-      # Shorthand to build a URI::GID from and app and a model.
+      # Shorthand to build a URI::GID from an app, a model and optional params.
       #
-      #   URI::GID.create('bcx', Person.find(5))
-      def create(app, model)
-        build app: app, model_name: model.class.name, model_id: model.id
+      #   URI::GID.create('bcx', Person.find(5), database: 'superhumans')
+      def create(app, model, params = nil)
+        build app: app, model_name: model.class.name, model_id: model.id, params: params
       end
 
       # Create a new URI::GID from components with argument check.
       #
-      # The allowed components are app, model_name and model_id, which can be
+      # The allowed components are app, model_name, model_id and params, which can be
       # either a hash or an array.
       #
       # Using a hash:
       #
-      #   URI::GID.build(app: 'bcx', model_name: 'Person', model_id: '1')
+      #   URI::GID.build(app: 'bcx', model_name: 'Person', model_id: '1', params: { key: 'value' })
       #
-      # Using an array, the arguments must be in order [app, model_name, model_id]:
+      # Using an array, the arguments must be in order [app, model_name, model_id, params]:
       #
-      #   URI::GID.build(['bcx', 'Person', '1'])
+      #   URI::GID.build(['bcx', 'Person', '1', key: 'value'])
       def build(args)
         parts = Util.make_components_hash(self, args)
         parts[:host] = parts[:app]
         parts[:path] = "/#{parts[:model_name]}/#{parts[:model_id]}"
+        parts[:query] = URI.encode_www_form(parts[:params]) if parts[:params]
 
         super parts
       end
@@ -73,7 +89,7 @@ module URI
 
     def to_s
       # Implement #to_s to avoid no implicit conversion of nil into string when path is nil
-      "gid://#{app}/#{model_name}/#{model_id}"
+      "gid://#{app}#{path_query}"
     end
 
     protected
@@ -82,8 +98,17 @@ module URI
         super
       end
 
+      def set_query(query)
+        set_params parse_query_params(query)
+        super
+      end
+
+      def set_params(params)
+        @params = params
+      end
+
     private
-      COMPONENT = [ :scheme, :app, :model_name, :model_id ].freeze
+      COMPONENT = [ :scheme, :app, :model_name, :model_id, :params ].freeze
 
       # Extracts model_name and model_id from the URI path.
       PATH_REGEXP = %r(\A/([^/]+)/?([^/]+)?\z)
@@ -120,6 +145,10 @@ module URI
 
         raise URI::InvalidComponentError,
           "Expected a URI like gid://app/Person/1234: #{inspect}"
+      end
+
+      def parse_query_params(query)
+        Hash[URI.decode_www_form(query)].with_indifferent_access if query
       end
   end
 
