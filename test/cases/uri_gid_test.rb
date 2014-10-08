@@ -22,17 +22,17 @@ class URI::GIDTest <  ActiveSupport::TestCase
   end
 
   test 'build' do
-    array = URI::GID.build(['bcx', 'Person', '5'])
+    array = URI::GID.build(['bcx', 'Person', '5', nil])
     assert array
 
-    hash = URI::GID.build(app: 'bcx', model_name: 'Person', model_id: '5')
+    hash = URI::GID.build(app: 'bcx', model_name: 'Person', model_id: '5', params: nil)
     assert hash
 
     assert_equal array, hash
   end
 
   test 'build with wrong ordered array creates a wrong ordered gid' do
-    assert_not_equal @gid_string, URI::GID.build(['Person', '5', 'bcx']).to_s
+    assert_not_equal @gid_string, URI::GID.build(['Person', '5', 'bcx', nil]).to_s
   end
 
   test 'as String' do
@@ -102,4 +102,35 @@ class URI::GIDAppValidationTest < ActiveSupport::TestCase
     def assert_invalid_app(value)
       assert_raise(ArgumentError) { URI::GID.validate_app(value) }
     end
+end
+
+class URI::GIDParamsTest < ActiveSupport::TestCase
+  setup do
+    @gid = URI::GID.create('bcx', Person.find(5), hello: 'world')
+  end
+
+  test 'indifferent key access' do
+    assert_equal 'world', @gid.params[:hello]
+    assert_equal 'world', @gid.params['hello']
+  end
+
+  test 'integer option' do
+    gid = URI::GID.build(['bcx', 'Person', '5', integer: 20])
+    assert_equal '20', gid.params[:integer]
+  end
+
+  test 'multi value params returns last value' do
+    gid = URI::GID.build(['bcx', 'Person', '5', multi: %w(one two)])
+    exp = { 'multi' => 'two' }
+    assert_equal exp, gid.params
+  end
+
+  test 'as String' do
+    assert_equal 'gid://bcx/Person/5?hello=world', @gid.to_s
+  end
+
+  test 'immutable params' do
+    @gid.params[:param] = 'value'
+    assert_not_equal 'gid://bcx/Person/5?hello=world&param=value', @gid.to_s
+  end
 end
