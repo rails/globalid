@@ -8,19 +8,19 @@ This is helpful when you need a single identifier to reference different
 classes of objects.
 
 One example is job scheduling. We need to reference a model object rather than
-serialize the object itself, so we pass a Global ID that can be used to locate
-the model when it's time to perform the job. The job scheduler needn't know
+serialize the object itself. We can pass a Global ID that can be used to locate
+the model when it's time to perform the job. The job scheduler doesn't need to know
 the details of model naming and IDs, just that it has a global identifier that
 references a model.
 
-Another example is a drop-down list of options with Users and Groups. Normally
-we'd need to come up with our own ad hoc scheme to reference them. With Global
+Another example is a drop-down list of options, consisting of both Users and Groups. 
+Normally we'd need to come up with our own ad hoc scheme to reference them. With Global
 IDs, we have a universal identifier that works for objects of both classes.
 
 
 ## Usage
 
-Mix `GlobalID::Identification` in to any model with a #find(id) class method.
+Mix `GlobalID::Identification` into any model with a `#find(id)` class method.
 Support is automatically included in Active Record.
 
 ```ruby
@@ -39,7 +39,7 @@ Support is automatically included in Active Record.
 
 ### Signed Global IDs
 
-For added security GlobalIDs can also be signed to ensure the data hasn't been tampered with.
+For added security GlobalIDs can also be signed to ensure that the data hasn't been tampered with.
 
 ```ruby
 >> person_gid = Person.find(1).to_signed_global_id
@@ -53,8 +53,10 @@ For added security GlobalIDs can also be signed to ensure the data hasn't been t
 
 >> GlobalID::Locator.locate_signed person_sgid
 => #<Person:0x007fae94bf6298 @id="1">
+
 ```
-You can even bump the security up some more by explaining what purpose a Signed Global ID is for. In this way evildoers can't reuse a sign up form SGID on the login page for example.
+You can even bump the security up some more by explaining what purpose a Signed Global ID is for. 
+In this way evildoers can't reuse a sign-up form's SGID on the login page. For example.
 
 ```ruby
 >> signup_person_sgid = Person.find(1).to_sgid(for: 'signup_form')
@@ -64,7 +66,8 @@ You can even bump the security up some more by explaining what purpose a Signed 
 => #<Person:0x007fae94bf6298 @id="1">
 ```
 
-You can also have SGIDs expire some time in the future. Useful if there's a resource people shouldn't have indefinite access to like a share link.
+You can also have SGIDs that expire some time in the future. This is useful if there's a resource, 
+people shouldn't have indefinite access to, like a share link.
 
 ```ruby
 >> expiring_sgid = Document.find(5).to_sgid(expires_in: 2.hours, for: 'sharing')
@@ -88,8 +91,9 @@ You can also have SGIDs expire some time in the future. Useful if there's a reso
 
 ### Custom App Locator
 
-A custom locator can be set for an app by calling use with the app and the locator to use for that app. A custom app locator is useful when different apps collaborate and reference each others' Global IDs.
-When a Global ID's model is being found the locator to use is based on the app in the Global ID url.
+A custom locator can be set for an app by calling `GlobalID::Locator.use` and providing an app locator to use for that app. 
+A custom app locator is useful when different apps collaborate and reference each others' Global IDs.
+When a Global ID's model is being searched, the locator to use is based on the app name provided in the Global ID url.
 
 A custom locator can either be a block or a class.
 
@@ -112,7 +116,8 @@ class BarLocator
 end
 ```
 
-After defining locators like the above URIs like "gid://foo/Person/1" and "gid://bar/Person/1" will now use the foo block locator and `BarLocator` respectively. Other apps will still use the default locator.
+After defining locators as above, URIs like "gid://foo/Person/1" and "gid://bar/Person/1" will now use the foo block locator and `BarLocator` respectively. 
+Other apps will still keep using the default locator.
 
 ## License
 
