@@ -93,7 +93,7 @@ people shouldn't have indefinite access to, like a share link.
 
 A custom locator can be set for an app by calling `GlobalID::Locator.use` and providing an app locator to use for that app. 
 A custom app locator is useful when different apps collaborate and reference each others' Global IDs.
-When a Global ID's model is being searched, the locator to use is based on the app name provided in the Global ID url.
+When finding a Global ID's model, the locator to use is based on the app name provided in the Global ID url.
 
 A custom locator can either be a block or a class.
 
