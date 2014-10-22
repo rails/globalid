@@ -55,7 +55,7 @@ module URI
       #   URI::GID.parse('gid://bcx/') # => raises URI::InvalidComponentError
       def parse(uri)
         generic_components = URI.split(uri) << nil << true # nil parser, true arg_check
-        new *generic_components
+        new(*generic_components)
       end
 
       # Shorthand to build a URI::GID from an app, a model and optional params.
