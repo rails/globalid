@@ -94,7 +94,7 @@ module URI
 
     protected
       def set_path(path)
-        set_model_components(path) unless @model_name && @model_id
+        set_model_components(path) unless defined?(@model_name) && @model_id
         super
       end
 
