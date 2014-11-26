@@ -89,7 +89,7 @@ module URI
 
     def to_s
       # Implement #to_s to avoid no implicit conversion of nil into string when path is nil
-      "gid://#{app}#{path_query}"
+      "gid://#{app}/#{model_name}/#{model_id}"
     end
 
     protected
