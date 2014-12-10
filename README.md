@@ -62,7 +62,7 @@ In this way evildoers can't reuse a sign-up form's SGID on the login page. For e
 >> signup_person_sgid = Person.find(1).to_sgid(for: 'signup_form')
 => #<SignedGlobalID:0x007fea1984b520
 
->> GlobalID::Locator.locate_signed signup_person_sgid
+>> GlobalID::Locator.locate_signed(signup_person_sgid, for: 'signup_form')
 => #<Person:0x007fae94bf6298 @id="1">
 ```
 
@@ -74,11 +74,11 @@ people shouldn't have indefinite access to, like a share link.
 => #<SignedGlobalID:0x008fde45df8937
 
 # Within 2 hours...
->> GlobalID::Locator.locate_signed expiring_sgid
+>> GlobalID::Locator.locate_signed(expiring_sgid, for: 'sharing')
 => #<Document:0x007fae94bf6298 @id="5">
 
 # More than 2 hours later...
->> GlobalID::Locator.locate_signed expiring_sgid
+>> GlobalID::Locator.locate_signed(expiring_sgid, for: 'sharing')
 => nil
 
 >> explicit_expiring_sgid = SecretAgentMessage.find(5).to_sgid(expires_at: Date.today.midnight)
