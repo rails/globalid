@@ -8,6 +8,11 @@ require 'models/person_model'
 
 require 'json'
 
+if ActiveSupport::TestCase.respond_to?(:test_order)
+  # TODO: remove check once ActiveSupport depencency is at least 4.2
+  ActiveSupport::TestCase.test_order = :random
+end
+
 GlobalID.app = 'bcx'
 
 # Default serializers is Marshal, whose format changed 1.9 -> 2.0,
