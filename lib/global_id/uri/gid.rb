@@ -98,6 +98,13 @@ module URI
         super
       end
 
+      # Ruby 2.2 uses #query= instead of #set_query
+      def query=(query)
+        set_params parse_query_params(query)
+        super
+      end
+
+      # Ruby 2.1 or less uses #set_query to assign the query
       def set_query(query)
         set_params parse_query_params(query)
         super
