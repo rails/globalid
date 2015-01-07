@@ -131,7 +131,7 @@ class SignedGlobalIDExpirationTest < ActiveSupport::TestCase
       travel 59.minutes
       assert SignedGlobalID.parse(encoded_sgid)
 
-      travel 1.minute
+      travel 2.minutes
       assert_not SignedGlobalID.parse(encoded_sgid)
     end
   end
@@ -143,7 +143,7 @@ class SignedGlobalIDExpirationTest < ActiveSupport::TestCase
       travel 1.hour
       assert SignedGlobalID.parse(encoded_sgid)
 
-      travel 1.hour
+      travel 1.hour + 3.seconds
       assert_not SignedGlobalID.parse(encoded_sgid)
     end
   end
