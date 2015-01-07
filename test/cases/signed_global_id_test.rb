@@ -1,4 +1,5 @@
 require 'helper'
+require 'minitest/mock' # for stubbing Time.now as #travel doesn't have subsecond precision.
 
 class SignedGlobalIDTest < ActiveSupport::TestCase
   setup do
@@ -149,12 +150,15 @@ class SignedGlobalIDExpirationTest < ActiveSupport::TestCase
 
   test 'passing expires_in less than a second is not expired' do
     encoded_sgid = SignedGlobalID.new(@uri, expires_in: 1.second).to_s
+    present = Time.now
 
-    travel 0.5.second
-    assert SignedGlobalID.parse(encoded_sgid)
+    Time.stub :now, present + 0.5.second do
+      assert SignedGlobalID.parse(encoded_sgid)
+    end
 
-    travel 0.5.second
-    assert_not SignedGlobalID.parse(encoded_sgid)
+    Time.stub :now, present + 2.seconds do
+      assert_not SignedGlobalID.parse(encoded_sgid)
+    end
   end
 
   test 'passing expires_in nil turns off expiration checking' do
