@@ -12,10 +12,9 @@ class RailtieTest < ActiveSupport::TestCase
 
   def setup
     Rails.env = 'development'
-    @app = BlogApp::Application.new do
-      config.eager_load = false
-      config.logger = Logger.new(nil)
-    end
+    @app = BlogApp::Application.new
+    @app.config.eager_load = false
+    @app.config.logger = Logger.new(nil)
   end
 
   test 'GlobalID.app for Blog::Application defaults to blog' do
