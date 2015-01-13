@@ -84,7 +84,7 @@ people shouldn't have indefinite access to, like a share link.
 >> explicit_expiring_sgid = SecretAgentMessage.find(5).to_sgid(expires_at: Time.now.advance(hours: 1))
 => #<SignedGlobalID:0x008fde45df8937
 
-# After midnight...
+# 1 hour later...
 >> GlobalID::Locator.locate_signed explicit_expiring_sgid
 => nil
 ```
