@@ -55,6 +55,22 @@ class GlobalLocatorTest < ActiveSupport::TestCase
     assert_equal @gid.model_id, found.id
   end
 
+  test 'by many GIDs of one class' do
+    assert_equal [ Person.new('1'), Person.new('2') ],
+      GlobalID::Locator.locate_many([ Person.new('1').to_gid, Person.new('2').to_gid ])
+  end
+
+  test 'by many GIDs of mixed classes' do
+    assert_equal [ Person.new('1'), Person::Child.new('1'), Person.new('2') ],
+      GlobalID::Locator.locate_many([ Person.new('1').to_gid, Person::Child.new('1').to_gid, Person.new('2').to_gid ])
+  end  
+
+  test 'by many GIDs with only: restriction to match subclass' do
+    assert_equal [ Person::Child.new('1') ],
+      GlobalID::Locator.locate_many([ Person.new('1').to_gid, Person::Child.new('1').to_gid, Person.new('2').to_gid ], only: Person::Child)
+  end
+
+
   test 'by SGID' do
     found = GlobalID::Locator.locate_signed(@sgid)
     assert_kind_of @sgid.model_class, found
@@ -102,6 +118,22 @@ class GlobalLocatorTest < ActiveSupport::TestCase
     assert_kind_of @sgid.model_class, found
     assert_equal @sgid.model_id, found.id
   end
+
+  test 'by many SGIDs of one class' do
+    assert_equal [ Person.new('1'), Person.new('2') ],
+      GlobalID::Locator.locate_many_signed([ Person.new('1').to_sgid, Person.new('2').to_sgid ])
+  end
+
+  test 'by many SGIDs of mixed classes' do
+    assert_equal [ Person.new('1'), Person::Child.new('1'), Person.new('2') ],
+      GlobalID::Locator.locate_many_signed([ Person.new('1').to_sgid, Person::Child.new('1').to_sgid, Person.new('2').to_sgid ])
+  end  
+
+  test 'by many SGIDs with only: restriction to match subclass' do
+    assert_equal [ Person::Child.new('1') ],
+      GlobalID::Locator.locate_many_signed([ Person.new('1').to_sgid, Person::Child.new('1').to_sgid, Person.new('2').to_sgid ], only: Person::Child)
+  end
+
 
   test 'by GID string' do
     found = GlobalID::Locator.locate(@gid.to_s)

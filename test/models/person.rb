@@ -3,8 +3,12 @@ class Person
 
   attr_reader :id
 
-  def self.find(id)
-    new(id)
+  def self.find(*args)
+    if args.first == :all
+      args.from(1).flatten.collect { |id| new(id) }
+    else
+      new(args.first)
+    end
   end
 
   def initialize(id = 1)
@@ -12,7 +16,7 @@ class Person
   end
 
   def ==(other)
-    id == other.try(:id)
+    other.is_a?(self.class) && id == other.try(:id)
   end
 end
 
