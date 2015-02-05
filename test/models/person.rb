@@ -3,12 +3,12 @@ class Person
 
   attr_reader :id
 
-  def self.find(*args)
-    if args.first == :all
-      args.from(1).flatten.collect { |id| new(id) }
-    else
-      new(args.first)
-    end
+  def self.find(id)
+    new(id)
+  end
+  
+  def self.all(ids)
+    ids.collect { |id| new(id) }
   end
 
   def initialize(id = 1)

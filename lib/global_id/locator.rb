@@ -19,7 +19,7 @@ class GlobalID
       end
 
       # Takes an array of GlobalIDs or strings that can be turned into a GlobalIDs.
-      # The GlobalIDs are located using Model.find(:all, ids), so the models must respond to
+      # The GlobalIDs are located using Model.all(ids), so the models must respond to
       # that finder signature.
       #
       # This approach will efficiently call only one #find per model class, but still interpolate
@@ -35,7 +35,7 @@ class GlobalID
         if (allowed_gids = parse_allowed(gids, options[:only])).any?
           models_and_ids  = allowed_gids.collect { |gid| [ gid.model_name.constantize, gid.model_id ] }
           ids_by_model    = models_and_ids.group_by(&:first)
-          loaded_by_model = Hash[ids_by_model.map { |model, ids| [ model, model.find(:all, ids.map(&:last)).index_by(&:id) ] }]
+          loaded_by_model = Hash[ids_by_model.map { |model, ids| [ model, model.all(ids.map(&:last)).index_by(&:id) ] }]
 
           models_and_ids.collect { |(model, id)| loaded_by_model[model][id] }.compact
         else
@@ -56,7 +56,7 @@ class GlobalID
       end
 
       # Takes an array of SignedGlobalIDs or strings that can be turned into a SignedGlobalIDs.
-      # The SignedGlobalIDs are located using Model.find(:all, ids), so the models must respond to
+      # The SignedGlobalIDs are located using Model.all(ids), so the models must respond to
       # that finder signature.
       #
       # This approach will efficiently call only one #find per model class, but still interpolate
