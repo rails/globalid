@@ -12,10 +12,6 @@ class Person
       new(id)
     end
   end
-  
-  def self.all(ids)
-    
-  end
 
   def initialize(id = 1)
     @id = id
