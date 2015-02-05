@@ -35,7 +35,7 @@ class GlobalID
         if (allowed_gids = parse_allowed(gids, options[:only])).any?
           models_and_ids  = allowed_gids.collect { |gid| [ gid.model_name.constantize, gid.model_id ] }
           ids_by_model    = models_and_ids.group_by(&:first)
-          loaded_by_model = Hash[ids_by_model.map { |model, ids| [ model, model.find(ids.map(&:last)).index_by(&:id) ] }]
+          loaded_by_model = Hash[ids_by_model.map { |model, ids| [ model, model.find(ids.map(&:last)).index_by { |record| record.id.to_s } ] }]
 
           models_and_ids.collect { |(model, id)| loaded_by_model[model][id] }.compact
         else
