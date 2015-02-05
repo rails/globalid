@@ -3,12 +3,18 @@ class Person
 
   attr_reader :id
 
-  def self.find(id)
-    new(id)
+  def self.find(id_or_ids)
+    if id_or_ids.is_a? Array
+      ids = id_or_ids
+      ids.collect { |id| new(id) }
+    else
+      id = id_or_ids
+      new(id)
+    end
   end
   
   def self.all(ids)
-    ids.collect { |id| new(id) }
+    
   end
 
   def initialize(id = 1)
