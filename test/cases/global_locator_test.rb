@@ -134,7 +134,6 @@ class GlobalLocatorTest < ActiveSupport::TestCase
       GlobalID::Locator.locate_many_signed([ Person.new('1').to_sgid, Person::Child.new('1').to_sgid, Person.new('2').to_sgid ], only: Person::Child)
   end
 
-
   test 'by GID string' do
     found = GlobalID::Locator.locate(@gid.to_s)
     assert_kind_of @gid.model_class, found
@@ -145,6 +144,11 @@ class GlobalLocatorTest < ActiveSupport::TestCase
     found = GlobalID::Locator.locate_signed(@sgid.to_s)
     assert_kind_of @sgid.model_class, found
     assert_equal @sgid.model_id, found.id
+  end
+
+  test 'by many SGID strings with for: restriction to match purpose' do
+    assert_equal [ Person::Child.new('2') ],
+      GlobalID::Locator.locate_many_signed([ Person.new('1').to_sgid(for: 'adoption').to_s, Person::Child.new('1').to_sgid.to_s, Person::Child.new('2').to_sgid(for: 'adoption').to_s ], for: 'adoption', only: Person::Child)
   end
 
   test 'by to_param encoding' do

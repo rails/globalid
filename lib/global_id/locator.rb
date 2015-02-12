@@ -69,7 +69,7 @@ class GlobalID
       #   instances of returned classes to those including that module.  If no classes or
       #   modules match, +nil+ is returned.
       def locate_many_signed(sgids, options = {})
-        locate_many sgids.collect { |sgid| SignedGlobalID.parse(sgid) }, options
+        locate_many sgids.collect { |sgid| SignedGlobalID.parse(sgid, options.slice(:for)) }.compact, options
       end
 
       # Tie a locator to an app.
