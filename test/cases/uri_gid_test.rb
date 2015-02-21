@@ -21,6 +21,10 @@ class URI::GIDTest <  ActiveSupport::TestCase
     assert_equal @gid_string, URI::GID.create('bcx', model).to_s
   end
 
+  test 'create_from' do
+    assert_equal @gid_string, URI::GID.create_from('bcx', "Person", 5).to_s
+  end
+
   test 'build' do
     array = URI::GID.build(['bcx', 'Person', '5', nil])
     assert array
