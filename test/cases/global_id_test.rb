@@ -186,6 +186,11 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
       person_gid = GlobalID.create(Person.new(5), app: nil)
     end
   end
+
+  test 'create_from class method' do
+    person_gid = GlobalID.create(Person.new(5))
+    assert_equal GlobalID.create_from("Person", 5), person_gid
+  end
 end
 
 class GlobalIDCustomParamsTest < ActiveSupport::TestCase

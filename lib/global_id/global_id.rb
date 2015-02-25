@@ -10,12 +10,11 @@ class GlobalID
     attr_reader :app
 
     def create(model, options = {})
-      if app = options.fetch(:app) { GlobalID.app }
-        new URI::GID.create(app, model), options
-      else
-        raise ArgumentError, 'An app is required to create a GlobalID. ' \
-          'Pass the :app option or set the default GlobalID.app.'
-      end
+      new URI::GID.create(get_app(options), model), options
+    end
+
+    def create_from(class_name, id, options = {})
+      new URI::GID.create_from(get_app(options), class_name, id), options
     end
 
     def find(gid, options = {})
@@ -41,6 +40,11 @@ class GlobalID
       def repad_gid(gid)
         padding_chars = gid.length.modulo(4).zero? ? 0 : (4 - gid.length.modulo(4))
         gid + ('=' * padding_chars)
+      end
+
+    protected
+      def get_app(options)
+        options.fetch(:app) { GlobalID.app } || raise(ArgumentError, 'An app is required to create a GlobalID. Pass the :app option or set the default GlobalID.app.')
       end
   end
 

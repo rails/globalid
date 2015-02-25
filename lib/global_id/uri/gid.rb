@@ -65,6 +65,10 @@ module URI
         build app: app, model_name: model.class.name, model_id: model.id, params: params
       end
 
+      def create_from(app, klass, id, params = nil)
+        build app: app, model_name: klass, model_id: id, params: params
+      end
+
       # Create a new URI::GID from components with argument check.
       #
       # The allowed components are app, model_name, model_id and params, which can be

@@ -3,8 +3,9 @@ require 'active_support'
 require 'active_support/testing/autorun'
 
 require 'global_id'
-require 'models/person'
-require 'models/person_model'
+require 'active_record'
+require 'support/db'
+Dir["#{File.dirname(__FILE__)}/models/*.rb"].each{|f| require f }
 
 require 'json'
 
