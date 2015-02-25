@@ -20,4 +20,6 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'activesupport', '>= 4.1.0'
 
   s.add_development_dependency 'rake'
+  s.add_development_dependency 'sqlite3-ruby'
+  s.add_development_dependency 'activerecord'
 end
