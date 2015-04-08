@@ -123,8 +123,8 @@ class GlobalID
           app.to_s.downcase
         end
 
-        def find_records(model_class, ids, ignore_missing:)
-          if ignore_missing
+        def find_records(model_class, ids, options)
+          if options[:ignore_missing]
             model_class.where(id: ids)
           else
             model_class.find(ids)
