@@ -226,6 +226,18 @@ class GlobalLocatorTest < ActiveSupport::TestCase
     assert_nil GlobalID::Locator.locate_signed(login_sgid.to_s, for: 'like_button')
   end
 
+  test "by many with one record missing leading to a raise" do
+    assert_raises RuntimeError do
+      GlobalID::Locator.locate_many([ Person.new('1').to_gid, Person.new(Person::HARDCODED_ID_FOR_MISSING_PERSON).to_gid ])
+    end
+  end
+
+  test "by many with one record missing not leading to a raise when ignoring missing" do
+    assert_nothing_raised do
+      GlobalID::Locator.locate_many([ Person.new('1').to_gid, Person.new(Person::HARDCODED_ID_FOR_MISSING_PERSON).to_gid ], ignore_missing: true)
+    end
+  end
+
   private
     def with_app(app)
       old_app, GlobalID.app = GlobalID.app, app

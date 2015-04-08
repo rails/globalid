@@ -1,3 +1,8 @@
+*   Added locate_many(ignore_missing: true) option that'll use #where instead of #find for bulk location,
+    which via Active Record means missing records will be ignored instead of raise an exception.
+
+    *DHH*
+
 *   Fixed that purpose should be passed on when using Locator.locate_many_signed(strings, for: 'purpose').
 
     *DHH*
