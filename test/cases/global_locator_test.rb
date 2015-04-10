@@ -63,7 +63,7 @@ class GlobalLocatorTest < ActiveSupport::TestCase
   test 'by many GIDs of mixed classes' do
     assert_equal [ Person.new('1'), Person::Child.new('1'), Person.new('2') ],
       GlobalID::Locator.locate_many([ Person.new('1').to_gid, Person::Child.new('1').to_gid, Person.new('2').to_gid ])
-  end  
+  end
 
   test 'by many GIDs with only: restriction to match subclass' do
     assert_equal [ Person::Child.new('1') ],
@@ -127,7 +127,7 @@ class GlobalLocatorTest < ActiveSupport::TestCase
   test 'by many SGIDs of mixed classes' do
     assert_equal [ Person.new('1'), Person::Child.new('1'), Person.new('2') ],
       GlobalID::Locator.locate_many_signed([ Person.new('1').to_sgid, Person::Child.new('1').to_sgid, Person.new('2').to_sgid ])
-  end  
+  end
 
   test 'by many SGIDs with only: restriction to match subclass' do
     assert_equal [ Person::Child.new('1') ],
@@ -185,12 +185,14 @@ class GlobalLocatorTest < ActiveSupport::TestCase
   test 'use locator with class' do
     class BarLocator
       def locate(gid); :bar; end
+      def locate_many(gids, options = {}); gids.map(&:model_id); end
     end
 
     GlobalID::Locator.use :bar, BarLocator.new
 
     with_app 'bar' do
       assert_equal :bar, GlobalID::Locator.locate('gid://bar/Person/1')
+      assert_equal ['1', '2'], GlobalID::Locator.locate_many(['gid://bar/Person/1', 'gid://bar/Person/2'])
     end
   end
 
