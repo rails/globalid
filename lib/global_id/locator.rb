@@ -19,8 +19,11 @@ class GlobalID
       end
 
       # Takes an array of GlobalIDs or strings that can be turned into a GlobalIDs.
-      # The GlobalIDs are located using Model.find(array_of_ids), so the models must respond to
-      # that finder signature.
+      # All GlobalIDs must belong to the same app, as they will be located using
+      # the same locator using its locate_many method.
+      #
+      # By default the GlobalIDs will be located using Model.find(array_of_ids), so the
+      # models must respond to that finder signature.
       #
       # This approach will efficiently call only one #find (or #where(id: id), when using ignore_missing)
       # per model class, but still interpolate the results to match the order in which the gids were passed.
@@ -37,13 +40,8 @@ class GlobalID
       #   we will use #where(id: ids) instead, which does not raise on missing records.
       def locate_many(gids, options = {})
         if (allowed_gids = parse_allowed(gids, options[:only])).any?
-          models_and_ids  = allowed_gids.collect { |gid| [ gid.model_name.constantize, gid.model_id ] }
-          ids_by_model    = models_and_ids.group_by(&:first)
-          loaded_by_model = Hash[ids_by_model.map { |model, ids|
-            [ model, find_records(model, ids.map(&:last), ignore_missing: options[:ignore_missing]).index_by { |record| record.id.to_s } ]
-          }]
-
-          models_and_ids.collect { |(model, id)| loaded_by_model[model][id] }.compact
+          locator = locator_for(allowed_gids.first)
+          locator.locate_many(allowed_gids, options)
         else
           []
         end
@@ -122,14 +120,6 @@ class GlobalID
         def normalize_app(app)
           app.to_s.downcase
         end
-
-        def find_records(model_class, ids, options)
-          if options[:ignore_missing]
-            model_class.where(id: ids)
-          else
-            model_class.find(ids)
-          end
-        end
     end
 
     private
@@ -139,6 +129,25 @@ class GlobalID
         def locate(gid)
           gid.model_class.find gid.model_id
         end
+
+        def locate_many(gids, options = {})
+          models_and_ids  = gids.collect { |gid| [ gid.model_class, gid.model_id ] }
+          ids_by_model    = models_and_ids.group_by(&:first)
+          loaded_by_model = Hash[ids_by_model.map { |model, ids|
+            [ model, find_records(model, ids.map(&:last), ignore_missing: options[:ignore_missing]).index_by { |record| record.id.to_s } ]
+          }]
+
+          models_and_ids.collect { |(model, id)| loaded_by_model[model][id] }.compact
+        end
+
+        private
+          def find_records(model_class, ids, options)
+            if options[:ignore_missing]
+              model_class.where(id: ids)
+            else
+              model_class.find(ids)
+            end
+          end
       end
 
       mattr_reader(:default_locator) { ActiveRecordFinder.new }
@@ -150,6 +159,10 @@ class GlobalID
 
         def locate(gid)
           @locator.call(gid)
+        end
+
+        def locate_many(gids, options = {})
+          gids.map { |gid| locate(gid) }
         end
       end
   end

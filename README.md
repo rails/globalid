@@ -13,7 +13,7 @@ the model when it's time to perform the job. The job scheduler doesn't need to k
 the details of model naming and IDs, just that it has a global identifier that
 references a model.
 
-Another example is a drop-down list of options, consisting of both Users and Groups. 
+Another example is a drop-down list of options, consisting of both Users and Groups.
 Normally we'd need to come up with our own ad hoc scheme to reference them. With Global
 IDs, we have a universal identifier that works for objects of both classes.
 
@@ -55,7 +55,7 @@ For added security GlobalIDs can also be signed to ensure that the data hasn't b
 => #<Person:0x007fae94bf6298 @id="1">
 
 ```
-You can even bump the security up some more by explaining what purpose a Signed Global ID is for. 
+You can even bump the security up some more by explaining what purpose a Signed Global ID is for.
 In this way evildoers can't reuse a sign-up form's SGID on the login page. For example.
 
 ```ruby
@@ -66,7 +66,7 @@ In this way evildoers can't reuse a sign-up form's SGID on the login page. For e
 => #<Person:0x007fae94bf6298 @id="1">
 ```
 
-You can also have SGIDs that expire some time in the future. This is useful if there's a resource, 
+You can also have SGIDs that expire some time in the future. This is useful if there's a resource,
 people shouldn't have indefinite access to, like a share link.
 
 ```ruby
@@ -91,7 +91,7 @@ people shouldn't have indefinite access to, like a share link.
 
 ### Custom App Locator
 
-A custom locator can be set for an app by calling `GlobalID::Locator.use` and providing an app locator to use for that app. 
+A custom locator can be set for an app by calling `GlobalID::Locator.use` and providing an app locator to use for that app.
 A custom app locator is useful when different apps collaborate and reference each others' Global IDs.
 When finding a Global ID's model, the locator to use is based on the app name provided in the Global ID url.
 
@@ -116,7 +116,7 @@ class BarLocator
 end
 ```
 
-After defining locators as above, URIs like "gid://foo/Person/1" and "gid://bar/Person/1" will now use the foo block locator and `BarLocator` respectively. 
+After defining locators as above, URIs like "gid://foo/Person/1" and "gid://bar/Person/1" will now use the foo block locator and `BarLocator` respectively.
 Other apps will still keep using the default locator.
 
 ## License
