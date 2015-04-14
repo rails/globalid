@@ -1,6 +1,6 @@
 # Global ID - Reference models by URI [![Build Status](https://secure.travis-ci.org/rails/globalid.png)](https://travis-ci.org/rails/globalid)
 
-A Global ID is a URI that uniquely identifies a model instance:
+A Global ID is an app wide URI that uniquely identifies a model instance:
 
   gid://YourApp/Some::Model/id
 
