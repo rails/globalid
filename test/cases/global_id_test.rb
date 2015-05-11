@@ -183,7 +183,7 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
     assert_equal 'gid://foo/Person/5', person_gid.to_s
 
     assert_raise ArgumentError do
-      person_gid = GlobalID.create(Person.new(5), app: nil)
+      GlobalID.create(Person.new(5), app: nil)
     end
   end
 end
