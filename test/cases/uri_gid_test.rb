@@ -55,7 +55,8 @@ class URI::GIDValidationTest < ActiveSupport::TestCase
   end
 
   test 'missing model id' do
-    assert_invalid_component 'gid://bcx/Person'
+    err = assert_raise(URI::GID::MissingModelIdError) { URI::GID.parse('gid://bcx/Person') }
+    assert_match /Unable to create a Global ID for Person/, err.message
   end
 
   test 'too many model ids' do

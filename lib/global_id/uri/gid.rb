@@ -28,6 +28,9 @@ module URI
     alias :app :host
     attr_reader :model_name, :model_id, :params
 
+    # Raised when creating a Global ID for a model without an id
+    class MissingModelIdError < URI::InvalidComponentError; end
+
     class << self
       # Validates +app+'s as URI hostnames containing only alphanumeric characters
       # and hyphens. An ArgumentError is raised if +app+ is invalid.
@@ -141,7 +144,7 @@ module URI
       def set_model_components(path, validate = false)
         _, model_name, model_id = path.match(PATH_REGEXP).to_a
 
-        validate_component(model_name) && validate_component(model_id) if validate
+        validate_component(model_name) && validate_model_id(model_id, model_name) if validate
 
         @model_name = model_name
         @model_id = model_id
@@ -152,6 +155,13 @@ module URI
 
         raise URI::InvalidComponentError,
           "Expected a URI like gid://app/Person/1234: #{inspect}"
+      end
+
+      def validate_model_id(model_id, model_name)
+        return model_id unless model_id.blank?
+
+        raise MissingModelIdError, "Unable to create a Global ID for " \
+          "#{model_name} without a model id."
       end
 
       def parse_query_params(query)
