@@ -248,3 +248,20 @@ class GlobalLocatorTest < ActiveSupport::TestCase
       GlobalID.app = old_app
     end
 end
+
+class ScopedRecordLocatingTest < ActiveSupport::TestCase
+  setup do
+    @gid = Person::Scoped.new('1').to_gid
+  end
+
+  test "by GID with scoped record" do
+    found = GlobalID::Locator.locate(@gid)
+    assert_kind_of @gid.model_class, found
+    assert_equal @gid.model_id, found.id
+  end
+
+  test "by many with scoped records" do
+    assert_equal [ Person::Scoped.new('1'), Person::Scoped.new('2') ],
+      GlobalID::Locator.locate_many([ Person::Scoped.new('1').to_gid, Person::Scoped.new('2').to_gid ])
+  end
+end

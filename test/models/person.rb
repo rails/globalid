@@ -33,4 +33,20 @@ class Person
   end
 end
 
+class Person::Scoped < Person
+  def initialize(*)
+    super
+    @find_allowed = false
+  end
+
+  def self.unscoped
+    @find_allowed = true
+    yield
+  end
+
+  def self.find(*)
+    super if @find_allowed
+  end
+end
+
 class Person::Child < Person; end
