@@ -83,7 +83,7 @@ module URI
       def build(args)
         parts = Util.make_components_hash(self, args)
         parts[:host] = parts[:app]
-        parts[:path] = "/#{parts[:model_name]}/#{parts[:model_id]}"
+        parts[:path] = "/#{parts[:model_name]}/#{CGI.escape(parts[:model_id].to_s)}"
         parts[:query] = URI.encode_www_form(parts[:params]) if parts[:params]
 
         super parts
@@ -143,6 +143,7 @@ module URI
 
       def set_model_components(path, validate = false)
         _, model_name, model_id = path.match(PATH_REGEXP).to_a
+        model_id = CGI.unescape(model_id) if model_id
 
         validate_component(model_name) && validate_model_id(model_id, model_name) if validate
 

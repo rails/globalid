@@ -45,6 +45,28 @@ class URI::GIDTest <  ActiveSupport::TestCase
   end
 end
 
+class URI::GIDModelIDEncodingTest < ActiveSupport::TestCase
+  test 'alphanumeric' do
+    model = Person.new('John123')
+    assert_equal 'gid://app/Person/John123', URI::GID.create('app', model).to_s
+  end
+
+  test 'non-alphanumeric' do
+    model = Person.new('John Doe-Smith/Jones')
+    assert_equal 'gid://app/Person/John+Doe-Smith%2FJones', URI::GID.create('app', model).to_s
+  end
+end
+
+class URI::GIDModelIDDecodingTest < ActiveSupport::TestCase
+  test 'alphanumeric' do
+    assert_equal 'John123', URI::GID.parse('gid://app/Person/John123').model_id
+  end
+
+  test 'non-alphanumeric' do
+    assert_equal 'John Doe-Smith/Jones', URI::GID.parse('gid://app/Person/John+Doe-Smith%2FJones').model_id
+  end
+end
+
 class URI::GIDValidationTest < ActiveSupport::TestCase
   test 'missing app' do
     assert_invalid_component 'gid:///Person/1'
