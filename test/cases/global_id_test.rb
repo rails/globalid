@@ -189,7 +189,12 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
 end
 
 class GlobalIDCustomParamsTest < ActiveSupport::TestCase
-  test 'custom params' do
+  test 'create custom params' do
+    gid = GlobalID.create(Person.new(5), hello: 'world')
+    assert_equal 'world', gid.params[:hello]
+  end
+
+  test 'parse custom params' do
     gid = GlobalID.parse 'gid://bcx/Person/5?hello=world'
     assert_equal 'world', gid.params[:hello]
   end

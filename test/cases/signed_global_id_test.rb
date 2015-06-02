@@ -219,3 +219,15 @@ class SignedGlobalIDExpirationTest < ActiveSupport::TestCase
       SignedGlobalID.expires_in = old_expires
     end
 end
+
+class SignedGlobalIDCustomParamsTest < ActiveSupport::TestCase
+  test 'create custom params' do
+    sgid = SignedGlobalID.create(Person.new(5), hello: 'world')
+    assert_equal 'world', sgid.params[:hello]
+  end
+
+  test 'parse custom params' do
+    sgid = SignedGlobalID.parse('eyJnaWQiOiJnaWQ6Ly9iY3gvUGVyc29uLzU/aGVsbG89d29ybGQiLCJwdXJwb3NlIjoiZGVmYXVsdCIsImV4cGlyZXNfYXQiOm51bGx9--7c042f09483dec470fa1088b76d9fd946eb30ffa')
+    assert_equal 'world', sgid.params[:hello]
+  end
+end
