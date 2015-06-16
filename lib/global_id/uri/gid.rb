@@ -84,7 +84,10 @@ module URI
         parts = Util.make_components_hash(self, args)
         parts[:host] = parts[:app]
         parts[:path] = "/#{parts[:model_name]}/#{CGI.escape(parts[:model_id].to_s)}"
-        parts[:query] = URI.encode_www_form(parts[:params]) if parts[:params]
+
+        if parts[:params] && !parts[:params].empty?
+          parts[:query] = URI.encode_www_form(parts[:params])
+        end
 
         super parts
       end
