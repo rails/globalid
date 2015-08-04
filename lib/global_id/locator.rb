@@ -106,7 +106,9 @@ class GlobalID
 
       private
         def locator_for(gid)
-          @locators.fetch(normalize_app(gid.app)) { default_locator }
+          @locators.fetch(normalize_app(gid.app)) do
+            gid.model_class.respond_to?(:unscoped) ? UNSCOPED_LOCATOR : DEFAULT_LOCATOR
+          end
         end
 
         def find_allowed?(model_class, only = nil)
@@ -125,7 +127,7 @@ class GlobalID
     private
       @locators = {}
 
-      class ActiveRecordFinder
+      class DefaultLocator
         def locate(gid)
           gid.model_class.find gid.model_id
         end
@@ -149,8 +151,19 @@ class GlobalID
             end
           end
       end
+      DEFAULT_LOCATOR = DefaultLocator.new
 
-      mattr_reader(:default_locator) { ActiveRecordFinder.new }
+      class UnscopedLocator < DefaultLocator
+        def locate(gid)
+          gid.model_class.unscoped { super }
+        end
+
+        private
+          def find_records(model_class, ids, options)
+            model_class.unscoped { super }
+          end
+      end
+      UNSCOPED_LOCATOR = UnscopedLocator.new
 
       class BlockLocator
         def initialize(block)
