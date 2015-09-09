@@ -1,4 +1,4 @@
-# Global ID - Reference models by URI [![Build Status](https://secure.travis-ci.org/rails/globalid.png)](https://travis-ci.org/rails/globalid)
+# Global ID - Reference models by URI
 
 A Global ID is an app wide URI that uniquely identifies a model instance:
 
@@ -119,6 +119,12 @@ end
 After defining locators as above, URIs like "gid://foo/Person/1" and "gid://bar/Person/1" will now use the foo block locator and `BarLocator` respectively.
 Other apps will still keep using the default locator.
 
-## License
+## Contributing to GlobalID
 
-GlobalID is released under the MIT license.
+GlobalID is work of many contributors. You're encouraged to submit pull requests, propose
+features and discuss issues.
+
+See [CONTRIBUTING](CONTRIBUTING.md).
+
+## License
+GlobalID is released under the [MIT License](http://www.opensource.org/licenses/MIT).
