@@ -16,7 +16,6 @@ Gem::Specification.new do |s|
   s.files        = Dir['MIT-LICENSE', 'README.rdoc', 'lib/**/*']
   s.require_path = 'lib'
 
-  # TODO: may relax this dependency further
   s.add_runtime_dependency 'activesupport', '>= 4.1.0'
 
   s.add_development_dependency 'rake'
