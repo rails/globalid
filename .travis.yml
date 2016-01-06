@@ -1,6 +1,11 @@
 ---
 language: ruby
 sudo: false
+before_install:
+  - gem install bundler
+  - "rm ${BUNDLE_GEMFILE}.lock"
+before_script:
+  - bundle update
 cache: bundler
 rvm:
 - 1.9.3
