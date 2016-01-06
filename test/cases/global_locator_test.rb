@@ -264,4 +264,9 @@ class ScopedRecordLocatingTest < ActiveSupport::TestCase
     assert_equal [ Person::Scoped.new('1'), Person::Scoped.new('2') ],
       GlobalID::Locator.locate_many([ Person::Scoped.new('1').to_gid, Person::Scoped.new('2').to_gid ])
   end
+
+  test "by many with scoped and unscoped records" do
+    assert_equal [ Person::Scoped.new('1'), Person.new('2') ],
+      GlobalID::Locator.locate_many([ Person::Scoped.new('1').to_gid, Person.new('2').to_gid ])
+  end
 end
