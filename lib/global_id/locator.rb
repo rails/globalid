@@ -152,19 +152,19 @@ class GlobalID
 
       class UnscopedLocator < BaseLocator
         def locate(gid)
-          if gid.model_class.respond_to?(:unscoped)
-            gid.model_class.unscoped { super }
-          else
-            super
-          end
+          unscoped(gid.model_class) { super }
         end
 
         private
           def find_records(model_class, ids, options)
+            unscoped(model_class) { super }
+          end
+
+          def unscoped(model_class)
             if model_class.respond_to?(:unscoped)
-              model_class.unscoped { super }
+              model_class.unscoped { yield }
             else
-              super
+              yield
             end
           end
       end
