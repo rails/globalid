@@ -66,12 +66,12 @@ In this way evildoers can't reuse a sign-up form's SGID on the login page. For e
 => #<Person:0x007fae94bf6298 @id="1">
 ```
 
-You can also have SGIDs that expire some time in the future. This is useful if there's a resource,
-people shouldn't have indefinite access to, like a share link.
+By default, SGIDs expire after a month. Specify the lifetime of an SGID when
+generating it using the `:expires_in` and `:expires_at` options.
 
 ```ruby
 >> expiring_sgid = Document.find(5).to_sgid(expires_in: 2.hours, for: 'sharing')
-=> #<SignedGlobalID:0x008fde45df8937
+=> #<SignedGlobalID:0x008fde45df8937 ...>
 
 # Within 2 hours...
 >> GlobalID::Locator.locate_signed(expiring_sgid, for: 'sharing')
@@ -82,11 +82,25 @@ people shouldn't have indefinite access to, like a share link.
 => nil
 
 >> explicit_expiring_sgid = SecretAgentMessage.find(5).to_sgid(expires_at: Time.now.advance(hours: 1))
-=> #<SignedGlobalID:0x008fde45df8937
+=> #<SignedGlobalID:0x008fde45df8937 ...>
 
 # 1 hour later...
 >> GlobalID::Locator.locate_signed explicit_expiring_sgid
 => nil
+
+>> never_expiring_sgid = Document.find(5).to_sgid(expires_in: nil)
+=> #<SignedGlobalID:0x008fde45df8937 ...>
+
+# Any time later...
+>> GlobalID::Locator.locate_signed never_expiring_sgid
+=> #<Document:0x007fae94bf6298 @id="5">
+```
+
+Alter the default SGID lifetime in app configuration, like so:
+
+```ruby
+# config/initializers/global_id.rb
+Rails.application.config.global_id.expires_in = 3.months
 ```
 
 ### Custom App Locator
