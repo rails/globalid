@@ -42,7 +42,7 @@ Support is automatically included in Active Record.
 For added security GlobalIDs can also be signed to ensure that the data hasn't been tampered with.
 
 ```ruby
->> person_gid = Person.find(1).to_signed_global_id
+>> person_sgid = Person.find(1).to_signed_global_id
 => #<SignedGlobalID:0x007fea1944b410
 
 >> person_sgid = Person.find(1).to_sgid
