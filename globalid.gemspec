@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   s.email    = 'david@loudthinking.com'
   s.homepage = 'http://www.rubyonrails.org'
 
-  s.files        = Dir['MIT-LICENSE', 'README.rdoc', 'lib/**/*']
+  s.files        = Dir['MIT-LICENSE', 'README.md', 'lib/**/*']
   s.require_path = 'lib'
 
   s.add_runtime_dependency 'activesupport', '>= 4.1.0'
