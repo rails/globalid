@@ -3,7 +3,7 @@ language: ruby
 sudo: false
 before_install:
   - gem install bundler
-  - "rm ${BUNDLE_GEMFILE}.lock"
+  - "rm -f ${BUNDLE_GEMFILE}.lock"
 before_script:
   - bundle update
 cache: bundler
@@ -16,7 +16,18 @@ rvm:
 - ruby-head
 - rbx-2
 - jruby
+gemfile:
+- gemfiles/rails_4.1.gemfile
+- gemfiles/rails_4.2.gemfile
+- gemfiles/rails_5.0.gemfile
 matrix:
+  exclude:
+  - rvm: 1.9.3
+    gemfile: gemfiles/rails_5.0.gemfile
+  - rvm: 2.0.0
+    gemfile: gemfiles/rails_5.0.gemfile
+  - rvm: 2.1
+    gemfile: gemfiles/rails_5.0.gemfile
   allow_failures:
   - rvm: rbx-2
   - rvm: jruby
