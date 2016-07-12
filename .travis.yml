@@ -10,9 +10,9 @@ cache: bundler
 rvm:
 - 1.9.3
 - 2.0.0
-- 2.1
-- 2.2
-- 2.3.0
+- 2.1.10
+- 2.2.5
+- 2.3.1
 - ruby-head
 - rbx-2
 - jruby
@@ -26,7 +26,7 @@ matrix:
     gemfile: gemfiles/rails_5.0.gemfile
   - rvm: 2.0.0
     gemfile: gemfiles/rails_5.0.gemfile
-  - rvm: 2.1
+  - rvm: 2.1.10
     gemfile: gemfiles/rails_5.0.gemfile
   allow_failures:
   - rvm: rbx-2
