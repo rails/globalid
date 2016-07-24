@@ -221,11 +221,27 @@ class GlobalLocatorTest < ActiveSupport::TestCase
     assert_equal login_sgid.model_id, found.id
   end
 
+  test "by valid purpose with SGID returns right model" do
+    instance = Person.new
+    login_sgid = instance.to_signed_global_id(for: 'login')
+
+    found = GlobalID::Locator.locate_signed(login_sgid, for: 'login')
+    assert_kind_of login_sgid.model_class, found
+    assert_equal login_sgid.model_id, found.id
+  end
+
   test "by invalid purpose returns nil" do
     instance = Person.new
     login_sgid = instance.to_signed_global_id(for: 'login')
 
     assert_nil GlobalID::Locator.locate_signed(login_sgid.to_s, for: 'like_button')
+  end
+
+  test "by invalid purpose with SGID returns nil" do
+    instance = Person.new
+    login_sgid = instance.to_signed_global_id(for: 'login')
+
+    assert_nil GlobalID::Locator.locate_signed(login_sgid, for: 'like_button')
   end
 
   test "by many with one record missing leading to a raise" do
