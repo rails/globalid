@@ -9,8 +9,7 @@ class SignedGlobalID < GlobalID
     attr_accessor :verifier
 
     def parse(sgid, options = {})
-      signed_message = sgid.is_a?(self) ? sgid.to_s : sgid
-      super verify(signed_message, options), options
+      super verify(sgid.to_s, options), options
     end
 
     # Grab the verifier from options and fall back to SignedGlobalID.verifier.
