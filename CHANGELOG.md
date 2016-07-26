@@ -1,3 +1,7 @@
+*   Verify instances of SignedGlobalID when locating them.
+
+    *y-yagi*
+
 *   Added locate_many(ignore_missing: true) option that'll use #where instead of #find for bulk location,
     which via Active Record means missing records will be ignored instead of raise an exception.
 
