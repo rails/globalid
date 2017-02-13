@@ -93,8 +93,10 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
   end
 
   test 'find with multiple class' do
-    assert_equal Person.find(@person_gid.model_id), @person_gid.find(only: [Fixnum, Person])
-    assert_equal Person.find(@person_uuid_gid.model_id), @person_uuid_gid.find(only: [Fixnum, Person])
+    assert_equal Person.find(@person_gid.model_id),
+                 @person_gid.find(only: [0.class, Person])
+    assert_equal Person.find(@person_uuid_gid.model_id),
+                 @person_uuid_gid.find(only: [0.class, Person])
     assert_equal PersonModel.find(@person_model_gid.model_id),
                  @person_model_gid.find(only: [Float, PersonModel])
     assert_equal Person::Child.find(@person_namespaced_gid.model_id),
@@ -102,8 +104,8 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
   end
 
   test 'find with multiple class no match' do
-    assert_nil @person_gid.find(only: [Fixnum, Numeric])
-    assert_nil @person_uuid_gid.find(only: [Fixnum, String])
+    assert_nil @person_gid.find(only: [0.class, Numeric])
+    assert_nil @person_uuid_gid.find(only: [0.class, String])
     assert_nil @person_model_gid.find(only: [Array, Hash])
     assert_nil @person_namespaced_gid.find(only: [String, Set])
   end
@@ -111,8 +113,10 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
   test 'find with multiple module' do
     assert_equal Person.find(@person_gid.model_id),
                  @person_gid.find(only: [Enumerable, GlobalID::Identification])
+    bignum_class = RUBY_VERSION >= '2.4' ? Integer : Bignum
     assert_equal Person.find(@person_uuid_gid.model_id),
-                 @person_uuid_gid.find(only: [Bignum, GlobalID::Identification])
+                 @person_uuid_gid.find(only: [bignum_class,
+                                              GlobalID::Identification])
     assert_equal PersonModel.find(@person_model_gid.model_id),
                  @person_model_gid.find(only: [String, ActiveModel::Model])
     assert_equal Person::Child.find(@person_namespaced_gid.model_id),
