@@ -66,8 +66,8 @@ In this way evildoers can't reuse a sign-up form's SGID on the login page. For e
 => #<Person:0x007fae94bf6298 @id="1">
 ```
 
-By default, SGIDs expire after a month. Specify the lifetime of an SGID when
-generating it using the `:expires_in` and `:expires_at` options.
+You can also have SGIDs that expire some time in the future. Useful if there's a resource,
+people shouldn't have indefinite access to, like a share link.
 
 ```ruby
 >> expiring_sgid = Document.find(5).to_sgid(expires_in: 2.hours, for: 'sharing')
@@ -88,6 +88,7 @@ generating it using the `:expires_in` and `:expires_at` options.
 >> GlobalID::Locator.locate_signed explicit_expiring_sgid.to_s
 => nil
 
+# Passing a false value to either expiry option turns off expiration entirely.
 >> never_expiring_sgid = Document.find(5).to_sgid(expires_in: nil)
 => #<SignedGlobalID:0x008fde45df8937 ...>
 
@@ -96,7 +97,18 @@ generating it using the `:expires_in` and `:expires_at` options.
 => #<Document:0x007fae94bf6298 @id="5">
 ```
 
-Alter the default SGID lifetime in app configuration, like so:
+Note that an explicit `:expires_at` takes precedence over a relative `:expires_in`.
+
+You can assign a default SGID lifetime like so:
+
+```ruby
+SignedGlobalID.expires_in = 1.month
+```
+
+This way any generated SGID will use that relative expiry.
+
+In Rails, an auto-expiry of 1 month is set by default. You can alter that deal
+in an initializer with:
 
 ```ruby
 # config/initializers/global_id.rb
