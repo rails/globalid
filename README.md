@@ -43,10 +43,10 @@ For added security GlobalIDs can also be signed to ensure that the data hasn't b
 
 ```ruby
 >> person_sgid = Person.find(1).to_signed_global_id
-=> #<SignedGlobalID:0x007fea1944b410
+=> #<SignedGlobalID:0x007fea1944b410>
 
 >> person_sgid = Person.find(1).to_sgid
-=> #<SignedGlobalID:0x007fea1944b410
+=> #<SignedGlobalID:0x007fea1944b410>
 
 >> person_sgid.to_s
 => "BAhJIh5naWQ6Ly9pZGluYWlkaS9Vc2VyLzM5NTk5BjoGRVQ=--81d7358dd5ee2ca33189bb404592df5e8d11420e"
