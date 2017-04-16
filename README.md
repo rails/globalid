@@ -33,7 +33,7 @@ Support is automatically included in Active Record.
 >> person_gid.to_s
 => "gid://app/Person/1"
 
->> GlobalID::Locator.locate person_gid
+>> GlobalID::Locator.locate GlobalID.parse(person_gid.to_s)
 => #<Person:0x007fae94bf6298 @id="1">
 ```
 
@@ -51,7 +51,7 @@ For added security GlobalIDs can also be signed to ensure that the data hasn't b
 >> person_sgid.to_s
 => "BAhJIh5naWQ6Ly9pZGluYWlkaS9Vc2VyLzM5NTk5BjoGRVQ=--81d7358dd5ee2ca33189bb404592df5e8d11420e"
 
->> GlobalID::Locator.locate_signed person_sgid
+>> GlobalID::Locator.locate_signed SignedGlobalID.parse(person_sgid.to_s)
 => #<Person:0x007fae94bf6298 @id="1">
 
 ```
