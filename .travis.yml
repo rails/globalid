@@ -18,7 +18,6 @@ rvm:
 - rbx-2
 - jruby
 gemfile:
-- gemfiles/rails_4.1.gemfile
 - gemfiles/rails_4.2.gemfile
 - gemfiles/rails_5.0.gemfile
 matrix:
@@ -29,8 +28,6 @@ matrix:
     gemfile: gemfiles/rails_5.0.gemfile
   - rvm: 2.1.10
     gemfile: gemfiles/rails_5.0.gemfile
-  - rvm: 2.4.0
-    gemfile: gemfiles/rails_4.1.gemfile
   allow_failures:
   - rvm: rbx-2
   - rvm: jruby
