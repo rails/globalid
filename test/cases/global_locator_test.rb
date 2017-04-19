@@ -173,7 +173,7 @@ class GlobalLocatorTest < ActiveSupport::TestCase
   end
 
   test 'use locator with block' do
-    GlobalID::Locator.use :foo do |gid|
+    GlobalID::Locator.use :foo do
       :foo
     end
 
@@ -197,7 +197,7 @@ class GlobalLocatorTest < ActiveSupport::TestCase
   end
 
   test 'app locator is case insensitive' do
-    GlobalID::Locator.use :insensitive do |gid|
+    GlobalID::Locator.use :insensitive do
       :insensitive
     end
 
@@ -208,7 +208,7 @@ class GlobalLocatorTest < ActiveSupport::TestCase
 
   test 'locator name cannot have underscore' do
     assert_raises ArgumentError do
-      GlobalID::Locator.use('under_score') { |gid| 'will never be found' }
+      GlobalID::Locator.use('under_score') { |_| 'will never be found' }
     end
   end
 
