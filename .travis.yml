@@ -8,9 +8,6 @@ before_script:
   - bundle update
 cache: bundler
 rvm:
-- 1.9.3
-- 2.0.0
-- 2.1.10
 - 2.2.5
 - 2.3.1
 - 2.4.0
@@ -20,14 +17,15 @@ rvm:
 gemfile:
 - gemfiles/rails_4.2.gemfile
 - gemfiles/rails_5.0.gemfile
+- gemfiles/rails_5.1.gemfile
 matrix:
-  exclude:
+  include:
   - rvm: 1.9.3
-    gemfile: gemfiles/rails_5.0.gemfile
+    gemfile: gemfiles/rails_4.2.gemfile
   - rvm: 2.0.0
-    gemfile: gemfiles/rails_5.0.gemfile
+    gemfile: gemfiles/rails_4.2.gemfile
   - rvm: 2.1.10
-    gemfile: gemfiles/rails_5.0.gemfile
+    gemfile: gemfiles/rails_4.2.gemfile
   allow_failures:
   - rvm: rbx-2
   - rvm: jruby
