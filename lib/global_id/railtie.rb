@@ -11,6 +11,7 @@ class GlobalID
   # Set up the signed GlobalID verifier and include Active Record support.
   class Railtie < Rails::Railtie # :nodoc:
     config.global_id = ActiveSupport::OrderedOptions.new
+    config.eager_load_namespaces << GlobalID
 
     initializer 'global_id' do |app|
 
