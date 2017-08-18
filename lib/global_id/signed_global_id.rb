@@ -9,7 +9,7 @@ class SignedGlobalID < GlobalID
     attr_accessor :verifier
 
     def parse(sgid, options = {})
-      super verify(sgid.to_s, options), options
+      super verify(decode_sgid_param(sgid.to_s), options), options
     end
 
     # Grab the verifier from options and fall back to SignedGlobalID.verifier.
@@ -29,6 +29,17 @@ class SignedGlobalID < GlobalID
     end
 
     private
+
+      def decode_sgid_param(sgid_param)
+        Base64.urlsafe_decode64(repad_gid(sgid_param))
+      rescue ArgumentError => argument_error
+        if argument_error.message.include?("invalid base64")
+          return sgid_param
+        else
+          raise
+        end
+      end
+
       def verify(sgid, options)
         metadata = pick_verifier(options).verify(sgid)
 
@@ -58,7 +69,6 @@ class SignedGlobalID < GlobalID
   def to_s
     @sgid ||= @verifier.generate(to_h)
   end
-  alias to_param to_s
 
   def to_h
     # Some serializers decodes symbol keys to symbols, others to strings.
