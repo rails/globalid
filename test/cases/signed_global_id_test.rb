@@ -27,7 +27,12 @@ class SignedGlobalIDTest < ActiveSupport::TestCase
   end
 
   test 'to param' do
-    assert_equal @person_sgid.to_s, @person_sgid.to_param
+    assert_equal "ZXlKbmFXUWlPaUpuYVdRNkx5OWlZM2d2VUdWeWMyOXVMelVpTENKd2RYSndiM05sSWpvaVpHVm1ZWFZzZENJc0ltVjRjR2x5WlhOZllYUWlPbTUxYkd4OS0tMDRhNmY1OTE0MDI1OTc1NmIyMjAwOGM4YzBmNzZlYTVlZDQ4NTU3OQ", @person_sgid.to_param
+  end
+
+  test 'to param produces param friendly value' do
+    sgid = SignedGlobalID.create(Person.new(25))
+    assert_not_includes sgid.to_param, "="
   end
 end
 
