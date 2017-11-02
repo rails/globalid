@@ -53,20 +53,11 @@ For added security GlobalIDs can also be signed to ensure that the data hasn't b
 
 >> GlobalID::Locator.locate_signed person_sgid
 => #<Person:0x007fae94bf6298 @id="1">
-
-```
-You can even bump the security up some more by explaining what purpose a Signed Global ID is for.
-In this way evildoers can't reuse a sign-up form's SGID on the login page. For example.
-
-```ruby
->> signup_person_sgid = Person.find(1).to_sgid(for: 'signup_form')
-=> #<SignedGlobalID:0x007fea1984b520
-
->> GlobalID::Locator.locate_signed(signup_person_sgid.to_s, for: 'signup_form')
-=> #<Person:0x007fae94bf6298 @id="1">
 ```
 
-You can also have SGIDs that expire some time in the future. Useful if there's a resource,
+**Expiration**
+
+Signed Global IDs can expire some time in the future. This is useful if there's a resource
 people shouldn't have indefinite access to, like a share link.
 
 ```ruby
@@ -80,24 +71,15 @@ people shouldn't have indefinite access to, like a share link.
 # More than 2 hours later...
 >> GlobalID::Locator.locate_signed(expiring_sgid.to_s, for: 'sharing')
 => nil
-
->> explicit_expiring_sgid = SecretAgentMessage.find(5).to_sgid(expires_at: Time.now.advance(hours: 1))
-=> #<SignedGlobalID:0x008fde45df8937 ...>
-
-# 1 hour later...
->> GlobalID::Locator.locate_signed explicit_expiring_sgid.to_s
-=> nil
-
-# Passing a false value to either expiry option turns off expiration entirely.
->> never_expiring_sgid = Document.find(5).to_sgid(expires_in: nil)
-=> #<SignedGlobalID:0x008fde45df8937 ...>
-
-# Any time later...
->> GlobalID::Locator.locate_signed never_expiring_sgid
-=> #<Document:0x007fae94bf6298 @id="5">
 ```
 
-Note that an explicit `:expires_at` takes precedence over a relative `:expires_in`.
+**In Rails, an auto-expiry of 1 month is set by default.** You can alter that deal
+in an initializer with:
+
+```ruby
+# config/initializers/global_id.rb
+Rails.application.config.global_id.expires_in = 3.months
+```
 
 You can assign a default SGID lifetime like so:
 
@@ -107,12 +89,48 @@ SignedGlobalID.expires_in = 1.month
 
 This way any generated SGID will use that relative expiry.
 
-In Rails, an auto-expiry of 1 month is set by default. You can alter that deal
-in an initializer with:
+It's worth noting that _expiring SGIDs are not idempotent_ because they encode the current timestamp; repeated calls to `to_sgid` will produce different results. For example, in Rails
+
+```
+Document.find(5).to_sgid.to_s == Document.find(5).to_sgid.to_s
+=> false
+```
+
+You need to explicity pass `expires_in: nil` to generate a permanent SGID that will not expire, 
+
+```
+# Passing a false value to either expiry option turns off expiration entirely.
+>> never_expiring_sgid = Document.find(5).to_sgid(expires_in: nil)
+=> #<SignedGlobalID:0x008fde45df8937 ...>
+
+# Any time later...
+>> GlobalID::Locator.locate_signed never_expiring_sgid
+=> #<Document:0x007fae94bf6298 @id="5">
+```
+
+It's also possible to pass a specific expiry time
+
+```
+>> explicit_expiring_sgid = SecretAgentMessage.find(5).to_sgid(expires_at: Time.now.advance(hours: 1))
+=> #<SignedGlobalID:0x008fde45df8937 ...>
+
+# 1 hour later...
+>> GlobalID::Locator.locate_signed explicit_expiring_sgid.to_s
+=> nil
+```
+Note that an explicit `:expires_at` takes precedence over a relative `:expires_in`.
+
+**Labels**
+
+You can even bump the security up some more by explaining what purpose a Signed Global ID is for.
+In this way evildoers can't reuse a sign-up form's SGID on the login page. For example.
 
 ```ruby
-# config/initializers/global_id.rb
-Rails.application.config.global_id.expires_in = 3.months
+>> signup_person_sgid = Person.find(1).to_sgid(for: 'signup_form')
+=> #<SignedGlobalID:0x007fea1984b520
+
+>> GlobalID::Locator.locate_signed(signup_person_sgid.to_s, for: 'signup_form')
+=> #<Person:0x007fae94bf6298 @id="1">
 ```
 
 ### Custom App Locator
