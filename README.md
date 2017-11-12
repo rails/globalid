@@ -24,17 +24,17 @@ Mix `GlobalID::Identification` into any model with a `#find(id)` class method.
 Support is automatically included in Active Record.
 
 ```ruby
->> person_gid = Person.find(1).to_global_id
-=> #<GlobalID ...
+person_gid = Person.find(1).to_global_id
+# => #<GlobalID ...
 
->> person_gid.uri
-=> #<URI ...
+person_gid.uri
+# => #<URI ...
 
->> person_gid.to_s
-=> "gid://app/Person/1"
+person_gid.to_s
+# => "gid://app/Person/1"
 
->> GlobalID::Locator.locate person_gid
-=> #<Person:0x007fae94bf6298 @id="1">
+GlobalID::Locator.locate person_gid
+# => #<Person:0x007fae94bf6298 @id="1">
 ```
 
 ### Signed Global IDs
@@ -42,17 +42,17 @@ Support is automatically included in Active Record.
 For added security GlobalIDs can also be signed to ensure that the data hasn't been tampered with.
 
 ```ruby
->> person_sgid = Person.find(1).to_signed_global_id
-=> #<SignedGlobalID:0x007fea1944b410>
+person_sgid = Person.find(1).to_signed_global_id
+# => #<SignedGlobalID:0x007fea1944b410>
 
->> person_sgid = Person.find(1).to_sgid
-=> #<SignedGlobalID:0x007fea1944b410>
+person_sgid = Person.find(1).to_sgid
+# => #<SignedGlobalID:0x007fea1944b410>
 
->> person_sgid.to_s
-=> "BAhJIh5naWQ6Ly9pZGluYWlkaS9Vc2VyLzM5NTk5BjoGRVQ=--81d7358dd5ee2ca33189bb404592df5e8d11420e"
+person_sgid.to_s
+# => "BAhJIh5naWQ6Ly9pZGluYWlkaS9Vc2VyLzM5NTk5BjoGRVQ=--81d7358dd5ee2ca33189bb404592df5e8d11420e"
 
->> GlobalID::Locator.locate_signed person_sgid
-=> #<Person:0x007fae94bf6298 @id="1">
+GlobalID::Locator.locate_signed person_sgid
+# => #<Person:0x007fae94bf6298 @id="1">
 ```
 
 **Expiration**
@@ -61,16 +61,16 @@ Signed Global IDs can expire some time in the future. This is useful if there's 
 people shouldn't have indefinite access to, like a share link.
 
 ```ruby
->> expiring_sgid = Document.find(5).to_sgid(expires_in: 2.hours, for: 'sharing')
-=> #<SignedGlobalID:0x008fde45df8937 ...>
+expiring_sgid = Document.find(5).to_sgid(expires_in: 2.hours, for: 'sharing')
+# => #<SignedGlobalID:0x008fde45df8937 ...>
 
 # Within 2 hours...
->> GlobalID::Locator.locate_signed(expiring_sgid.to_s, for: 'sharing')
-=> #<Document:0x007fae94bf6298 @id="5">
+GlobalID::Locator.locate_signed(expiring_sgid.to_s, for: 'sharing')
+# => #<Document:0x007fae94bf6298 @id="5">
 
 # More than 2 hours later...
->> GlobalID::Locator.locate_signed(expiring_sgid.to_s, for: 'sharing')
-=> nil
+GlobalID::Locator.locate_signed(expiring_sgid.to_s, for: 'sharing')
+# => nil
 ```
 
 **In Rails, an auto-expiry of 1 month is set by default.** You can alter that deal
@@ -91,32 +91,32 @@ This way any generated SGID will use that relative expiry.
 
 It's worth noting that _expiring SGIDs are not idempotent_ because they encode the current timestamp; repeated calls to `to_sgid` will produce different results. For example, in Rails
 
-```
+```ruby
 Document.find(5).to_sgid.to_s == Document.find(5).to_sgid.to_s
-=> false
+# => false
 ```
 
 You need to explicity pass `expires_in: nil` to generate a permanent SGID that will not expire,
 
-```
+```ruby
 # Passing a false value to either expiry option turns off expiration entirely.
->> never_expiring_sgid = Document.find(5).to_sgid(expires_in: nil)
-=> #<SignedGlobalID:0x008fde45df8937 ...>
+never_expiring_sgid = Document.find(5).to_sgid(expires_in: nil)
+# => #<SignedGlobalID:0x008fde45df8937 ...>
 
 # Any time later...
->> GlobalID::Locator.locate_signed never_expiring_sgid
-=> #<Document:0x007fae94bf6298 @id="5">
+GlobalID::Locator.locate_signed never_expiring_sgid
+# => #<Document:0x007fae94bf6298 @id="5">
 ```
 
 It's also possible to pass a specific expiry time
 
-```
->> explicit_expiring_sgid = SecretAgentMessage.find(5).to_sgid(expires_at: Time.now.advance(hours: 1))
-=> #<SignedGlobalID:0x008fde45df8937 ...>
+```ruby
+explicit_expiring_sgid = SecretAgentMessage.find(5).to_sgid(expires_at: Time.now.advance(hours: 1))
+# => #<SignedGlobalID:0x008fde45df8937 ...>
 
 # 1 hour later...
->> GlobalID::Locator.locate_signed explicit_expiring_sgid.to_s
-=> nil
+GlobalID::Locator.locate_signed explicit_expiring_sgid.to_s
+# => nil
 ```
 Note that an explicit `:expires_at` takes precedence over a relative `:expires_in`.
 
@@ -126,11 +126,11 @@ You can even bump the security up some more by explaining what purpose a Signed 
 In this way evildoers can't reuse a sign-up form's SGID on the login page. For example.
 
 ```ruby
->> signup_person_sgid = Person.find(1).to_sgid(for: 'signup_form')
-=> #<SignedGlobalID:0x007fea1984b520
+signup_person_sgid = Person.find(1).to_sgid(for: 'signup_form')
+# => #<SignedGlobalID:0x007fea1984b520
 
->> GlobalID::Locator.locate_signed(signup_person_sgid.to_s, for: 'signup_form')
-=> #<Person:0x007fae94bf6298 @id="1">
+GlobalID::Locator.locate_signed(signup_person_sgid.to_s, for: 'signup_form')
+# => #<Person:0x007fae94bf6298 @id="1">
 ```
 
 ### Custom App Locator
