@@ -96,7 +96,7 @@ Document.find(5).to_sgid.to_s == Document.find(5).to_sgid.to_s
 => false
 ```
 
-You need to explicity pass `expires_in: nil` to generate a permanent SGID that will not expire, 
+You need to explicity pass `expires_in: nil` to generate a permanent SGID that will not expire,
 
 ```
 # Passing a false value to either expiry option turns off expiration entirely.
@@ -120,7 +120,7 @@ It's also possible to pass a specific expiry time
 ```
 Note that an explicit `:expires_at` takes precedence over a relative `:expires_in`.
 
-**Labels**
+**Purpose**
 
 You can even bump the security up some more by explaining what purpose a Signed Global ID is for.
 In this way evildoers can't reuse a sign-up form's SGID on the login page. For example.
