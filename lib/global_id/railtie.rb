@@ -20,6 +20,9 @@ class GlobalID
       GlobalID.app = app.config.global_id.app ||= default_app_name
       SignedGlobalID.expires_in = app.config.global_id.fetch(:expires_in, default_expires_in)
 
+      app.config.global_id.use_verifier_to_handle_metadata ||= false
+      SignedGlobalID.use_verifier_to_handle_metadata = app.config.global_id.use_verifier_to_handle_metadata
+
       config.after_initialize do
         GlobalID.app = app.config.global_id.app ||= default_app_name
         SignedGlobalID.expires_in = app.config.global_id.fetch(:expires_in, default_expires_in)
