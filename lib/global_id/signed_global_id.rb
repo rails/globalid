@@ -3,10 +3,12 @@ require 'active_support/message_verifier'
 require 'time'
 
 class SignedGlobalID < GlobalID
+  cattr_accessor :use_verifier_to_handle_metadata, instance_accessor: false, default: false
+
   class ExpiredMessage < StandardError; end
 
   class << self
-    attr_accessor :verifier
+    attr_accessor :verifier, :expires_in
 
     def parse(sgid, options = {})
       super verify(sgid.to_s, options), options
@@ -20,8 +22,6 @@ class SignedGlobalID < GlobalID
       end
     end
 
-    attr_accessor :expires_in
-
     DEFAULT_PURPOSE = "default"
 
     def pick_purpose(options)
@@ -30,11 +30,24 @@ class SignedGlobalID < GlobalID
 
     private
       def verify(sgid, options)
+        verify_with_verifier_validated_metadata(sgid, options) || verify_with_self_validated_metadata(sgid, options)
+      end
+
+      def verify_with_verifier_validated_metadata(sgid, options)
+        if use_verifier_to_handle_metadata
+          pick_verifier(options).verify(sgid, purpose: pick_purpose(options))
+        end
+      rescue ActiveSupport::MessageVerifier::InvalidSignature
+        nil
+      end
+
+      def verify_with_self_validated_metadata(sgid, options)
         metadata = pick_verifier(options).verify(sgid)
 
         raise_if_expired(metadata['expires_at'])
 
         metadata['gid'] if pick_purpose(options) == metadata['purpose']
+
       rescue ActiveSupport::MessageVerifier::InvalidSignature, ExpiredMessage
         nil
       end
@@ -56,7 +69,11 @@ class SignedGlobalID < GlobalID
   end
 
   def to_s
-    @sgid ||= @verifier.generate(to_h)
+    if self.class.use_verifier_to_handle_metadata
+      @sgid ||= @verifier.generate(@uri.to_s, purpose: purpose, expires_at: expires_at)
+    else
+      @sgid ||= @verifier.generate(to_h)
+    end
   end
   alias to_param to_s
 

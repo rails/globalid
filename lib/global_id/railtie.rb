@@ -21,6 +21,9 @@ class GlobalID
       app.config.global_id.expires_in ||= 1.month
       SignedGlobalID.expires_in = app.config.global_id.expires_in
 
+      app.config.global_id.use_verifier_to_handle_metadata ||= false
+      SignedGlobalID.use_verifier_to_handle_metadata = app.config.global_id.use_verifier_to_handle_metadata
+
       config.after_initialize do
         app.config.global_id.verifier ||= begin
           GlobalID::Verifier.new(app.key_generator.generate_key('signed_global_ids'))

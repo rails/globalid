@@ -36,11 +36,6 @@ class RailtieTest < ActiveSupport::TestCase
     assert_equal @app.message_verifier(:signed_global_ids).generate(message), signed_message
   end
 
-  test 'SignedGlobalID.verifier defaults to nil when secret_token is not present' do
-    @app.initialize!
-    assert_nil SignedGlobalID.verifier
-  end
-
   test 'SignedGlobalID.verifier can be set with config.global_id.verifier =' do
     custom_verifier = @app.config.global_id.verifier = ActiveSupport::MessageVerifier.new('muchSECRETsoHIDDEN', serializer: SERIALIZER)
     @app.initialize!
