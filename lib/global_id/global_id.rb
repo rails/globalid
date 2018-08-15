@@ -63,6 +63,11 @@ class GlobalID
   def ==(other)
     other.is_a?(GlobalID) && @uri == other.uri
   end
+  alias_method :eql?, :==
+
+  def hash
+    self.class.hash | @uri.hash
+  end
 
   def to_param
     # remove the = padding character for a prettier param -- it'll be added back in parse_encoded_gid

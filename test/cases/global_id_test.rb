@@ -190,6 +190,30 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
       person_gid = GlobalID.create(Person.new(5), app: nil)
     end
   end
+
+  test 'equality' do
+    p1 = Person.new(5)
+    p2 = Person.new(5)
+    p3 = Person.new(10)
+    assert_equal p1, p2
+    assert_not_equal p2, p3
+
+    gid1 = GlobalID.create(p1)
+    gid2 = GlobalID.create(p2)
+    gid3 = GlobalID.create(p3)
+    assert_equal gid1, gid2
+    assert_not_equal gid2, gid3
+
+    # hash and eql? to match for two GlobalID's pointing to the same object
+    assert_equal [gid1], [gid1, gid2].uniq
+    assert_equal [gid1, gid3], [gid1, gid2, gid3].uniq
+
+    # verify that the GlobalID's hash is different to the underlaying URI
+    assert_not_equal gid1.hash, gid1.uri.hash
+
+    # verify that URI and GlobalID do not pass the uniq test
+    assert_equal [gid1, gid1.uri], [gid1, gid1.uri].uniq
+  end
 end
 
 class GlobalIDCustomParamsTest < ActiveSupport::TestCase
