@@ -21,5 +21,10 @@ class GlobalID
     def to_sgid_param(options = {})
       to_signed_global_id(options).to_param
     end
+
+    def initialize_dup(other)
+      @global_id = nil
+      super
+    end
   end
 end

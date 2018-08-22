@@ -29,4 +29,12 @@ class GlobalIdentificationTest < ActiveSupport::TestCase
     assert_equal SignedGlobalID.create(@model, some: 'param'), @model.to_signed_global_id(some: 'param')
     assert_equal SignedGlobalID.create(@model, some: 'param'), @model.to_sgid(some: 'param')
   end
+
+  test 'dup should clear memoized to_global_id' do
+    global_id = @model.to_global_id
+    dup_model = @model.dup
+    dup_model.id = @model.id + 1
+    dup_global_id = dup_model.to_global_id
+    assert_not_equal global_id, dup_global_id
+  end
 end
