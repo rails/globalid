@@ -15,6 +15,11 @@ class GlobalIdentificationTest < ActiveSupport::TestCase
     assert_equal GlobalID.create(@model, some: 'param'), @model.to_gid(some: 'param')
   end
 
+  test 'creates a Global ID with different sets of custom params' do
+    assert_equal GlobalID.create(@model, some: 'param'), @model.to_global_id(some: 'param')
+    assert_equal GlobalID.create(@model, other: 'param'), @model.to_global_id(other: 'param')
+  end
+
   test 'creates a signed Global ID from self' do
     assert_equal SignedGlobalID.create(@model), @model.to_signed_global_id
     assert_equal SignedGlobalID.create(@model), @model.to_sgid

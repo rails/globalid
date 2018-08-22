@@ -5,7 +5,8 @@ class GlobalID
     extend ActiveSupport::Concern
 
     def to_global_id(options = {})
-      @global_id ||= GlobalID.create(self, options)
+      @global_id_cache ||= {}
+      @global_id_cache[options] ||= GlobalID.create(self, options)
     end
     alias to_gid to_global_id
 
