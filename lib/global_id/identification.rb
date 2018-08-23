@@ -5,7 +5,7 @@ class GlobalID
     extend ActiveSupport::Concern
 
     def to_global_id(options = {})
-      @global_id ||= GlobalID.create(self, options)
+      GlobalID.create(self, options)
     end
     alias to_gid to_global_id
 
@@ -20,11 +20,6 @@ class GlobalID
 
     def to_sgid_param(options = {})
       to_signed_global_id(options).to_param
-    end
-
-    def initialize_dup(other)
-      @global_id = nil
-      super
     end
   end
 end
