@@ -96,7 +96,7 @@ Document.find(5).to_sgid.to_s == Document.find(5).to_sgid.to_s
 # => false
 ```
 
-You need to explicity pass `expires_in: nil` to generate a permanent SGID that will not expire,
+You need to explicitly pass `expires_in: nil` to generate a permanent SGID that will not expire,
 
 ```ruby
 # Passing a false value to either expiry option turns off expiration entirely.
