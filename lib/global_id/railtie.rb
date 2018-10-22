@@ -14,14 +14,16 @@ class GlobalID
     config.eager_load_namespaces << GlobalID
 
     initializer 'global_id' do |app|
+      default_expires_in = 1.month
+      default_app_name = app.railtie_name.remove('_application').dasherize
 
-      app.config.global_id.app ||= app.railtie_name.remove('_application').dasherize
-      GlobalID.app = app.config.global_id.app
-
-      app.config.global_id.expires_in ||= 1.month
-      SignedGlobalID.expires_in = app.config.global_id.expires_in
+      GlobalID.app = app.config.global_id.app ||= default_app_name
+      SignedGlobalID.expires_in = app.config.global_id.expires_in ||= default_expires_in
 
       config.after_initialize do
+        GlobalID.app = app.config.global_id.app ||= default_app_name
+        SignedGlobalID.expires_in = app.config.global_id.expires_in ||= default_expires_in
+
         app.config.global_id.verifier ||= begin
           GlobalID::Verifier.new(app.key_generator.generate_key('signed_global_ids'))
         rescue ArgumentError

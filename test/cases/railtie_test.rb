@@ -28,6 +28,18 @@ class RailtieTest < ActiveSupport::TestCase
     assert_equal 'foo', GlobalID.app
   end
 
+  test 'config.global_id can be used to set configurations after the railtie has been loaded' do
+    @app.config.eager_load = true
+    @app.config.before_eager_load do
+      @app.config.global_id.app = 'foobar'
+      @app.config.global_id.expires_in = 1.year
+    end
+
+    @app.initialize!
+    assert_equal 'foobar', GlobalID.app
+    assert_equal 1.year, SignedGlobalID.expires_in
+  end
+
   test 'SignedGlobalID.verifier defaults to Blog::Application.message_verifier(:signed_global_ids) when secret_token is present' do
     @app.config.secret_token = ('x' * 30)
     @app.initialize!
