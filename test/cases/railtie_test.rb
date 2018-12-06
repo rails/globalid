@@ -49,8 +49,14 @@ class RailtieTest < ActiveSupport::TestCase
   end
 
   test 'SignedGlobalID.verifier defaults to nil when secret_key_base is not present' do
-    @app.initialize!
-    assert_nil SignedGlobalID.verifier
+    original_env, Rails.env = Rails.env, 'production'
+
+    begin
+      @app.initialize!
+      assert_nil SignedGlobalID.verifier
+    ensure
+      Rails.env = original_env
+    end
   end
 
   test 'SignedGlobalID.verifier can be set with config.global_id.verifier =' do
