@@ -40,17 +40,23 @@ class RailtieTest < ActiveSupport::TestCase
     assert_equal 1.year, SignedGlobalID.expires_in
   end
 
-  test 'SignedGlobalID.verifier defaults to Blog::Application.message_verifier(:signed_global_ids) when secret_token is present' do
-    @app.config.secret_token = ('x' * 30)
+  test 'SignedGlobalID.verifier defaults to Blog::Application.message_verifier(:signed_global_ids) when secret_key_base is present' do
+    @app.config.secret_key_base = ('x' * 30)
     @app.initialize!
     message = {id: 42}
     signed_message = SignedGlobalID.verifier.generate(message)
     assert_equal @app.message_verifier(:signed_global_ids).generate(message), signed_message
   end
 
-  test 'SignedGlobalID.verifier defaults to nil when secret_token is not present' do
-    @app.initialize!
-    assert_nil SignedGlobalID.verifier
+  test 'SignedGlobalID.verifier defaults to nil when secret_key_base is not present' do
+    original_env, Rails.env = Rails.env, 'production'
+
+    begin
+      @app.initialize!
+      assert_nil SignedGlobalID.verifier
+    ensure
+      Rails.env = original_env
+    end
   end
 
   test 'SignedGlobalID.verifier can be set with config.global_id.verifier =' do
