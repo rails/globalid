@@ -8,9 +8,10 @@ before_script:
   - bundle update
 cache: bundler
 rvm:
-- 2.2.5
-- 2.3.1
-- 2.4.0
+- 2.2.10
+- 2.3.8
+- 2.4.5
+- 2.5.3
 - ruby-head
 - rbx-2
 - jruby
