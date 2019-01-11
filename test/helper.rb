@@ -1,4 +1,5 @@
 require 'bundler/setup'
+require 'forwardable'
 require 'active_support'
 require 'active_support/testing/autorun'
 
