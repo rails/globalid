@@ -21,13 +21,6 @@ gemfile:
 - gemfiles/rails_5.1.gemfile
 - gemfiles/rails_5.2.gemfile
 matrix:
-  include:
-  - rvm: 1.9.3
-    gemfile: gemfiles/rails_4.2.gemfile
-  - rvm: 2.0.0
-    gemfile: gemfiles/rails_4.2.gemfile
-  - rvm: 2.1.10
-    gemfile: gemfiles/rails_4.2.gemfile
   allow_failures:
   - rvm: rbx-2
   - rvm: jruby
