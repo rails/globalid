@@ -15,6 +15,7 @@ class RailtieTest < ActiveSupport::TestCase
     @app = BlogApp::Application.new
     @app.config.eager_load = false
     @app.config.logger = Logger.new(nil)
+    @app.config.secret_key_base = ('x' * 30)
   end
 
   test 'GlobalID.app for Blog::Application defaults to blog' do
@@ -41,7 +42,6 @@ class RailtieTest < ActiveSupport::TestCase
   end
 
   test 'SignedGlobalID.verifier defaults to Blog::Application.message_verifier(:signed_global_ids) when secret_key_base is present' do
-    @app.config.secret_key_base = ('x' * 30)
     @app.initialize!
     message = {id: 42}
     signed_message = SignedGlobalID.verifier.generate(message)
@@ -52,6 +52,7 @@ class RailtieTest < ActiveSupport::TestCase
     original_env, Rails.env = Rails.env, 'production'
 
     begin
+      @app.config.secret_key_base = nil
       @app.initialize!
       assert_nil SignedGlobalID.verifier
     ensure
