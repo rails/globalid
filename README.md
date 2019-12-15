@@ -133,14 +133,19 @@ GlobalID::Locator.locate_signed(signup_person_sgid.to_s, for: 'signup_form')
 # => #<Person:0x007fae94bf6298 @id="1">
 ```
 
-### Retrieving a collection of GlobalIDs
+### Locating many Global IDs
 
-It's possible that you have a collection of Global ID's, perhaps passed as parameters in a controller. Naively, calling `GlobalID::Locator.locate` for each Global ID in a collection will initiate an SQL select query `n` times (which can be a performance hit)
+When needing to locate many Global IDs use `GlobalID::Locator.locate_many` or `GlobalID::Locator.locate_many_signed` for Signed Global IDs to allow loading
+Global IDs more efficiently.
 
-Instead, use `GlobalID::Locator.locate_many` (and its counterpart `GlobalID::Locator.locate_many_signed`) to retrieve a collection using the minimum number of SQL queries necessary. It uses just one query per model class.
+For instance, the default locator passes every `model_id` per `model_name` thus
+using `model_name.where(id: model_ids)` versus `GlobalID::Locator.locate`'s `model_name.find(id)`.
+
+In the case of looking up Global IDs from a database, it's only necessary to query
+once per `model_name` as shown here:
 
 ```ruby
-ids = (User.first(3) + Student.first(3)).sort_by(&:id).map(&:to_global_id)
+gids = users.concat(people).sort_by(&:id).map(&:to_global_id)
 # => [#<GlobalID:0x00007ffd6a8411a0 @uri=#<URI::GID gid://app/User/1>>,
 #<GlobalID:0x00007ffd675d32b8 @uri=#<URI::GID gid://app/Student/1>>,
 #<GlobalID:0x00007ffd6a840b10 @uri=#<URI::GID gid://app/User/2>>,
@@ -148,17 +153,13 @@ ids = (User.first(3) + Student.first(3)).sort_by(&:id).map(&:to_global_id)
 #<GlobalID:0x00007ffd6a840480 @uri=#<URI::GID gid://app/User/3>>,
 #<GlobalID:0x00007ffd675d2598 @uri=#<URI::GID gid://app/Student/3>>]
 
-objects = GlobalID::Locator.locate_many ids
-# SELECT "users".*
-#   FROM "users"
-#   WHERE "users"."id" IN ($1, $2, $3)  [["id", 1], ["id", 2], ["id", 3]]
-# SELECT "students".*
-#   FROM "students"
-#   WHERE "students"."id" IN ($1, $2, $3)  [["id", 1], ["id", 2], ["id", 3]]
+GlobalID::Locator.locate_many gids
+# SELECT "users".* FROM "users" WHERE "users"."id" IN ($1, $2, $3)  [["id", 1], ["id", 2], ["id", 3]]
+# SELECT "students".* FROM "students" WHERE "students"."id" IN ($1, $2, $3)  [["id", 1], ["id", 2], ["id", 3]]
 # => [#<User id: 1>, #<Student id: 1>, #<User id: 2>, #<Student id: 2>, #<User id: 3>, #<Student id: 3>]
 ```
 
-Notice how using `locate_many` has only used 2 SQL queries (one for all the Users, one for all the Students), and has maintained the order of the items in the collection.
+Note the order is maintained in the returned results.
 
 ### Custom App Locator
 
