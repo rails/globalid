@@ -29,6 +29,12 @@ class RailtieTest < ActiveSupport::TestCase
     assert_equal 'foo', GlobalID.app
   end
 
+  test 'SignedGlobalID.expires_in can be explicitly set to nil with config.global_id.expires_in' do
+    @app.config.global_id.expires_in = nil
+    @app.initialize!
+    assert_nil SignedGlobalID.expires_in
+  end
+
   test 'config.global_id can be used to set configurations after the railtie has been loaded' do
     @app.config.eager_load = true
     @app.config.before_eager_load do
@@ -40,6 +46,17 @@ class RailtieTest < ActiveSupport::TestCase
     assert_equal 'foobar', GlobalID.app
     assert_equal 1.year, SignedGlobalID.expires_in
   end
+
+  test 'config.global_id can be used to explicitly set SignedGlobalID.expires_in to nil after the railtie has been loaded' do
+    @app.config.eager_load = true
+    @app.config.before_eager_load do
+      @app.config.global_id.expires_in = nil
+    end
+
+    @app.initialize!
+    assert_nil SignedGlobalID.expires_in
+  end
+
 
   test 'SignedGlobalID.verifier defaults to Blog::Application.message_verifier(:signed_global_ids) when secret_key_base is present' do
     @app.initialize!
