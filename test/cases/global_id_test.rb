@@ -227,3 +227,28 @@ class GlobalIDCustomParamsTest < ActiveSupport::TestCase
     assert_equal 'world', gid.params[:hello]
   end
 end
+
+class GlobalIDCustomClassLoaderTest < ActiveSupport::TestCase
+  setup do
+    GlobalID.class_loader_strategy = lambda do |model_name|
+      nested_model = model_name.split('::').last.to_sym
+      if Object.constants.include?(nested_model)
+        Kernel.const_get(nested_model)
+      else
+        model_name.constantize
+      end
+    end
+  end
+
+  test 'model class custom class loader strategy' do
+    assert_equal model_class('gid://bcx/Very::Nested::Person/5'), Person
+    assert_equal model_class('gid://bcx/Nested::Person/5'), Person
+    assert_equal model_class('gid://bcx/Person/5'), Person
+  end
+
+  private
+
+  def model_class(gid)
+    GlobalID.parse(gid).model_class
+  end
+end

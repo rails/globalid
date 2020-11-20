@@ -33,6 +33,12 @@ class GlobalID
       @app = URI::GID.validate_app(app)
     end
 
+    attr_writer :class_loader_strategy
+
+    def class_loader_strategy
+      @class_loader_strategy ||= ->(model_name) { model_name.constantize }
+    end
+
     private
       def parse_encoded_gid(gid, options)
         new(Base64.urlsafe_decode64(repad_gid(gid)), options) rescue nil
@@ -57,7 +63,11 @@ class GlobalID
   end
 
   def model_class
-    model_name.constantize
+    model_class_for(model_name)
+  end
+
+  def model_class_for(model_name)
+    self.class.class_loader_strategy.call(model_name)
   end
 
   def ==(other)

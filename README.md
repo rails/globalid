@@ -191,6 +191,35 @@ end
 After defining locators as above, URIs like "gid://foo/Person/1" and "gid://bar/Person/1" will now use the foo block locator and `BarLocator` respectively.
 Other apps will still keep using the default locator.
 
+### Custom Class Loader strategy
+
+By default the class loader just try to constantize the name:
+
+```ruby
+GlobalID.class_loader_strategy = -> (model_name) { model_name.constantize }
+```
+
+To define a custom class loader, you can assign the `class_loader_strategy`:
+
+```ruby
+GlobalID.class_loader_strategy = lambda (model_name) do
+  nested_model = model_name.split('::').last.to_sym
+  if Object.constants.include?(nested_model)
+    Kernel.const_get(nested_model)
+  else
+    model_name.constantize
+  end
+end
+```
+
+The sample class loader above will check nested model name first:
+
+```ruby
+GlobalID.parse('gid://bar/Foo::Bar::Person/5').model_class # => Person
+GlobalID.parse('gid://bar/Bar::Person/5').model_class # => Person
+GlobalID.parse('gid://bar/Person/5').model_class # => Person
+```
+
 ## Contributing to GlobalID
 
 GlobalID is work of many contributors. You're encouraged to submit pull requests, propose
