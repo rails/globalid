@@ -1,9 +1,5 @@
-require 'active_support/concern'
-
 class GlobalID
   module Identification
-    extend ActiveSupport::Concern
-
     def to_global_id(options = {})
       GlobalID.create(self, options)
     end
