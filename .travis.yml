@@ -25,15 +25,3 @@ matrix:
   - rvm: jruby
   - rvm: ruby-head
   fast_finish: true
-notifications:
-  email: false
-  irc:
-    on_success: change
-    on_failure: always
-    channels:
-      - "irc.freenode.org#rails-contrib"
-    campfire:
-      on_success: change
-      on_failure: always
-      rooms:
-        - secure: "A6lU9PnAYUzvayOnJjKXA+lav6uQ4O8+bhFZs/wiEw3I/B/vUyNjxUlDu3qRhZHDKs3LX1zH82BC/TEP6CgVtP7hE0WfgFqaCouLzBxgzlyzQMdlObRdoO1PlNTglfph8Q7gQEY3Fo4dZmE9DfgOzY6Lkopnj7Esg2YnoZ1lrXI="
