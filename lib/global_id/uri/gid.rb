@@ -173,5 +173,9 @@ module URI
       end
   end
 
-  @@schemes['GID'] = GID
+  if respond_to?(:register_scheme)
+    register_scheme('GID', GID)
+  else
+    @@schemes['GID'] = GID
+  end
 end
