@@ -7,10 +7,6 @@ before_script:
   - bundle update
 cache: bundler
 rvm:
-  - 2.2.10
-  - 2.3.8
-  - 2.4.5
-  - 2.5.3
   - 2.6.8
   - 2.7.4
   - ruby-head
