@@ -16,12 +16,11 @@ gemfile:
   - gemfiles/rails_5.2.gemfile
   - gemfiles/rails_6.0.gemfile
   - gemfiles/rails_6.1.gemfile
-matrix:
+jobs:
   allow_failures:
     - rvm: jruby
     - rvm: ruby-head
   fast_finish: true
-jobs:
   include:
     - rvm: 3.0.2
       gemfile: gemfiles/rails_6.0.gemfile
