@@ -37,3 +37,4 @@ jobs:
       - name: Run tests
         run: bundle exec rake test
         continue-on-error: ${{ matrix.ruby == 'head' || matrix.ruby == 'truffleruby' }}
+        timeout-minutes: 3
