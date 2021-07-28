@@ -7,10 +7,10 @@ jobs:
       fail-fast: false
       matrix:
         ruby: [ 2.6, 2.7, "3.0", head, jruby, truffleruby ]
-        gemfile: [ "5.0", "5.1", "5.2", "6.0", "6.1" ]
+        rails: [ "5.0", "5.1", "5.2", "6.0", "6.1" ]
 
     env:
-      BUNDLE_GEMFILE: ${{ github.workspace }}/gemfiles/rails_${{ matrix.gemfile }}.gemfile
+      BUNDLE_GEMFILE: ${{ github.workspace }}/gemfiles/rails_${{ matrix.rails }}.gemfile
 
     steps:
       - uses: actions/checkout@v2
