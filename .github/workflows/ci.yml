@@ -32,4 +32,4 @@ jobs:
 
       - name: Run tests
         run: bundle exec rake test
-        continue-on-error: ${{ matrix.ruby == "jruby" }}
+        continue-on-error: ${{ matrix.ruby == 'jruby' }}
