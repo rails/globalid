@@ -22,7 +22,7 @@ end
 
 class GlobalIDParamEncodedTest < ActiveSupport::TestCase
   setup do
-    model = Person.new('id')
+    model = Person.new(id: 'id')
     @gid = GlobalID.create(model)
   end
 
@@ -40,9 +40,9 @@ end
 class GlobalIDCreationTest < ActiveSupport::TestCase
   setup do
     @uuid = '7ef9b614-353c-43a1-a203-ab2307851990'
-    @person_gid = GlobalID.create(Person.new(5))
-    @person_uuid_gid = GlobalID.create(Person.new(@uuid))
-    @person_namespaced_gid = GlobalID.create(Person::Child.new(4))
+    @person_gid = GlobalID.create(Person.new(id: 5))
+    @person_uuid_gid = GlobalID.create(Person.new(uuid: @uuid))
+    @person_namespaced_gid = GlobalID.create(Person::Child.new(id: 4))
     @person_model_gid = GlobalID.create(PersonModel.new(id: 1))
   end
 
@@ -180,21 +180,21 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
   end
 
   test ':app option' do
-    person_gid = GlobalID.create(Person.new(5))
+    person_gid = GlobalID.create(Person.new(id: 5))
     assert_equal 'gid://bcx/Person/5', person_gid.to_s
 
-    person_gid = GlobalID.create(Person.new(5), app: "foo")
+    person_gid = GlobalID.create(Person.new(id: 5), app: "foo")
     assert_equal 'gid://foo/Person/5', person_gid.to_s
 
     assert_raise ArgumentError do
-      person_gid = GlobalID.create(Person.new(5), app: nil)
+      person_gid = GlobalID.create(Person.new(id: 5), app: nil)
     end
   end
 
   test 'equality' do
-    p1 = Person.new(5)
-    p2 = Person.new(5)
-    p3 = Person.new(10)
+    p1 = Person.new(id: 5)
+    p2 = Person.new(id: 5)
+    p3 = Person.new(id: 10)
     assert_equal p1, p2
     assert_not_equal p2, p3
 

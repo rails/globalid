@@ -4,3 +4,4 @@ gemspec
 
 gem 'activemodel'
 gem 'railties'
+gem 'pry'

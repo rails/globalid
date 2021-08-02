@@ -1,3 +1,5 @@
+require 'pry'
+
 class Person
   include GlobalID::Identification
 
@@ -15,17 +17,28 @@ class Person
       if id == HARDCODED_ID_FOR_MISSING_PERSON
         raise 'Person missing'
       else
-        new(id)
+        new(id: id)
       end
     end
   end
 
-  def self.where(conditions)
-    (conditions[:id] - [HARDCODED_ID_FOR_MISSING_PERSON]).collect { |id| new(id) }
+  def self.find_by(args)
+    find_by_options = args.with_indifferent_access
+    if find_by_options[:id].present? && find_by_options[:id] == HARDCODED_ID_FOR_MISSING_PERSON
+      raise 'Person missing'
+    else
+      new(find_by_options)
+    end
   end
 
-  def initialize(id = 1)
-    @id = id
+  def self.where(conditions)
+    (conditions[:id] - [HARDCODED_ID_FOR_MISSING_PERSON]).collect { |id| new(id: id) }
+  end
+
+  def initialize(**args)
+    args.each do |k, v|
+      define_singleton_method(k) { v }
+    end
   end
 
   def ==(other)

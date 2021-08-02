@@ -17,7 +17,7 @@ class URI::GIDTest <  ActiveSupport::TestCase
   end
 
   test 'create' do
-    model = Person.new('5')
+    model = Person.new(id: '5')
     assert_equal @gid_string, URI::GID.create('bcx', model).to_s
   end
 
@@ -47,12 +47,12 @@ end
 
 class URI::GIDModelIDEncodingTest < ActiveSupport::TestCase
   test 'alphanumeric' do
-    model = Person.new('John123')
+    model = Person.new(id: 'John123')
     assert_equal 'gid://app/Person/John123', URI::GID.create('app', model).to_s
   end
 
   test 'non-alphanumeric' do
-    model = Person.new('John Doe-Smith/Jones')
+    model = Person.new(id: 'John Doe-Smith/Jones')
     assert_equal 'gid://app/Person/John+Doe-Smith%2FJones', URI::GID.create('app', model).to_s
   end
 end

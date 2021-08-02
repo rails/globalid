@@ -127,7 +127,7 @@ class GlobalID
 
       class BaseLocator
         def locate(gid)
-          gid.model_class.find gid.model_id
+          gid.model_class.find_by(gid.primary_key => gid.model_id)
         end
 
         def locate_many(gids, options = {})

@@ -2,7 +2,7 @@ require 'helper'
 
 class GlobalLocatorTest < ActiveSupport::TestCase
   setup do
-    model = Person.new('id')
+    model = Person.new(id: 'id')
     @gid  = model.to_gid
     @sgid = model.to_sgid
   end
@@ -56,18 +56,18 @@ class GlobalLocatorTest < ActiveSupport::TestCase
   end
 
   test 'by many GIDs of one class' do
-    assert_equal [ Person.new('1'), Person.new('2') ],
-      GlobalID::Locator.locate_many([ Person.new('1').to_gid, Person.new('2').to_gid ])
+    assert_equal [ Person.new(id: '1'), Person.new(id: '2') ],
+      GlobalID::Locator.locate_many([ Person.new(id: '1').to_gid, Person.new(id: '2').to_gid ])
   end
 
   test 'by many GIDs of mixed classes' do
-    assert_equal [ Person.new('1'), Person::Child.new('1'), Person.new('2') ],
-      GlobalID::Locator.locate_many([ Person.new('1').to_gid, Person::Child.new('1').to_gid, Person.new('2').to_gid ])
+    assert_equal [ Person.new(id: '1'), Person::Child.new(id: '1'), Person.new(id: '2') ],
+      GlobalID::Locator.locate_many([ Person.new(id: '1').to_gid, Person::Child.new(id: '1').to_gid, Person.new(id: '2').to_gid ])
   end
 
   test 'by many GIDs with only: restriction to match subclass' do
-    assert_equal [ Person::Child.new('1') ],
-      GlobalID::Locator.locate_many([ Person.new('1').to_gid, Person::Child.new('1').to_gid, Person.new('2').to_gid ], only: Person::Child)
+    assert_equal [ Person::Child.new(id: '1') ],
+      GlobalID::Locator.locate_many([ Person.new(id: '1').to_gid, Person::Child.new(id: '1').to_gid, Person.new(id: '2').to_gid ], only: Person::Child)
   end
 
 
@@ -120,18 +120,18 @@ class GlobalLocatorTest < ActiveSupport::TestCase
   end
 
   test 'by many SGIDs of one class' do
-    assert_equal [ Person.new('1'), Person.new('2') ],
-      GlobalID::Locator.locate_many_signed([ Person.new('1').to_sgid, Person.new('2').to_sgid ])
+    assert_equal [ Person.new(id: '1'), Person.new(id: '2') ],
+      GlobalID::Locator.locate_many_signed([ Person.new(id: '1').to_sgid, Person.new(id: '2').to_sgid ])
   end
 
   test 'by many SGIDs of mixed classes' do
-    assert_equal [ Person.new('1'), Person::Child.new('1'), Person.new('2') ],
-      GlobalID::Locator.locate_many_signed([ Person.new('1').to_sgid, Person::Child.new('1').to_sgid, Person.new('2').to_sgid ])
+    assert_equal [ Person.new(id: '1'), Person::Child.new(id: '1'), Person.new(id: '2') ],
+      GlobalID::Locator.locate_many_signed([ Person.new(id: '1').to_sgid, Person::Child.new(id: '1').to_sgid, Person.new(id: '2').to_sgid ])
   end
 
   test 'by many SGIDs with only: restriction to match subclass' do
-    assert_equal [ Person::Child.new('1') ],
-      GlobalID::Locator.locate_many_signed([ Person.new('1').to_sgid, Person::Child.new('1').to_sgid, Person.new('2').to_sgid ], only: Person::Child)
+    assert_equal [ Person::Child.new(id: '1') ],
+      GlobalID::Locator.locate_many_signed([ Person.new(id: '1').to_sgid, Person::Child.new(id: '1').to_sgid, Person.new(id: '2').to_sgid ], only: Person::Child)
   end
 
   test 'by GID string' do
@@ -147,8 +147,8 @@ class GlobalLocatorTest < ActiveSupport::TestCase
   end
 
   test 'by many SGID strings with for: restriction to match purpose' do
-    assert_equal [ Person::Child.new('2') ],
-      GlobalID::Locator.locate_many_signed([ Person.new('1').to_sgid(for: 'adoption').to_s, Person::Child.new('1').to_sgid.to_s, Person::Child.new('2').to_sgid(for: 'adoption').to_s ], for: 'adoption', only: Person::Child)
+    assert_equal [ Person::Child.new(id: '2') ],
+      GlobalID::Locator.locate_many_signed([ Person.new(id: '1').to_sgid(for: 'adoption').to_s, Person::Child.new(id: '1').to_sgid.to_s, Person::Child.new(id: '2').to_sgid(for: 'adoption').to_s ], for: 'adoption', only: Person::Child)
   end
 
   test 'by to_param encoding' do
@@ -246,13 +246,13 @@ class GlobalLocatorTest < ActiveSupport::TestCase
 
   test "by many with one record missing leading to a raise" do
     assert_raises RuntimeError do
-      GlobalID::Locator.locate_many([ Person.new('1').to_gid, Person.new(Person::HARDCODED_ID_FOR_MISSING_PERSON).to_gid ])
+      GlobalID::Locator.locate_many([ Person.new(id: '1').to_gid, Person.new(Person::HARDCODED_ID_FOR_MISSING_PERSON).to_gid ])
     end
   end
 
   test "by many with one record missing not leading to a raise when ignoring missing" do
     assert_nothing_raised do
-      GlobalID::Locator.locate_many([ Person.new('1').to_gid, Person.new(Person::HARDCODED_ID_FOR_MISSING_PERSON).to_gid ], ignore_missing: true)
+      GlobalID::Locator.locate_many([ Person.new(id: '1').to_gid, Person.new(Person::HARDCODED_ID_FOR_MISSING_PERSON).to_gid ], ignore_missing: true)
     end
   end
 
@@ -267,7 +267,7 @@ end
 
 class ScopedRecordLocatingTest < ActiveSupport::TestCase
   setup do
-    @gid = Person::Scoped.new('1').to_gid
+    @gid = Person::Scoped.new(id: '1').to_gid
   end
 
   test "by GID with scoped record" do
@@ -277,12 +277,12 @@ class ScopedRecordLocatingTest < ActiveSupport::TestCase
   end
 
   test "by many with scoped records" do
-    assert_equal [ Person::Scoped.new('1'), Person::Scoped.new('2') ],
-      GlobalID::Locator.locate_many([ Person::Scoped.new('1').to_gid, Person::Scoped.new('2').to_gid ])
+    assert_equal [ Person::Scoped.new(id: '1'), Person::Scoped.new(id: '2') ],
+      GlobalID::Locator.locate_many([ Person::Scoped.new(id: '1').to_gid, Person::Scoped.new(id: '2').to_gid ])
   end
 
   test "by many with scoped and unscoped records" do
-    assert_equal [ Person::Scoped.new('1'), Person.new('2') ],
-      GlobalID::Locator.locate_many([ Person::Scoped.new('1').to_gid, Person.new('2').to_gid ])
+    assert_equal [ Person::Scoped.new(id: '1'), Person.new(id: '2') ],
+      GlobalID::Locator.locate_many([ Person::Scoped.new(id: '1').to_gid, Person.new(id: '2').to_gid ])
   end
 end

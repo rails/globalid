@@ -2,6 +2,7 @@ require 'uri/generic'
 require 'active_support/core_ext/module/aliasing'
 require 'active_support/core_ext/object/blank'
 require 'active_support/core_ext/hash/indifferent_access'
+require 'pry'
 
 module URI
   class GID < Generic
@@ -26,7 +27,7 @@ module URI
     #
     # Read the documentation for +parse+, +create+ and +build+ for more.
     alias :app :host
-    attr_reader :model_name, :model_id, :params
+    attr_reader :model_name, :model_id, :params, :primary_key
 
     # Raised when creating a Global ID for a model without an id
     class MissingModelIdError < URI::InvalidComponentError; end
@@ -65,7 +66,9 @@ module URI
       #
       #   URI::GID.create('bcx', Person.find(5), database: 'superhumans')
       def create(app, model, params = nil)
-        build app: app, model_name: model.class.name, model_id: model.id, params: params
+        primary_key = params&.delete(:primary_key).presence || :id
+        build app: app, model_name: model.class.name, primary_key: primary_key, model_id: model.public_send(primary_key), params: params
+        # build app: app, model_name: model.class.name, model_id: model.public_send(primary_key), params: params
       end
 
       # Create a new URI::GID from components with argument check.
@@ -83,7 +86,11 @@ module URI
       def build(args)
         parts = Util.make_components_hash(self, args)
         parts[:host] = parts[:app]
-        parts[:path] = "/#{parts[:model_name]}/#{CGI.escape(parts[:model_id].to_s)}"
+
+        path_components = ["", parts[:model_name], CGI.escape(parts[:model_id].to_s)]
+        path_components.insert(2, parts[:primary_key]) unless parts[:primary_key].to_s == "id"
+
+        parts[:path] = path_components.join("/")
 
         if parts[:params] && !parts[:params].empty?
           parts[:query] = URI.encode_www_form(parts[:params])

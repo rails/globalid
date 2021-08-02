@@ -3,7 +3,7 @@ require 'minitest/mock' # for stubbing Time.now as #travel doesn't have subsecon
 
 class SignedGlobalIDTest < ActiveSupport::TestCase
   setup do
-    @person_sgid = SignedGlobalID.create(Person.new(5))
+    @person_sgid = SignedGlobalID.create(Person.new(id: 5))
   end
 
   test 'as string' do
@@ -19,11 +19,11 @@ class SignedGlobalIDTest < ActiveSupport::TestCase
   end
 
   test 'value equality' do
-    assert_equal SignedGlobalID.create(Person.new(5)), SignedGlobalID.create(Person.new(5))
+    assert_equal SignedGlobalID.create(Person.new(id: 5)), SignedGlobalID.create(Person.new(id: 5))
   end
 
   test 'value equality with an unsigned id' do
-    assert_equal GlobalID.create(Person.new(5)), SignedGlobalID.create(Person.new(5))
+    assert_equal GlobalID.create(Person.new(id: 5)), SignedGlobalID.create(Person.new(id: 5))
   end
 
   test 'to param' do
@@ -33,7 +33,7 @@ end
 
 class SignedGlobalIDVerifierTest < ActiveSupport::TestCase
   setup do
-    @person_sgid = SignedGlobalID.create(Person.new(5))
+    @person_sgid = SignedGlobalID.create(Person.new(id: 5))
   end
 
   test 'parse raises when default verifier is nil' do
@@ -48,21 +48,21 @@ class SignedGlobalIDVerifierTest < ActiveSupport::TestCase
   test 'create raises when default verifier is nil' do
     with_default_verifier nil do
       assert_raise ArgumentError do
-        SignedGlobalID.create(Person.new(5))
+        SignedGlobalID.create(Person.new(id: 5))
       end
     end
   end
 
   test 'create accepts a :verifier' do
     with_default_verifier nil do
-      expected = SignedGlobalID.create(Person.new(5), verifier: VERIFIER)
+      expected = SignedGlobalID.create(Person.new(id: 5), verifier: VERIFIER)
       assert_equal @person_sgid, expected
     end
   end
 
   test 'new accepts a :verifier' do
     with_default_verifier nil do
-      expected = SignedGlobalID.new(Person.new(5).to_gid.uri, verifier: VERIFIER)
+      expected = SignedGlobalID.new(Person.new(id: 5).to_gid.uri, verifier: VERIFIER)
       assert_equal @person_sgid, expected
     end
   end
@@ -77,7 +77,7 @@ end
 
 class SignedGlobalIDPurposeTest < ActiveSupport::TestCase
   setup do
-    @login_sgid = SignedGlobalID.create(Person.new(5), for: 'login')
+    @login_sgid = SignedGlobalID.create(Person.new(id: 5), for: 'login')
   end
 
   test 'sign with purpose when :for is provided' do
@@ -85,20 +85,20 @@ class SignedGlobalIDPurposeTest < ActiveSupport::TestCase
   end
 
   test 'sign with default purpose when no :for is provided' do
-    sgid = SignedGlobalID.create(Person.new(5))
-    default_sgid = SignedGlobalID.create(Person.new(5), for: "default")
+    sgid = SignedGlobalID.create(Person.new(id: 5))
+    default_sgid = SignedGlobalID.create(Person.new(id: 5), for: "default")
 
     assert_equal "eyJnaWQiOiJnaWQ6Ly9iY3gvUGVyc29uLzUiLCJwdXJwb3NlIjoiZGVmYXVsdCIsImV4cGlyZXNfYXQiOm51bGx9--04a6f59140259756b22008c8c0f76ea5ed485579", sgid.to_s
     assert_equal sgid, default_sgid
   end
 
   test 'create accepts a :for' do
-    expected = SignedGlobalID.create(Person.new(5), for: "login")
+    expected = SignedGlobalID.create(Person.new(id: 5), for: "login")
     assert_equal @login_sgid, expected
   end
 
   test 'new accepts a :for' do
-    expected = SignedGlobalID.new(Person.new(5).to_gid.uri, for: 'login')
+    expected = SignedGlobalID.new(Person.new(id: 5).to_gid.uri, for: 'login')
     assert_equal @login_sgid, expected
   end
 
@@ -109,9 +109,9 @@ class SignedGlobalIDPurposeTest < ActiveSupport::TestCase
   end
 
   test 'equal only with same purpose' do
-    expected = SignedGlobalID.create(Person.new(5), for: 'login')
-    like_sgid = SignedGlobalID.create(Person.new(5), for: 'like_button')
-    no_purpose_sgid = SignedGlobalID.create(Person.new(5))
+    expected = SignedGlobalID.create(Person.new(id: 5), for: 'login')
+    like_sgid = SignedGlobalID.create(Person.new(id: 5), for: 'like_button')
+    no_purpose_sgid = SignedGlobalID.create(Person.new(id: 5))
 
     assert_equal @login_sgid, expected
     assert_not_equal @login_sgid, like_sgid
@@ -121,7 +121,7 @@ end
 
 class SignedGlobalIDExpirationTest < ActiveSupport::TestCase
   setup do
-    @uri = Person.new(5).to_gid.uri
+    @uri = Person.new(id: 5).to_gid.uri
   end
 
   test 'expires_in defaults to class level expiration' do
@@ -222,7 +222,7 @@ end
 
 class SignedGlobalIDCustomParamsTest < ActiveSupport::TestCase
   test 'create custom params' do
-    sgid = SignedGlobalID.create(Person.new(5), hello: 'world')
+    sgid = SignedGlobalID.create(Person.new(id: 5), hello: 'world')
     assert_equal 'world', sgid.params[:hello]
   end
 

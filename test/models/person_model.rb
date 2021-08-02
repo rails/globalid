@@ -4,7 +4,7 @@ class PersonModel
   include ActiveModel::Model
   include GlobalID::Identification
 
-  attr_accessor :id
+  attr_accessor :id, :uuid
 
   def self.find(id)
     new id: id
