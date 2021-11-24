@@ -37,6 +37,11 @@ class GlobalID
         require 'global_id/identification'
         send :include, GlobalID::Identification
       end
+
+      ActiveSupport.on_load(:active_record_fixture_set) do
+        require 'global_id/fixture_set'
+        send :extend, GlobalID::FixtureSet
+      end
     end
   end
 end
