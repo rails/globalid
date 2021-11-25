@@ -19,4 +19,8 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'activesupport', '>= 5.0'
 
   s.add_development_dependency 'rake'
+
+  s.metadata = {
+    "rubygems_mfa_required" => "true",
+  }
 end
