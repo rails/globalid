@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    globalid (0.6.0)
+    globalid (1.0.0)
       activesupport (>= 5.0)
 
 GEM
