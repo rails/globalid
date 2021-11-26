@@ -64,6 +64,23 @@ class GlobalLocatorTest < ActiveSupport::TestCase
     assert_equal @gid.model_id, found.id
   end
 
+  test 'by GID with eager loading' do
+    assert_equal Person::Child.new('1', Person.new('1')),
+      GlobalID::Locator.locate(
+        Person::Child.new('1', Person.new('1')).to_gid,
+        includes: :parent
+      )
+  end
+
+  test 'by GID trying to eager load an unexisting relationship' do
+    assert_raises StandardError do
+      GlobalID::Locator.locate(
+        Person::Child.new('1', Person.new('1')).to_gid,
+        includes: :some_non_existent_relationship
+      )
+    end
+  end
+
   test 'by many GIDs of one class' do
     assert_equal [ Person.new('1'), Person.new('2') ],
       GlobalID::Locator.locate_many([ Person.new('1').to_gid, Person.new('2').to_gid ])
@@ -91,6 +108,22 @@ class GlobalLocatorTest < ActiveSupport::TestCase
       GlobalID::Locator.locate_many([ Person.new('1').to_gid, Person::Child.new('1').to_gid, Person.new('2').to_gid ], only: Person::Child)
   end
 
+  test 'by many GIDs with eager loading' do
+    assert_equal [ Person::Child.new('1', Person.new('1')), Person::Child.new('2', Person.new('2')) ],
+      GlobalID::Locator.locate_many(
+        [ Person::Child.new('1', Person.new('1')).to_gid, Person::Child.new('2', Person.new('2')).to_gid ],
+        includes: :parent
+      )
+  end
+
+  test 'by many GIDs trying to eager load an unexisting relationship' do
+    assert_raises StandardError do
+      GlobalID::Locator.locate_many(
+        [ Person::Child.new('1', Person.new('1')).to_gid, Person::Child.new('2', Person.new('2')).to_gid ],
+        includes: :some_non_existent_relationship
+      )
+    end
+  end
 
   test 'by SGID' do
     found = GlobalID::Locator.locate_signed(@sgid)
@@ -236,7 +269,7 @@ class GlobalLocatorTest < ActiveSupport::TestCase
 
   test 'use locator with class' do
     class BarLocator
-      def locate(gid); :bar; end
+      def locate(gid, options = {}); :bar; end
       def locate_many(gids, options = {}); gids.map(&:model_id); end
     end
 

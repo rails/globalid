@@ -8,15 +8,20 @@ class GlobalID
       # Takes either a GlobalID or a string that can be turned into a GlobalID
       #
       # Options:
+      # * <tt>:includes</tt> - A Symbol, Array, Hash or combination of them
+      #   The same structure you would pass into a includes method of Active Record.
+      #   @see https://guides.rubyonrails.org/active_record_querying.html#eager-loading-associations
+      #   If present, locate will load all the relationships specified here.
       # * <tt>:only</tt> - A class, module or Array of classes and/or modules that are
       #   allowed to be located.  Passing one or more classes limits instances of returned
       #   classes to those classes or their subclasses.  Passing one or more modules in limits
       #   instances of returned classes to those including that module.  If no classes or
       #   modules match, +nil+ is returned.
       def locate(gid, options = {})
-        if gid = GlobalID.parse(gid)
-          locator_for(gid).locate gid if find_allowed?(gid.model_class, options[:only])
-        end
+        gid = GlobalID.parse(gid)
+        return unless gid && find_allowed?(gid.model_class, options[:only])
+
+        locator_for(gid).locate(gid, options.except(:only))
       end
 
       # Takes an array of GlobalIDs or strings that can be turned into a GlobalIDs.
@@ -30,6 +35,11 @@ class GlobalID
       # per model class, but still interpolate the results to match the order in which the gids were passed.
       #
       # Options:
+      # * <tt>:includes</tt> - A Symbol, Array, Hash or combination of them
+      #   The same structure you would pass into a includes method of Active Record.
+      #   @see https://guides.rubyonrails.org/active_record_querying.html#eager-loading-associations
+      #   If present, locate_many will load all the relationships specified here.
+      #   Note: It only works if all the gids models have that relationships.
       # * <tt>:only</tt> - A class, module or Array of classes and/or modules that are
       #   allowed to be located.  Passing one or more classes limits instances of returned
       #   classes to those classes or their subclasses.  Passing one or more modules in limits
@@ -51,6 +61,10 @@ class GlobalID
       # Takes either a SignedGlobalID or a string that can be turned into a SignedGlobalID
       #
       # Options:
+      # * <tt>:includes</tt> - A Symbol, Array, Hash or combination of them
+      #   The same structure you would pass into a includes method of Active Record.
+      #   @see https://guides.rubyonrails.org/active_record_querying.html#eager-loading-associations
+      #   If present, locate_signed will load all the relationships specified here.
       # * <tt>:only</tt> - A class, module or Array of classes and/or modules that are
       #   allowed to be located.  Passing one or more classes limits instances of returned
       #   classes to those classes or their subclasses.  Passing one or more modules in limits
@@ -68,6 +82,11 @@ class GlobalID
       # the results to match the order in which the gids were passed.
       #
       # Options:
+      # * <tt>:includes</tt> - A Symbol, Array, Hash or combination of them
+      #   The same structure you would pass into a includes method of Active Record.
+      #   @see https://guides.rubyonrails.org/active_record_querying.html#eager-loading-associations
+      #   If present, locate_many_signed will load all the relationships specified here.
+      #   Note: It only works if all the gids models have that relationships.
       # * <tt>:only</tt> - A class, module or Array of classes and/or modules that are
       #   allowed to be located.  Passing one or more classes limits instances of returned
       #   classes to those classes or their subclasses.  Passing one or more modules in limits
@@ -84,7 +103,7 @@ class GlobalID
       #
       # Using a block:
       #
-      #   GlobalID::Locator.use :foo do |gid|
+      #   GlobalID::Locator.use :foo do |gid, options|
       #     FooRemote.const_get(gid.model_name).find(gid.model_id)
       #   end
       #
@@ -93,7 +112,7 @@ class GlobalID
       #   GlobalID::Locator.use :bar, BarLocator.new
       #
       #   class BarLocator
-      #     def locate(gid)
+      #     def locate(gid, options = {})
       #       @search_client.search name: gid.model_name, id: gid.model_id
       #     end
       #   end
@@ -127,9 +146,12 @@ class GlobalID
       @locators = {}
 
       class BaseLocator
-        def locate(gid)
+        def locate(gid, options = {})
           return unless model_id_is_valid?(gid)
-          gid.model_class.find gid.model_id
+          model_class = gid.model_class
+          model_class = model_class.includes(options[:includes]) if options[:includes]
+
+          model_class.find gid.model_id
         end
 
         def locate_many(gids, options = {})
@@ -143,7 +165,7 @@ class GlobalID
           records_by_model_name_and_id = {}
 
           ids_by_model.each do |model, ids|
-            records = find_records(model, ids, ignore_missing: options[:ignore_missing])
+            records = find_records(model, ids, ignore_missing: options[:ignore_missing], includes: options[:includes])
 
             records_by_id = records.index_by do |record|
               record.id.is_a?(Array) ? record.id.map(&:to_s) : record.id.to_s
@@ -157,6 +179,8 @@ class GlobalID
 
         private
           def find_records(model_class, ids, options)
+            model_class = model_class.includes(options[:includes]) if options[:includes]
+
             if options[:ignore_missing]
               model_class.where(model_class.primary_key => ids)
             else
@@ -170,7 +194,7 @@ class GlobalID
       end
 
       class UnscopedLocator < BaseLocator
-        def locate(gid)
+        def locate(gid, options = {})
           unscoped(gid.model_class) { super }
         end
 
@@ -194,12 +218,12 @@ class GlobalID
           @locator = block
         end
 
-        def locate(gid)
-          @locator.call(gid)
+        def locate(gid, options = {})
+          @locator.call(gid, options)
         end
 
         def locate_many(gids, options = {})
-          gids.map { |gid| locate(gid) }
+          gids.map { |gid| locate(gid, options) }
         end
       end
   end
