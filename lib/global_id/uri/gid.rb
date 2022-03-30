@@ -98,6 +98,10 @@ module URI
       "gid://#{app}#{path}#{'?' + query if query}"
     end
 
+    def deconstruct_keys(_keys)
+      {app: app, model_name: model_name, model_id: model_id, params: params}
+    end
+
     protected
       def set_path(path)
         set_model_components(path) unless defined?(@model_name) && @model_id
