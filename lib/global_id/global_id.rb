@@ -35,13 +35,7 @@ class GlobalID
 
     private
       def parse_encoded_gid(gid, options)
-        new(Base64.urlsafe_decode64(repad_gid(gid)), options) rescue nil
-      end
-
-      # We removed the base64 padding character = during #to_param, now we're adding it back so decoding will work
-      def repad_gid(gid)
-        padding_chars = gid.length.modulo(4).zero? ? 0 : (4 - gid.length.modulo(4))
-        gid + ('=' * padding_chars)
+        new(Base64.urlsafe_decode64(gid), options) rescue nil
       end
   end
 
@@ -70,7 +64,6 @@ class GlobalID
   end
 
   def to_param
-    # remove the = padding character for a prettier param -- it'll be added back in parse_encoded_gid
-    Base64.urlsafe_encode64(to_s).sub(/=+$/, '')
+    Base64.urlsafe_encode64(to_s, padding: false)
   end
 end
