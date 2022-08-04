@@ -138,7 +138,7 @@ module URI
 
       def check_scheme(scheme)
         if scheme == 'gid'
-          super
+          true
         else
           raise URI::BadURIError, "Not a gid:// URI scheme: #{inspect}"
         end
