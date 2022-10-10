@@ -177,6 +177,9 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
     assert_equal Person, @person_uuid_gid.model_class
     assert_equal Person::Child, @person_namespaced_gid.model_class
     assert_equal PersonModel, @person_model_gid.model_class
+    assert_raise ArgumentError do
+      person_gid = GlobalID.find 'gid://bcx/SignedGlobalID/5'
+    end
   end
 
   test ':app option' do
