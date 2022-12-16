@@ -66,4 +66,8 @@ class GlobalID
   def to_param
     Base64.urlsafe_encode64(to_s, padding: false)
   end
+
+  def as_json(*)
+    to_s
+  end
 end

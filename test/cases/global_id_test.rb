@@ -158,6 +158,20 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
     assert_equal URI('gid://bcx/PersonModel/1'), @person_model_gid.uri
   end
 
+  test 'as JSON' do
+    assert_equal 'gid://bcx/Person/5', @person_gid.as_json
+    assert_equal '"gid://bcx/Person/5"', @person_gid.to_json
+
+    assert_equal "gid://bcx/Person/#{@uuid}", @person_uuid_gid.as_json
+    assert_equal "\"gid://bcx/Person/#{@uuid}\"", @person_uuid_gid.to_json
+
+    assert_equal 'gid://bcx/Person::Child/4', @person_namespaced_gid.as_json
+    assert_equal '"gid://bcx/Person::Child/4"', @person_namespaced_gid.to_json
+
+    assert_equal 'gid://bcx/PersonModel/1', @person_model_gid.as_json
+    assert_equal '"gid://bcx/PersonModel/1"', @person_model_gid.to_json
+  end
+
   test 'model id' do
     assert_equal '5', @person_gid.model_id
     assert_equal @uuid, @person_uuid_gid.model_id
