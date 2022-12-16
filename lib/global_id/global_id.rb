@@ -40,7 +40,7 @@ class GlobalID
   end
 
   attr_reader :uri
-  delegate :app, :model_name, :model_id, :params, :to_s, to: :uri
+  delegate :app, :model_name, :model_id, :params, :to_s, :deconstruct_keys, to: :uri
 
   def initialize(gid, options = {})
     @uri = gid.is_a?(URI::GID) ? gid : URI::GID.parse(gid)
