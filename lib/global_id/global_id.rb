@@ -51,7 +51,13 @@ class GlobalID
   end
 
   def model_class
-    model_name.constantize
+    model = model_name.constantize
+
+    unless model <= GlobalID
+      model
+    else
+      raise ArgumentError, "GlobalID and SignedGlobalID cannot be used as model_class."
+    end
   end
 
   def ==(other)
