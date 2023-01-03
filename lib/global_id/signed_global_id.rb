@@ -3,8 +3,6 @@ require 'active_support/message_verifier'
 require 'time'
 
 class SignedGlobalID < GlobalID
-  cattr_accessor :use_verifier_to_handle_metadata, instance_accessor: false, default: false
-
   class ExpiredMessage < StandardError; end
 
   class << self
@@ -30,18 +28,17 @@ class SignedGlobalID < GlobalID
 
     private
       def verify(sgid, options)
-        verify_with_verifier_validated_metadata(sgid, options) || verify_with_self_validated_metadata(sgid, options)
+        verify_with_verifier_validated_metadata(sgid, options) ||
+          verify_with_legacy_self_validated_metadata(sgid, options)
       end
 
       def verify_with_verifier_validated_metadata(sgid, options)
-        if use_verifier_to_handle_metadata
-          pick_verifier(options).verify(sgid, purpose: pick_purpose(options))
-        end
+        pick_verifier(options).verify(sgid, purpose: pick_purpose(options))
       rescue ActiveSupport::MessageVerifier::InvalidSignature
         nil
       end
 
-      def verify_with_self_validated_metadata(sgid, options)
+      def verify_with_legacy_self_validated_metadata(sgid, options)
         metadata = pick_verifier(options).verify(sgid)
 
         raise_if_expired(metadata['expires_at'])
@@ -68,29 +65,15 @@ class SignedGlobalID < GlobalID
   end
 
   def to_s
-    if self.class.use_verifier_to_handle_metadata
-      @sgid ||= @verifier.generate(@uri.to_s, purpose: purpose, expires_at: expires_at)
-    else
-      @sgid ||= @verifier.generate(to_h)
-    end
+    @sgid ||= @verifier.generate(@uri.to_s, purpose: purpose, expires_at: expires_at)
   end
   alias to_param to_s
-
-  def to_h
-    # Some serializers decodes symbol keys to symbols, others to strings.
-    # Using string keys remedies that.
-    { 'gid' => @uri.to_s, 'purpose' => purpose, 'expires_at' => encoded_expiration }
-  end
 
   def ==(other)
     super && @purpose == other.purpose
   end
 
   private
-    def encoded_expiration
-      expires_at.utc.iso8601(3) if expires_at
-    end
-
     def pick_expiration(options)
       return options[:expires_at] if options.key?(:expires_at)
 
