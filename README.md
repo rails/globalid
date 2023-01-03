@@ -96,7 +96,7 @@ Document.find(5).to_sgid.to_s == Document.find(5).to_sgid.to_s
 # => false
 ```
 
-You need to explicity pass `expires_in: nil` to generate a permanent SGID that will not expire,
+You need to explicitly pass `expires_in: nil` to generate a permanent SGID that will not expire,
 
 ```ruby
 # Passing a false value to either expiry option turns off expiration entirely.
@@ -132,6 +132,34 @@ signup_person_sgid = Person.find(1).to_sgid(for: 'signup_form')
 GlobalID::Locator.locate_signed(signup_person_sgid.to_s, for: 'signup_form')
 # => #<Person:0x007fae94bf6298 @id="1">
 ```
+
+### Locating many Global IDs
+
+When needing to locate many Global IDs use `GlobalID::Locator.locate_many` or `GlobalID::Locator.locate_many_signed` for Signed Global IDs to allow loading
+Global IDs more efficiently.
+
+For instance, the default locator passes every `model_id` per `model_name` thus
+using `model_name.where(id: model_ids)` versus `GlobalID::Locator.locate`'s `model_name.find(id)`.
+
+In the case of looking up Global IDs from a database, it's only necessary to query
+once per `model_name` as shown here:
+
+```ruby
+gids = users.concat(people).sort_by(&:id).map(&:to_global_id)
+# => [#<GlobalID:0x00007ffd6a8411a0 @uri=#<URI::GID gid://app/User/1>>,
+#<GlobalID:0x00007ffd675d32b8 @uri=#<URI::GID gid://app/Student/1>>,
+#<GlobalID:0x00007ffd6a840b10 @uri=#<URI::GID gid://app/User/2>>,
+#<GlobalID:0x00007ffd675d2c28 @uri=#<URI::GID gid://app/Student/2>>,
+#<GlobalID:0x00007ffd6a840480 @uri=#<URI::GID gid://app/User/3>>,
+#<GlobalID:0x00007ffd675d2598 @uri=#<URI::GID gid://app/Student/3>>]
+
+GlobalID::Locator.locate_many gids
+# SELECT "users".* FROM "users" WHERE "users"."id" IN ($1, $2, $3)  [["id", 1], ["id", 2], ["id", 3]]
+# SELECT "students".* FROM "students" WHERE "students"."id" IN ($1, $2, $3)  [["id", 1], ["id", 2], ["id", 3]]
+# => [#<User id: 1>, #<Student id: 1>, #<User id: 2>, #<Student id: 2>, #<User id: 3>, #<Student id: 3>]
+```
+
+Note the order is maintained in the returned results.
 
 ### Custom App Locator
 

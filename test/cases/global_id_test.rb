@@ -158,6 +158,20 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
     assert_equal URI('gid://bcx/PersonModel/1'), @person_model_gid.uri
   end
 
+  test 'as JSON' do
+    assert_equal 'gid://bcx/Person/5', @person_gid.as_json
+    assert_equal '"gid://bcx/Person/5"', @person_gid.to_json
+
+    assert_equal "gid://bcx/Person/#{@uuid}", @person_uuid_gid.as_json
+    assert_equal "\"gid://bcx/Person/#{@uuid}\"", @person_uuid_gid.to_json
+
+    assert_equal 'gid://bcx/Person::Child/4', @person_namespaced_gid.as_json
+    assert_equal '"gid://bcx/Person::Child/4"', @person_namespaced_gid.to_json
+
+    assert_equal 'gid://bcx/PersonModel/1', @person_model_gid.as_json
+    assert_equal '"gid://bcx/PersonModel/1"', @person_model_gid.to_json
+  end
+
   test 'model id' do
     assert_equal '5', @person_gid.model_id
     assert_equal @uuid, @person_uuid_gid.model_id
@@ -177,6 +191,9 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
     assert_equal Person, @person_uuid_gid.model_class
     assert_equal Person::Child, @person_namespaced_gid.model_class
     assert_equal PersonModel, @person_model_gid.model_class
+    assert_raise ArgumentError do
+      GlobalID.find 'gid://bcx/SignedGlobalID/5'
+    end
   end
 
   test ':app option' do
@@ -189,6 +206,30 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
     assert_raise ArgumentError do
       person_gid = GlobalID.create(Person.new(5), app: nil)
     end
+  end
+
+  test 'equality' do
+    p1 = Person.new(5)
+    p2 = Person.new(5)
+    p3 = Person.new(10)
+    assert_equal p1, p2
+    assert_not_equal p2, p3
+
+    gid1 = GlobalID.create(p1)
+    gid2 = GlobalID.create(p2)
+    gid3 = GlobalID.create(p3)
+    assert_equal gid1, gid2
+    assert_not_equal gid2, gid3
+
+    # hash and eql? to match for two GlobalID's pointing to the same object
+    assert_equal [gid1], [gid1, gid2].uniq
+    assert_equal [gid1, gid3], [gid1, gid2, gid3].uniq
+
+    # verify that the GlobalID's hash is different to the underlaying URI
+    assert_not_equal gid1.hash, gid1.uri.hash
+
+    # verify that URI and GlobalID do not pass the uniq test
+    assert_equal [gid1, gid1.uri], [gid1, gid1.uri].uniq
   end
 end
 

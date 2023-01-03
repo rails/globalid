@@ -98,6 +98,10 @@ module URI
       "gid://#{app}#{path}#{'?' + query if query}"
     end
 
+    def deconstruct_keys(_keys)
+      {app: app, model_name: model_name, model_id: model_id, params: params}
+    end
+
     protected
       def set_path(path)
         set_model_components(path) unless defined?(@model_name) && @model_id
@@ -138,7 +142,7 @@ module URI
 
       def check_scheme(scheme)
         if scheme == 'gid'
-          super
+          true
         else
           raise URI::BadURIError, "Not a gid:// URI scheme: #{inspect}"
         end
@@ -173,5 +177,9 @@ module URI
       end
   end
 
-  @@schemes['GID'] = GID
+  if respond_to?(:register_scheme)
+    register_scheme('GID', GID)
+  else
+    @@schemes['GID'] = GID
+  end
 end
