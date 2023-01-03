@@ -7,7 +7,7 @@ class URI::PatternMatchingTest < ActiveSupport::TestCase
 
   test 'URI::GID pattern matching' do
     case @gid
-    in app: 'bcx', model_name: 'Person', model_id: '5', params: { hello: _ => world, param: }
+    in app: 'bcx', model_name: 'Person', model_id: '5', params: { hello: _ => world, param: _ => _ }
       assert_equal world, 'worlds'
     else
       raise
@@ -22,7 +22,7 @@ class GlobalIDPatternMatchingTest < ActiveSupport::TestCase
 
   test 'GlobalID pattern matching' do
     case @gid
-    in app: 'bcx', model_name: 'Person', model_id: '5', params: { hello: _ => world, param: }
+    in app: 'bcx', model_name: 'Person', model_id: '5', params: { hello: _ => world, param: _ => _ }
       assert_equal world, 'worlds'
     else
       raise
