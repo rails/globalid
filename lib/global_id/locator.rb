@@ -1,4 +1,3 @@
-require 'active_support'
 require 'active_support/core_ext/enumerable' # For Enumerable#index_by
 
 class GlobalID

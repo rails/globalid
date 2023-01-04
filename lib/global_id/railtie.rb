@@ -3,7 +3,6 @@ require 'rails/railtie'
 rescue LoadError
 else
 require 'global_id'
-require 'active_support'
 require 'active_support/core_ext/string/inflections'
 require 'active_support/core_ext/integer/time'
 
