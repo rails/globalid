@@ -21,7 +21,12 @@ class GlobalID
         gid = GlobalID.parse(gid)
         return unless gid && find_allowed?(gid.model_class, options[:only])
 
-        locator_for(gid).locate(gid, options.except(:only))
+        if locator_for(gid).method(:locate).arity == 1
+          ActiveSupport::Deprecation.warn "Calling `locate(gid)' is deprecated. Please use `locate(gid, options)' instead."
+          locator_for(gid).locate(gid)
+        else
+          locator_for(gid).locate(gid, options.except(:only))
+        end
       end
 
       # Takes an array of GlobalIDs or strings that can be turned into a GlobalIDs.

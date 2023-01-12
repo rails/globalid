@@ -281,6 +281,21 @@ class GlobalLocatorTest < ActiveSupport::TestCase
     end
   end
 
+  test 'use locator with class and single argument' do
+    class DeprecatedBarLocator
+      def locate(gid); :bar; end
+      def locate_many(gids, options = {}); gids.map(&:model_id); end
+    end
+
+    GlobalID::Locator.use :bar, DeprecatedBarLocator.new
+
+    with_app 'bar' do
+      assert_output(nil, /.*Calling `locate\(gid\)' is deprecated\. Please use `locate\(gid, options\)' instead\..*/) { GlobalID::Locator.locate('gid://bar/Person/1') }
+      assert_equal :bar, GlobalID::Locator.locate('gid://bar/Person/1')
+      assert_equal ['1', '2'], GlobalID::Locator.locate_many(['gid://bar/Person/1', 'gid://bar/Person/2'])
+    end
+  end
+
   test 'app locator is case insensitive' do
     GlobalID::Locator.use :insensitive do |gid|
       :insensitive
