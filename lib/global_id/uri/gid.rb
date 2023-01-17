@@ -127,9 +127,6 @@ module URI
     private
       COMPONENT = [ :scheme, :app, :model_name, :model_id, :params ].freeze
 
-      # Extracts model_name and model_id from the URI path.
-      PATH_REGEXP = %r(\A/([^/]+)/?([^/]+)?\z)
-
       def check_host(host)
         validate_component(host)
         super
@@ -149,10 +146,10 @@ module URI
       end
 
       def set_model_components(path, validate = false)
-        _, model_name, model_id = path.match(PATH_REGEXP).to_a
-        model_id = CGI.unescape(model_id) if model_id
-
+        _, model_name, model_id = path.split('/', 3)
         validate_component(model_name) && validate_model_id(model_id, model_name) if validate
+
+        model_id = CGI.unescape(model_id) if model_id
 
         @model_name = model_name
         @model_id = model_id
@@ -166,7 +163,7 @@ module URI
       end
 
       def validate_model_id(model_id, model_name)
-        return model_id unless model_id.blank?
+        return model_id unless model_id.blank? || model_id.include?('/')
 
         raise MissingModelIdError, "Unable to create a Global ID for " \
           "#{model_name} without a model id."
