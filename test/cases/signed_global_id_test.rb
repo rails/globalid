@@ -29,6 +29,10 @@ class SignedGlobalIDTest < ActiveSupport::TestCase
   test 'to param' do
     assert_equal @person_sgid.to_s, @person_sgid.to_param
   end
+
+  test 'inspect' do
+    assert_match(/\A#<SignedGlobalID:0x[0-9a-f]+>\z/, @person_sgid.inspect)
+  end
 end
 
 class SignedGlobalIDPurposeTest < ActiveSupport::TestCase
