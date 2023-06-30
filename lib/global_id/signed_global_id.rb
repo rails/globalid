@@ -72,6 +72,10 @@ class SignedGlobalID < GlobalID
     super && @purpose == other.purpose
   end
 
+  def inspect # :nodoc:
+    "#<#{self.class.name}:#{'%#016x' % (object_id << 1)}>"
+  end
+
   private
     def pick_expiration(options)
       return options[:expires_at] if options.key?(:expires_at)
