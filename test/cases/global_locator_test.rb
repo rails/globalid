@@ -5,12 +5,21 @@ class GlobalLocatorTest < ActiveSupport::TestCase
     model = Person.new('id')
     @gid  = model.to_gid
     @sgid = model.to_sgid
+    @cpk_model = CompositePrimaryKeyModel.new(id: ["tenant-key-value", "id-value"])
+    @cpk_gid = @cpk_model.to_gid
+    @cpk_sgid = @cpk_model.to_sgid
   end
 
   test 'by GID' do
     found = GlobalID::Locator.locate(@gid)
     assert_kind_of @gid.model_class, found
     assert_equal @gid.model_id, found.id
+  end
+
+  test 'composite primary key model by GID' do
+    found = GlobalID::Locator.locate(@cpk_gid)
+    assert_kind_of @cpk_gid.model_class, found
+    assert_equal ["tenant-key-value", "id-value"], found.id
   end
 
   test 'by GID with only: restriction with match' do
@@ -60,6 +69,18 @@ class GlobalLocatorTest < ActiveSupport::TestCase
       GlobalID::Locator.locate_many([ Person.new('1').to_gid, Person.new('2').to_gid ])
   end
 
+  test '#locate_many by composite primary key GIDs of the same class' do
+    records = [ @cpk_model, CompositePrimaryKeyModel.new(id: ["tenant-key-value2", "id-value2"]) ]
+    located = GlobalID::Locator.locate_many(records.map(&:to_gid))
+    assert_equal records, located
+  end
+
+  test '#locate_many by composite primary key GIDs of different classes' do
+    records = [ @cpk_model, Person.new('1') ]
+    located = GlobalID::Locator.locate_many(records.map(&:to_gid))
+    assert_equal records, located
+  end
+
   test 'by many GIDs of mixed classes' do
     assert_equal [ Person.new('1'), Person::Child.new('1'), Person.new('2') ],
       GlobalID::Locator.locate_many([ Person.new('1').to_gid, Person::Child.new('1').to_gid, Person.new('2').to_gid ])
@@ -75,6 +96,12 @@ class GlobalLocatorTest < ActiveSupport::TestCase
     found = GlobalID::Locator.locate_signed(@sgid)
     assert_kind_of @sgid.model_class, found
     assert_equal @sgid.model_id, found.id
+  end
+
+  test 'by SGID of a composite primary key model' do
+    found = GlobalID::Locator.locate_signed(@cpk_sgid)
+    assert_kind_of @cpk_sgid.model_class, found
+    assert_equal @cpk_sgid.model_id, found.id
   end
 
   test 'by SGID with only: restriction with match' do
@@ -124,9 +151,21 @@ class GlobalLocatorTest < ActiveSupport::TestCase
       GlobalID::Locator.locate_many_signed([ Person.new('1').to_sgid, Person.new('2').to_sgid ])
   end
 
+  test 'by many SGIDs of the same composite primary key class' do
+    records = [ @cpk_model, CompositePrimaryKeyModel.new(id: ["tenant-key-value2", "id-value2"]) ]
+    located = GlobalID::Locator.locate_many_signed(records.map(&:to_sgid))
+    assert_equal records, located
+  end
+
   test 'by many SGIDs of mixed classes' do
     assert_equal [ Person.new('1'), Person::Child.new('1'), Person.new('2') ],
       GlobalID::Locator.locate_many_signed([ Person.new('1').to_sgid, Person::Child.new('1').to_sgid, Person.new('2').to_sgid ])
+  end
+
+  test 'by many SGIDs of composite primary key model mixed with other models' do
+    records = [ @cpk_model, Person.new('1') ]
+    located = GlobalID::Locator.locate_many_signed(records.map(&:to_sgid))
+    assert_equal records, located
   end
 
   test 'by many SGIDs with only: restriction to match subclass' do
@@ -157,6 +196,12 @@ class GlobalLocatorTest < ActiveSupport::TestCase
     assert_equal @gid.model_id, found.id
   end
 
+  test 'by to_param encoding for a composite primary key model' do
+    found = GlobalID::Locator.locate(@cpk_gid.to_param)
+    assert_kind_of @cpk_gid.model_class, found
+    assert_equal @cpk_gid.model_id, found.id
+  end
+
   test 'by non-GID returns nil' do
     assert_nil GlobalID::Locator.locate 'This is not a GID'
   end
@@ -170,6 +215,13 @@ class GlobalLocatorTest < ActiveSupport::TestCase
     assert_nil GlobalID::Locator.locate 'gid://Person/1'
     assert_nil GlobalID::Locator.locate 'gid://app/Person'
     assert_nil GlobalID::Locator.locate 'gid://app/Person/1/2'
+  end
+
+  test 'locating by a GID URI with a mismatching model_id returns nil' do
+    assert_nil GlobalID::Locator.locate 'gid://app/Person/1/2'
+    assert_nil GlobalID::Locator.locate 'gid://app/CompositePrimaryKeyModel/tenant-key-value/id-value/something_else'
+    assert_nil GlobalID::Locator.locate 'gid://app/CompositePrimaryKeyModel/tenant-key-value/'
+    assert_nil GlobalID::Locator.locate 'gid://app/CompositePrimaryKeyModel/tenant-key-value'
   end
 
   test 'use locator with block' do
