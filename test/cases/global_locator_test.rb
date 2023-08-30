@@ -283,16 +283,17 @@ class GlobalLocatorTest < ActiveSupport::TestCase
 
   test 'use locator with class and single argument' do
     class DeprecatedBarLocator
-      def locate(gid); :bar; end
+      def locate(gid); :deprecated; end
       def locate_many(gids, options = {}); gids.map(&:model_id); end
     end
 
-    GlobalID::Locator.use :bar, DeprecatedBarLocator.new
+    GlobalID::Locator.use :deprecated, DeprecatedBarLocator.new
 
-    with_app 'bar' do
-      assert_output(nil, /.*Calling `locate\(gid\)' is deprecated\. Please use `locate\(gid, options\)' instead\..*/) { GlobalID::Locator.locate('gid://bar/Person/1') }
-      assert_equal :bar, GlobalID::Locator.locate('gid://bar/Person/1')
-      assert_equal ['1', '2'], GlobalID::Locator.locate_many(['gid://bar/Person/1', 'gid://bar/Person/2'])
+    with_app 'deprecated' do
+      assert_deprecated(nil, GlobalID.deprecator) do
+        assert_equal :deprecated, GlobalID::Locator.locate('gid://deprecated/Person/1')
+      end
+      assert_equal ['1', '2'], GlobalID::Locator.locate_many(['gid://deprecated/Person/1', 'gid://deprecated/Person/2'])
     end
   end
 

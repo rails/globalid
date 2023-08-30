@@ -19,13 +19,16 @@ class GlobalID
       #   modules match, +nil+ is returned.
       def locate(gid, options = {})
         gid = GlobalID.parse(gid)
+
         return unless gid && find_allowed?(gid.model_class, options[:only])
 
-        if locator_for(gid).method(:locate).arity == 1
-          ActiveSupport::Deprecation.warn "Calling `locate(gid)' is deprecated. Please use `locate(gid, options)' instead."
-          locator_for(gid).locate(gid)
+        locator = locator_for(gid)
+
+        if locator.method(:locate).arity == 1
+          GlobalID.deprecator.warn "It seems your locator is defining the `locate` method only with one argument. Please make sure your locator is receiving the options argument as well, like `locate(gid, options = {})`."
+          locator.locate(gid)
         else
-          locator_for(gid).locate(gid, options.except(:only))
+          locator.locate(gid, options.except(:only))
         end
       end
 

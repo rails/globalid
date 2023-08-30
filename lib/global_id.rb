@@ -16,4 +16,8 @@ class GlobalID
     super
     require 'global_id/signed_global_id'
   end
+
+  def self.deprecator # :nodoc:
+    @deprecator ||= ActiveSupport::Deprecation.new("2.1", "GlobalID")
+  end
 end
