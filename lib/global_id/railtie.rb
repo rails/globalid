@@ -42,6 +42,10 @@ class GlobalID
         send :extend, GlobalID::FixtureSet
       end
     end
+
+    initializer "web_console.deprecator" do |app|
+      app.deprecators[:global_id] = GlobalID.deprecator if app.respond_to?(:deprecators)
+    end
   end
 end
 
