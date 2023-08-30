@@ -141,8 +141,8 @@ class GlobalID
           end
 
           records_by_model_name_and_id = {}
-          ids_by_model.each do |model, ids|
 
+          ids_by_model.each do |model, ids|
             records = find_records(model, ids, ignore_missing: options[:ignore_missing])
 
             records_by_id = records.index_by do |record|
@@ -164,12 +164,8 @@ class GlobalID
             end
           end
 
-          private
           def model_id_is_valid?(gid)
-            primary_key = Array(gid.model_class.primary_key)
-            primary_key_size = primary_key.size
-
-            Array(gid.model_id).size == primary_key_size
+            Array(gid.model_id).size == Array(gid.model_class.primary_key).size
           end
       end
 
