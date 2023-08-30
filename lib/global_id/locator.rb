@@ -8,10 +8,10 @@ class GlobalID
       # Takes either a GlobalID or a string that can be turned into a GlobalID
       #
       # Options:
-      # * <tt>:includes</tt> - A Symbol, Array, Hash or combination of them
-      #   The same structure you would pass into a includes method of Active Record.
-      #   @see https://guides.rubyonrails.org/active_record_querying.html#eager-loading-associations
+      # * <tt>:includes</tt> - A Symbol, Array, Hash or combination of them.
+      #   The same structure you would pass into a +includes+ method of Active Record.
       #   If present, locate will load all the relationships specified here.
+      #   See https://guides.rubyonrails.org/active_record_querying.html#eager-loading-associations.
       # * <tt>:only</tt> - A class, module or Array of classes and/or modules that are
       #   allowed to be located.  Passing one or more classes limits instances of returned
       #   classes to those classes or their subclasses.  Passing one or more modules in limits
