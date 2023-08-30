@@ -30,6 +30,11 @@ module URI
 
     # Raised when creating a Global ID for a model without an id
     class MissingModelIdError < URI::InvalidComponentError; end
+    class InvalidModelIdError < URI::InvalidComponentError; end
+
+    # Maximum size of a model id segment
+    COMPOSITE_MODEL_ID_MAX_SIZE = 20
+    COMPOSITE_MODEL_ID_DELIMITER = "/"
 
     class << self
       # Validates +app+'s as URI hostnames containing only alphanumeric characters
@@ -83,7 +88,8 @@ module URI
       def build(args)
         parts = Util.make_components_hash(self, args)
         parts[:host] = parts[:app]
-        parts[:path] = "/#{parts[:model_name]}/#{CGI.escape(parts[:model_id].to_s)}"
+        model_id_segment = Array(parts[:model_id]).map { |p| CGI.escape(p.to_s) }.join(COMPOSITE_MODEL_ID_DELIMITER)
+        parts[:path] = "/#{parts[:model_name]}/#{model_id_segment}"
 
         if parts[:params] && !parts[:params].empty?
           parts[:query] = URI.encode_www_form(parts[:params])
@@ -147,12 +153,22 @@ module URI
 
       def set_model_components(path, validate = false)
         _, model_name, model_id = path.split('/', 3)
-        validate_component(model_name) && validate_model_id(model_id, model_name) if validate
 
-        model_id = CGI.unescape(model_id) if model_id
-
+        validate_component(model_name) && validate_model_id_section(model_id, model_name) if validate
         @model_name = model_name
-        @model_id = model_id
+
+        if model_id
+          model_id_parts = model_id
+            .split(COMPOSITE_MODEL_ID_DELIMITER, COMPOSITE_MODEL_ID_MAX_SIZE)
+            .reject(&:blank?)
+
+          model_id_parts.map! do |id|
+            validate_model_id(id)
+            CGI.unescape(id)
+          end
+
+          @model_id = model_id_parts.length == 1 ? model_id_parts.first : model_id_parts
+        end
       end
 
       def validate_component(component)
@@ -162,11 +178,18 @@ module URI
           "Expected a URI like gid://app/Person/1234: #{inspect}"
       end
 
-      def validate_model_id(model_id, model_name)
-        return model_id unless model_id.blank? || model_id.include?('/')
+      def validate_model_id_section(model_id, model_name)
+        return model_id unless model_id.blank?
 
         raise MissingModelIdError, "Unable to create a Global ID for " \
           "#{model_name} without a model id."
+      end
+
+      def validate_model_id(model_id_part)
+        return unless model_id_part.include?('/')
+
+        raise InvalidModelIdError, "Unable to create a Global ID for " \
+          "#{model_name} with a malformed model id."
       end
 
       def parse_query_params(query)

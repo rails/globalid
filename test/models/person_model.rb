@@ -6,6 +6,10 @@ class PersonModel
 
   attr_accessor :id
 
+  def self.primary_key
+    :id
+  end
+
   def self.find(id)
     new id: id
   end

@@ -6,6 +6,7 @@ require 'active_support/testing/autorun'
 require 'global_id'
 require 'models/person'
 require 'models/person_model'
+require 'models/composite_primary_key_model'
 
 require 'json'
 

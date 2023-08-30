@@ -50,12 +50,13 @@ class GlobalID
   end
 
   def model_class
-    model = model_name.constantize
+    @model_class ||= begin
+      model = model_name.constantize
 
-    unless model <= GlobalID
+      if model <= GlobalID
+        raise ArgumentError, "GlobalID and SignedGlobalID cannot be used as model_class."
+      end
       model
-    else
-      raise ArgumentError, "GlobalID and SignedGlobalID cannot be used as model_class."
     end
   end
 

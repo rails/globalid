@@ -4,12 +4,25 @@ class URI::GIDTest <  ActiveSupport::TestCase
   setup do
     @gid_string = 'gid://bcx/Person/5'
     @gid = URI::GID.parse(@gid_string)
+    @cpk_gid_string = 'gid://bcx/CompositePrimaryKeyModel/tenant-key-value/id-value'
+    @cpk_gid = URI::GID.parse(@cpk_gid_string)
   end
 
   test 'parsed' do
     assert_equal @gid.app, 'bcx'
     assert_equal @gid.model_name, 'Person'
     assert_equal @gid.model_id, '5'
+    assert_equal ["tenant-key-value", "id-value"], @cpk_gid.model_id
+  end
+
+  test 'parsed for non existing model class' do
+    flat_id_gid = URI::GID.parse("gid://bcx/NonExistingModel/1")
+    assert_equal("1", flat_id_gid.model_id)
+    assert_equal("NonExistingModel", flat_id_gid.model_name)
+
+    composite_id_gid = URI::GID.parse("gid://bcx/NonExistingModel/tenant-key-value/id-value")
+    assert_equal(["tenant-key-value", "id-value"], composite_id_gid.model_id)
+    assert_equal("NonExistingModel", composite_id_gid.model_name)
   end
 
   test 'new returns invalid gid when not checking' do
@@ -21,6 +34,11 @@ class URI::GIDTest <  ActiveSupport::TestCase
     assert_equal @gid_string, URI::GID.create('bcx', model).to_s
   end
 
+  test 'create from a composite primary key model' do
+    model = CompositePrimaryKeyModel.new(id: ["tenant-key-value", "id-value"])
+    assert_equal @cpk_gid_string, URI::GID.create('bcx', model).to_s
+  end
+
   test 'build' do
     array = URI::GID.build(['bcx', 'Person', '5', nil])
     assert array
@@ -29,6 +47,22 @@ class URI::GIDTest <  ActiveSupport::TestCase
     assert hash
 
     assert_equal array, hash
+  end
+
+  test 'build with a composite primary key' do
+    array = URI::GID.build(['bcx', 'CompositePrimaryKeyModel', ["tenant-key-value", "id-value"], nil])
+    assert array
+
+    hash = URI::GID.build(
+      app: 'bcx',
+      model_name: 'CompositePrimaryKeyModel',
+      model_id: ["tenant-key-value", "id-value"],
+      params: nil
+    )
+    assert hash
+
+    assert_equal array, hash
+    assert_equal("gid://bcx/CompositePrimaryKeyModel/tenant-key-value/id-value", array.to_s)
   end
 
   test 'build with wrong ordered array creates a wrong ordered gid' do
@@ -55,6 +89,11 @@ class URI::GIDModelIDEncodingTest < ActiveSupport::TestCase
     model = Person.new('John Doe-Smith/Jones')
     assert_equal 'gid://app/Person/John+Doe-Smith%2FJones', URI::GID.create('app', model).to_s
   end
+
+  test 'every part of composite primary key is encoded' do
+    model = CompositePrimaryKeyModel.new(id: ["tenant key", "id value"])
+    assert_equal 'gid://app/CompositePrimaryKeyModel/tenant+key/id+value', URI::GID.create('app', model).to_s
+  end
 end
 
 class URI::GIDModelIDDecodingTest < ActiveSupport::TestCase
@@ -64,6 +103,11 @@ class URI::GIDModelIDDecodingTest < ActiveSupport::TestCase
 
   test 'non-alphanumeric' do
     assert_equal 'John Doe-Smith/Jones', URI::GID.parse('gid://app/Person/John+Doe-Smith%2FJones').model_id
+  end
+
+  test 'every part of composite primary key is decoded' do
+    gid = 'gid://app/CompositePrimaryKeyModel/tenant+key+value/id+value'
+    assert_equal ['tenant key value', 'id value'], URI::GID.parse(gid).model_id
   end
 end
 
@@ -81,8 +125,9 @@ class URI::GIDValidationTest < ActiveSupport::TestCase
     assert_match(/Unable to create a Global ID for Person/, err.message)
   end
 
-  test 'too many model ids' do
-    assert_invalid_component 'gid://bcx/Person/1/2'
+  test 'missing model composite id' do
+    err = assert_raise(URI::GID::MissingModelIdError) { URI::GID.parse('gid://bcx/CompositePrimaryKeyModel') }
+    assert_match(/Unable to create a Global ID for CompositePrimaryKeyModel/, err.message)
   end
 
   test 'empty' do
@@ -112,7 +157,7 @@ class URI::GIDAppValidationTest < ActiveSupport::TestCase
   end
 
   test 'apps containing non alphanumeric characters are invalid' do
-    assert_invalid_app 'foo/bar'
+    assert_invalid_app 'foo&bar'
     assert_invalid_app 'foo:bar'
     assert_invalid_app 'foo_bar'
   end

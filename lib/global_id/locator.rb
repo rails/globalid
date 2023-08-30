@@ -2,6 +2,8 @@ require 'active_support/core_ext/enumerable' # For Enumerable#index_by
 
 class GlobalID
   module Locator
+    class InvalidModelIdError < StandardError; end
+
     class << self
       # Takes either a GlobalID or a string that can be turned into a GlobalID
       #
@@ -126,26 +128,48 @@ class GlobalID
 
       class BaseLocator
         def locate(gid)
+          return unless model_id_is_valid?(gid)
           gid.model_class.find gid.model_id
         end
 
         def locate_many(gids, options = {})
-          models_and_ids  = gids.collect { |gid| [ gid.model_class, gid.model_id ] }
-          ids_by_model    = models_and_ids.group_by(&:first)
-          loaded_by_model = Hash[ids_by_model.map { |model, ids|
-            [ model, find_records(model, ids.map(&:last), ignore_missing: options[:ignore_missing]).index_by { |record| record.id.to_s } ]
-          }]
+          ids_by_model = Hash.new { |hash, key| hash[key] = [] }
 
-          models_and_ids.collect { |(model, id)| loaded_by_model[model][id] }.compact
+          gids.each do |gid|
+            next unless model_id_is_valid?(gid)
+            ids_by_model[gid.model_class] << gid.model_id
+          end
+
+          records_by_model_name_and_id = {}
+          ids_by_model.each do |model, ids|
+
+            records = find_records(model, ids, ignore_missing: options[:ignore_missing])
+
+            records_by_id = records.index_by do |record|
+              record.id.is_a?(Array) ? record.id.map(&:to_s) : record.id.to_s
+            end
+
+            records_by_model_name_and_id[model.name] = records_by_id
+          end
+
+          gids.filter_map { |gid| records_by_model_name_and_id[gid.model_name][gid.model_id] }
         end
 
         private
           def find_records(model_class, ids, options)
             if options[:ignore_missing]
-              model_class.where(id: ids)
+              model_class.where(model_class.primary_key => ids)
             else
               model_class.find(ids)
             end
+          end
+
+          private
+          def model_id_is_valid?(gid)
+            primary_key = Array(gid.model_class.primary_key)
+            primary_key_size = primary_key.size
+
+            Array(gid.model_id).size == primary_key_size
           end
       end
 

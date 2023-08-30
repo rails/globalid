@@ -5,6 +5,10 @@ class Person
 
   attr_reader :id
 
+  def self.primary_key
+    :id
+  end
+
   def self.find(id_or_ids)
     if id_or_ids.is_a? Array
       ids = id_or_ids
