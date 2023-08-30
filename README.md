@@ -161,6 +161,25 @@ GlobalID::Locator.locate_many gids
 
 Note the order is maintained in the returned results.
 
+### Options
+
+Either `GlobalID::Locator.locate` or `GlobalID::Locator.locate_many` supports a hash of options as second parameter. The supported options are:
+
+* :includes - A Symbol, Array, Hash or combination of them
+  The same structure you would pass into a `includes` method of Active Record.
+  See [Active Record eager loading associations](https://guides.rubyonrails.org/active_record_querying.html#eager-loading-associations)
+  If present, `locate` or `locate_many` will eager load all the relationships specified here.
+  Note: It only works if all the gids models have that relationships.
+* :only - A class, module or Array of classes and/or modules that are
+  allowed to be located.  Passing one or more classes limits instances of returned
+  classes to those classes or their subclasses.  Passing one or more modules in limits
+  instances of returned classes to those including that module.  If no classes or
+  modules match, +nil+ is returned.
+* :ignore_missing (Only for `locate_many`) - By default, `locate_many` will call `#find` on the model to locate the
+  ids extracted from the GIDs. In Active Record (and other data stores following the same pattern),
+  `#find` will raise an exception if a named ID can't be found. When you set this option to true,
+  we will use `#where(id: ids)` instead, which does not raise on missing records.
+
 ### Custom App Locator
 
 A custom locator can be set for an app by calling `GlobalID::Locator.use` and providing an app locator to use for that app.
@@ -172,7 +191,7 @@ A custom locator can either be a block or a class.
 Using a block:
 
 ```ruby
-GlobalID::Locator.use :foo do |gid|
+GlobalID::Locator.use :foo do |gid, options|
   FooRemote.const_get(gid.model_name).find(gid.model_id)
 end
 ```
@@ -182,7 +201,7 @@ Using a class:
 ```ruby
 GlobalID::Locator.use :bar, BarLocator.new
 class BarLocator
-  def locate(gid)
+  def locate(gid, options = {})
     @search_client.search name: gid.model_name, id: gid.model_id
   end
 end
