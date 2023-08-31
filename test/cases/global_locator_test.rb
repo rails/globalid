@@ -6,6 +6,7 @@ class GlobalLocatorTest < ActiveSupport::TestCase
     @gid  = model.to_gid
     @sgid = model.to_sgid
     @cpk_model = CompositePrimaryKeyModel.new(id: ["tenant-key-value", "id-value"])
+    @uuid_pk_model = PersonUuid.new('7ef9b614-353c-43a1-a203-ab2307851990')
     @cpk_gid = @cpk_model.to_gid
     @cpk_sgid = @cpk_model.to_sgid
   end
@@ -84,6 +85,17 @@ class GlobalLocatorTest < ActiveSupport::TestCase
   test 'by many GIDs of one class' do
     assert_equal [ Person.new('1'), Person.new('2') ],
       GlobalID::Locator.locate_many([ Person.new('1').to_gid, Person.new('2').to_gid ])
+  end
+
+  test 'by many GIDs of a UUID pk class' do
+    expected = [ @uuid_pk_model, @uuid_pk_model ]
+    assert_equal expected, GlobalID::Locator.locate_many(expected.map(&:to_gid))
+  end
+
+  test 'by many GIDs of a UUID pk class with ignore missing' do
+    gids_to_locate = [ @uuid_pk_model, PersonUuid.new(Person::HARDCODED_ID_FOR_MISSING_PERSON), @uuid_pk_model ]
+    expected = [ @uuid_pk_model, @uuid_pk_model ]
+    assert_equal expected, GlobalID::Locator.locate_many(gids_to_locate.map(&:to_gid), ignore_missing: true)
   end
 
   test '#locate_many by composite primary key GIDs of the same class' do

@@ -41,7 +41,7 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
   setup do
     @uuid = '7ef9b614-353c-43a1-a203-ab2307851990'
     @person_gid = GlobalID.create(Person.new(5))
-    @person_uuid_gid = GlobalID.create(Person.new(@uuid))
+    @person_uuid_gid = GlobalID.create(PersonUuid.new(@uuid))
     @person_namespaced_gid = GlobalID.create(Person::Child.new(4))
     @person_model_gid = GlobalID.create(PersonModel.new(id: 1))
     @cpk_model_gid = GlobalID.create(CompositePrimaryKeyModel.new(id: ["tenant-key-value", "id-value"]))
@@ -136,7 +136,7 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
 
   test 'as string' do
     assert_equal 'gid://bcx/Person/5', @person_gid.to_s
-    assert_equal "gid://bcx/Person/#{@uuid}", @person_uuid_gid.to_s
+    assert_equal "gid://bcx/PersonUuid/#{@uuid}", @person_uuid_gid.to_s
     assert_equal 'gid://bcx/Person::Child/4', @person_namespaced_gid.to_s
     assert_equal 'gid://bcx/PersonModel/1', @person_model_gid.to_s
     assert_equal 'gid://bcx/CompositePrimaryKeyModel/tenant-key-value/id-value', @cpk_model_gid.to_s
@@ -146,8 +146,8 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
     assert_equal 'Z2lkOi8vYmN4L1BlcnNvbi81', @person_gid.to_param
     assert_equal @person_gid, GlobalID.parse('Z2lkOi8vYmN4L1BlcnNvbi81')
 
-    assert_equal 'Z2lkOi8vYmN4L1BlcnNvbi83ZWY5YjYxNC0zNTNjLTQzYTEtYTIwMy1hYjIzMDc4NTE5OTA', @person_uuid_gid.to_param
-    assert_equal @person_uuid_gid, GlobalID.parse('Z2lkOi8vYmN4L1BlcnNvbi83ZWY5YjYxNC0zNTNjLTQzYTEtYTIwMy1hYjIzMDc4NTE5OTA')
+    assert_equal 'Z2lkOi8vYmN4L1BlcnNvblV1aWQvN2VmOWI2MTQtMzUzYy00M2ExLWEyMDMtYWIyMzA3ODUxOTkw', @person_uuid_gid.to_param
+    assert_equal @person_uuid_gid, GlobalID.parse('Z2lkOi8vYmN4L1BlcnNvblV1aWQvN2VmOWI2MTQtMzUzYy00M2ExLWEyMDMtYWIyMzA3ODUxOTkw')
 
     assert_equal 'Z2lkOi8vYmN4L1BlcnNvbjo6Q2hpbGQvNA', @person_namespaced_gid.to_param
     assert_equal @person_namespaced_gid, GlobalID.parse('Z2lkOi8vYmN4L1BlcnNvbjo6Q2hpbGQvNA')
@@ -162,7 +162,7 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
 
   test 'as URI' do
     assert_equal URI('gid://bcx/Person/5'), @person_gid.uri
-    assert_equal URI("gid://bcx/Person/#{@uuid}"), @person_uuid_gid.uri
+    assert_equal URI("gid://bcx/PersonUuid/#{@uuid}"), @person_uuid_gid.uri
     assert_equal URI('gid://bcx/Person::Child/4'), @person_namespaced_gid.uri
     assert_equal URI('gid://bcx/PersonModel/1'), @person_model_gid.uri
     assert_equal URI('gid://bcx/CompositePrimaryKeyModel/tenant-key-value/id-value'), @cpk_model_gid.uri
@@ -172,8 +172,8 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
     assert_equal 'gid://bcx/Person/5', @person_gid.as_json
     assert_equal '"gid://bcx/Person/5"', @person_gid.to_json
 
-    assert_equal "gid://bcx/Person/#{@uuid}", @person_uuid_gid.as_json
-    assert_equal "\"gid://bcx/Person/#{@uuid}\"", @person_uuid_gid.to_json
+    assert_equal "gid://bcx/PersonUuid/#{@uuid}", @person_uuid_gid.as_json
+    assert_equal "\"gid://bcx/PersonUuid/#{@uuid}\"", @person_uuid_gid.to_json
 
     assert_equal 'gid://bcx/Person::Child/4', @person_namespaced_gid.as_json
     assert_equal '"gid://bcx/Person::Child/4"', @person_namespaced_gid.to_json
@@ -195,7 +195,7 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
 
   test 'model name' do
     assert_equal 'Person', @person_gid.model_name
-    assert_equal 'Person', @person_uuid_gid.model_name
+    assert_equal 'PersonUuid', @person_uuid_gid.model_name
     assert_equal 'Person::Child', @person_namespaced_gid.model_name
     assert_equal 'PersonModel', @person_model_gid.model_name
     assert_equal 'CompositePrimaryKeyModel', @cpk_model_gid.model_name
@@ -203,7 +203,7 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
 
   test 'model class' do
     assert_equal Person, @person_gid.model_class
-    assert_equal Person, @person_uuid_gid.model_class
+    assert_equal PersonUuid, @person_uuid_gid.model_class
     assert_equal Person::Child, @person_namespaced_gid.model_class
     assert_equal PersonModel, @person_model_gid.model_class
     assert_equal CompositePrimaryKeyModel, @cpk_model_gid.model_class
