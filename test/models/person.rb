@@ -25,7 +25,7 @@ class Person
   end
 
   def self.where(conditions)
-    (conditions[:id] - [HARDCODED_ID_FOR_MISSING_PERSON]).collect { |id| new(id) }
+    (conditions[primary_key] - [HARDCODED_ID_FOR_MISSING_PERSON]).collect { |id| new(id) }
   end
 
   def initialize(id = 1)
@@ -34,6 +34,12 @@ class Person
 
   def ==(other)
     other.is_a?(self.class) && id == other.try(:id)
+  end
+end
+
+class PersonUuid < Person
+  def self.primary_key
+    :uuid
   end
 end
 
