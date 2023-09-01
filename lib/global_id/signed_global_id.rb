@@ -42,7 +42,7 @@ class SignedGlobalID < GlobalID
 
         raise_if_expired(metadata['expires_at'])
 
-        metadata['gid'] if pick_purpose(options) == metadata['purpose']
+        metadata['gid'] if pick_purpose(options)&.to_s == metadata['purpose']&.to_s
       rescue ActiveSupport::MessageVerifier::InvalidSignature, ExpiredMessage
         nil
       end
