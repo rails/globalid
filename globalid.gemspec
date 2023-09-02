@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.name        = 'globalid'
-  s.version     = '1.1.0'
+  s.version     = '1.2.0'
   s.summary     = 'Refer to any model with a URI: gid://app/class/id'
   s.description = 'URIs for your models makes it easy to pass references around.'
 
