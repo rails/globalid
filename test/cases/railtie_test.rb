@@ -16,6 +16,7 @@ class RailtieTest < ActiveSupport::TestCase
     @app.config.eager_load = false
     @app.config.logger = Logger.new(nil)
     @app.config.secret_key_base = ('x' * 30)
+    @app.config.active_support.cache_format_version = Rails::VERSION::STRING.to_f
   end
 
   test 'GlobalID.app for Blog::Application defaults to blog' do

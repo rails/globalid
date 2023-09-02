@@ -71,7 +71,9 @@ class SignedGlobalIDPurposeTest < ActiveSupport::TestCase
 
   test 'parse is backwards compatible with the self validated metadata' do
     legacy_sgid = "eyJnaWQiOiJnaWQ6Ly9iY3gvUGVyc29uLzUiLCJwdXJwb3NlIjoibG9naW4iLCJleHBpcmVzX2F0IjpudWxsfQ==--4b9630f3a1fb3d7d6584d95d4fac96433ec2deef"
-    assert_equal @login_sgid, SignedGlobalID.parse(legacy_sgid, for: 'login')
+    parsed_sgid = SignedGlobalID.parse(legacy_sgid, for: :login)
+    assert_equal @login_sgid.uri, parsed_sgid.uri
+    assert_equal @login_sgid.purpose, parsed_sgid.purpose.to_s
   end
 
   test 'equal only with same purpose' do
