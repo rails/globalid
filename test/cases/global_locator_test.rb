@@ -369,6 +369,23 @@ class GlobalLocatorTest < ActiveSupport::TestCase
     end
   end
 
+  test 'by GID without a primary key method' do
+    model = PersonWithoutPrimaryKey.new('id')
+    gid = model.to_gid
+    model2 = PersonWithoutPrimaryKey.new('id2')
+    gid2 = model.to_gid
+
+    found = GlobalID::Locator.locate(gid)
+    assert_kind_of model.class, found
+    assert_equal 'id', found.id
+
+    found = GlobalID::Locator.locate_many([gid, gid2])
+    assert_equal 2, found.length
+
+    found = GlobalID::Locator.locate_many([gid, gid2], ignore_missing: true)
+    assert_equal 2, found.length
+  end
+
   private
     def with_app(app)
       old_app, GlobalID.app = GlobalID.app, app

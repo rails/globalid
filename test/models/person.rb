@@ -101,3 +101,27 @@ class Person::Child < Person
     other.is_a?(self.class) && id == other.try(:id) && parent == other.parent
   end
 end
+
+class PersonWithoutPrimaryKey
+  include GlobalID::Identification
+
+  attr_reader :id
+
+  def self.find(id_or_ids)
+    if id_or_ids.is_a? Array
+      ids = id_or_ids
+      ids.collect { |id| find(id) }
+    else
+      id = id_or_ids
+      new(id)
+    end
+  end
+
+  def self.where(conditions)
+    (conditions[:id]).collect { |id| new(id) }
+  end
+
+  def initialize(id = 1)
+    @id = id
+  end
+end

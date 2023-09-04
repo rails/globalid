@@ -190,14 +190,18 @@ class GlobalID
             model_class = model_class.includes(options[:includes]) if options[:includes]
 
             if options[:ignore_missing]
-              model_class.where(model_class.primary_key => ids)
+              model_class.where(primary_key(model_class) => ids)
             else
               model_class.find(ids)
             end
           end
 
           def model_id_is_valid?(gid)
-            Array(gid.model_id).size == Array(gid.model_class.primary_key).size
+            Array(gid.model_id).size == Array(primary_key(gid.model_class)).size
+          end
+
+          def primary_key(model_class)
+            model_class.respond_to?(:primary_key) ? model_class.primary_key : :id
           end
       end
 
