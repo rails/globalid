@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
   s.summary     = 'Refer to any model with a URI: gid://app/class/id'
   s.description = 'URIs for your models makes it easy to pass references around.'
 
-  s.required_ruby_version = '>= 2.5.0'
+  s.required_ruby_version = '>= 2.7.0'
 
   s.license = 'MIT'
 
