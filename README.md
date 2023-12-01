@@ -73,8 +73,8 @@ GlobalID::Locator.locate_signed(expiring_sgid.to_s, for: 'sharing')
 # => nil
 ```
 
-**In Rails, an auto-expiry of 1 month is set by default.** You can alter that deal
-in an initializer with:
+**In Rails, an auto-expiry of 1 month is set by default.** You can alter that
+default in an initializer with:
 
 ```ruby
 # config/initializers/global_id.rb
@@ -165,19 +165,19 @@ Note the order is maintained in the returned results.
 
 Either `GlobalID::Locator.locate` or `GlobalID::Locator.locate_many` supports a hash of options as second parameter. The supported options are:
 
-* :includes - A Symbol, Array, Hash or combination of them
-  The same structure you would pass into a `includes` method of Active Record.
-  See [Active Record eager loading associations](https://guides.rubyonrails.org/active_record_querying.html#eager-loading-associations)
+* `:includes` - A Symbol, Array, Hash or combination of them.
+  The same structure you would pass into an `includes` method of Active Record.
+  See [Active Record eager loading associations](https://guides.rubyonrails.org/active_record_querying.html#eager-loading-associations).
   If present, `locate` or `locate_many` will eager load all the relationships specified here.
-  Note: It only works if all the gids models have that relationships.
-* :only - A class, module or Array of classes and/or modules that are
-  allowed to be located.  Passing one or more classes limits instances of returned
-  classes to those classes or their subclasses.  Passing one or more modules in limits
-  instances of returned classes to those including that module.  If no classes or
-  modules match, +nil+ is returned.
-* :ignore_missing (Only for `locate_many`) - By default, `locate_many` will call `#find` on the model to locate the
+  Note: It only works if all the GIDs Models have that relationships.
+* `:only` - A class, module, or Array of classes and/or modules that are
+  allowed to be located. Passing one or more classes limits instances of returned
+  classes to those classes or their subclasses. Passing one or more modules limits
+  instances of returned classes to those including that module. If no classes or
+  modules match, `nil` is returned.
+* `:ignore_missing` (Only for `locate_many`) - By default, `locate_many` will call `#find` on the model to locate the
   ids extracted from the GIDs. In Active Record (and other data stores following the same pattern),
-  `#find` will raise an exception if a named ID can't be found. When you set this option to true,
+  `#find` will raise an exception if a named ID can't be found. When you set this option to `true`,
   we will use `#where(id: ids)` instead, which does not raise on missing records.
 
 ### Custom App Locator
@@ -207,7 +207,7 @@ class BarLocator
 end
 ```
 
-After defining locators as above, URIs like "gid://foo/Person/1" and "gid://bar/Person/1" will now use the foo block locator and `BarLocator` respectively.
+After defining locators as above, URIs like `gid://foo/Person/1` and `gid://bar/Person/1` will now use the foo block locator and `BarLocator` respectively.
 Other apps will still keep using the default locator.
 
 ## Contributing to GlobalID
