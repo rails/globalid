@@ -210,6 +210,28 @@ end
 After defining locators as above, URIs like "gid://foo/Person/1" and "gid://bar/Person/1" will now use the foo block locator and `BarLocator` respectively.
 Other apps will still keep using the default locator.
 
+### Custom Default Locator
+
+A custom default locator can be set for an app by calling `GlobalID::Locator.default_locator=` and providing a default locator to use for that app.
+
+```ruby
+class MyCustomLocator < UnscopedLocator
+  def locate(gid, options = {})
+    ActiveRecord::Base.connected_to(role: :reading) do
+      super(gid, options)
+    end
+  end
+  
+  def locate_many(gids, options = {})
+    ActiveRecord::Base.connected_to(role: :reading) do
+      super(gids, options)
+    end
+  end
+end
+
+GlobalID::Locator.default_locator = MyCustomLocator.new
+```
+
 ## Contributing to GlobalID
 
 GlobalID is work of many contributors. You're encouraged to submit pull requests, propose
