@@ -57,7 +57,7 @@ GlobalID::Locator.locate_signed person_sgid
 
 **Expiration**
 
-Signed Global IDs can expire some time in the future. This is useful if there's a resource
+Signed Global IDs can expire sometime in the future. This is useful if there's a resource
 people shouldn't have indefinite access to, like a share link.
 
 ```ruby
@@ -87,7 +87,7 @@ You can assign a default SGID lifetime like so:
 SignedGlobalID.expires_in = 1.month
 ```
 
-This way any generated SGID will use that relative expiry.
+This way, any generated SGID will use that relative expiry.
 
 It's worth noting that _expiring SGIDs are not idempotent_ because they encode the current timestamp; repeated calls to `to_sgid` will produce different results. For example, in Rails
 
@@ -169,12 +169,12 @@ Either `GlobalID::Locator.locate` or `GlobalID::Locator.locate_many` supports a 
   The same structure you would pass into a `includes` method of Active Record.
   See [Active Record eager loading associations](https://guides.rubyonrails.org/active_record_querying.html#eager-loading-associations)
   If present, `locate` or `locate_many` will eager load all the relationships specified here.
-  Note: It only works if all the gids models have that relationships.
+  Note: It only works if all the gids models have those relationships.
 * :only - A class, module or Array of classes and/or modules that are
   allowed to be located.  Passing one or more classes limits instances of returned
   classes to those classes or their subclasses.  Passing one or more modules in limits
   instances of returned classes to those including that module.  If no classes or
-  modules match, +nil+ is returned.
+  modules match, `nil` is returned.
 * :ignore_missing (Only for `locate_many`) - By default, `locate_many` will call `#find` on the model to locate the
   ids extracted from the GIDs. In Active Record (and other data stores following the same pattern),
   `#find` will raise an exception if a named ID can't be found. When you set this option to true,
