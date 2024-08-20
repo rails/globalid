@@ -1,7 +1,7 @@
 Contributing to GlobalID
 =====================
 
-[![Build Status](https://secure.travis-ci.org/rails/globalid.png)](https://travis-ci.org/rails/globalid)
+[![CI](https://github.com/rails/globalid/actions/workflows/ci.yml/badge.svg)](https://github.com/rails/globalid/actions/workflows/ci.yml)
 
 GlobalID is work of [many contributors](https://github.com/rails/globalid/graphs/contributors). You're encouraged to submit [pull requests](https://github.com/rails/globalid/pulls), [propose features and discuss issues](https://github.com/rails/globalid/issues).
 
