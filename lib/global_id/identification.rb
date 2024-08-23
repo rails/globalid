@@ -36,8 +36,8 @@ class GlobalID
       end
     end
 
-    def global_id_column
-      self.class.global_id_column || self.class.try(:primary_key) || :id
+    def global_id_method
+      self.class.global_id_column || :id
     end
 
     # Returns the Global ID of the model.
