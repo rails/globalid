@@ -46,7 +46,7 @@ class URI::GIDTest <  ActiveSupport::TestCase
 
   test 'create from a configurable key model' do
     model = ConfigurableKeyModel.new(id: 'id-value', external_id: 'external-id-123')
-    assert_equal @ckm_gid_string, URI::GID.create('bcx', model, global_id_column: :external_id).to_s
+    assert_equal @ckm_gid_string, URI::GID.create('bcx', model).to_s
   end
 
   test 'build' do
