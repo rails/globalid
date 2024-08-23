@@ -41,10 +41,6 @@ class PersonUuid < Person
   def self.primary_key
     :uuid
   end
-
-  def uuid
-    id
-  end
 end
 
 class Person::Scoped < Person
