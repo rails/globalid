@@ -26,6 +26,19 @@ class GlobalID
   #   GlobalID::Locator.locate person_gid
   #   # => #<Person:0x007fae94bf6298 @id="1">
   module Identification
+    def self.included(base)
+      base.extend(ClassMethods)
+    end
+
+    module ClassMethods
+      def global_id_column(column_name = nil)
+        @global_id_column ||= column_name
+      end
+    end
+
+    def global_id_column
+      self.class.global_id_column || self.class.try(:primary_key) || :id
+    end
 
     # Returns the Global ID of the model.
     #
