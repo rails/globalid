@@ -72,8 +72,11 @@ module URI
       #
       #   URI::GID.create('bcx', Person.find(5), database: 'superhumans')
       def create(app, model, params = nil)
-        model_id_method = if params.is_a?(Hash) && (model_id_key = params.delete(:model_id_key))
-                            model_id_key
+        global_id_column = params&.delete(:global_id_column)
+        model_id_method = if model.id.is_a?(Array)
+                            :id
+                          else
+                            global_id_column
                           end || :id
 
         build app: app, model_name: model.class.name, model_id: model.send(model_id_method), params: params
