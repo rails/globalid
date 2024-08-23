@@ -45,6 +45,8 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
     @person_namespaced_gid = GlobalID.create(Person::Child.new(4))
     @person_model_gid = GlobalID.create(PersonModel.new(id: 1))
     @cpk_model_gid = GlobalID.create(CompositePrimaryKeyModel.new(id: ["tenant-key-value", "id-value"]))
+    @ckm_model = ConfigurableKeyModel.new(id: "id-value", external_id: "external-id-value")
+    @ckm_model_gid = GlobalID.create(@ckm_model)
   end
 
   test 'find' do
@@ -53,6 +55,7 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
     assert_equal Person::Child.find(@person_namespaced_gid.model_id), @person_namespaced_gid.find
     assert_equal PersonModel.find(@person_model_gid.model_id), @person_model_gid.find
     assert_equal CompositePrimaryKeyModel.find(@cpk_model_gid.model_id), @cpk_model_gid.find
+    assert_equal ConfigurableKeyModel.find(@ckm_model_gid.model_id), @ckm_model_gid.find
   end
 
   test 'find with class' do
@@ -60,6 +63,7 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
     assert_equal Person.find(@person_uuid_gid.model_id), @person_uuid_gid.find(only: Person)
     assert_equal PersonModel.find(@person_model_gid.model_id), @person_model_gid.find(only: PersonModel)
     assert_equal CompositePrimaryKeyModel.find(@cpk_model_gid.model_id), @cpk_model_gid.find(only: CompositePrimaryKeyModel)
+    assert_equal ConfigurableKeyModel.find(@ckm_model_gid.model_id), @ckm_model_gid.find(only: ConfigurableKeyModel)
   end
 
   test 'find with class no match' do
@@ -68,6 +72,7 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
     assert_nil @person_namespaced_gid.find(only: String)
     assert_nil @person_model_gid.find(only: Float)
     assert_nil @cpk_model_gid.find(only: Hash)
+    assert_nil @ckm_model_gid.find(only: Hash)
   end
 
   test 'find with subclass' do
@@ -140,6 +145,7 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
     assert_equal 'gid://bcx/Person::Child/4', @person_namespaced_gid.to_s
     assert_equal 'gid://bcx/PersonModel/1', @person_model_gid.to_s
     assert_equal 'gid://bcx/CompositePrimaryKeyModel/tenant-key-value/id-value', @cpk_model_gid.to_s
+    assert_equal 'gid://bcx/ConfigurableKeyModel/external-id-value', @ckm_model_gid.to_s
   end
 
   test 'as param' do
@@ -166,6 +172,7 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
     assert_equal URI('gid://bcx/Person::Child/4'), @person_namespaced_gid.uri
     assert_equal URI('gid://bcx/PersonModel/1'), @person_model_gid.uri
     assert_equal URI('gid://bcx/CompositePrimaryKeyModel/tenant-key-value/id-value'), @cpk_model_gid.uri
+    assert_equal URI('gid://bcx/ConfigurableKeyModel/external-id-value'), @ckm_model_gid.uri
   end
 
   test 'as JSON' do
@@ -183,6 +190,9 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
 
     assert_equal 'gid://bcx/CompositePrimaryKeyModel/tenant-key-value/id-value', @cpk_model_gid.as_json
     assert_equal '"gid://bcx/CompositePrimaryKeyModel/tenant-key-value/id-value"', @cpk_model_gid.to_json
+
+    assert_equal 'gid://bcx/ConfigurableKeyModel/external-id-value', @ckm_model_gid.as_json
+    assert_equal '"gid://bcx/ConfigurableKeyModel/external-id-value"', @ckm_model_gid.to_json
   end
 
   test 'model id' do
@@ -191,6 +201,7 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
     assert_equal '4', @person_namespaced_gid.model_id
     assert_equal '1', @person_model_gid.model_id
     assert_equal ['tenant-key-value', 'id-value'], @cpk_model_gid.model_id
+    assert_equal 'external-id-value', @ckm_model_gid.model_id
   end
 
   test 'model name' do
@@ -199,6 +210,7 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
     assert_equal 'Person::Child', @person_namespaced_gid.model_name
     assert_equal 'PersonModel', @person_model_gid.model_name
     assert_equal 'CompositePrimaryKeyModel', @cpk_model_gid.model_name
+    assert_equal 'ConfigurableKeyModel', @ckm_model_gid.model_name
   end
 
   test 'model class' do
@@ -207,6 +219,7 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
     assert_equal Person::Child, @person_namespaced_gid.model_class
     assert_equal PersonModel, @person_model_gid.model_class
     assert_equal CompositePrimaryKeyModel, @cpk_model_gid.model_class
+    assert_equal ConfigurableKeyModel, @ckm_model_gid.model_class
     assert_raise ArgumentError do
       GlobalID.find 'gid://bcx/SignedGlobalID/5'
     end
