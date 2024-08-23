@@ -11,7 +11,6 @@ class GlobalID
     def create(model, options = {})
       if app = options.fetch(:app) { GlobalID.app }
         params = options.except(:app, :verifier, :for)
-        params[:global_id_column] ||= model.global_id_column
         new URI::GID.create(app, model, params), options
       else
         raise ArgumentError, 'An app is required to create a GlobalID. ' \
