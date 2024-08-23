@@ -70,7 +70,11 @@ module URI
       #
       #   URI::GID.create('bcx', Person.find(5), database: 'superhumans')
       def create(app, model, params = nil)
-        build app: app, model_name: model.class.name, model_id: model.id, params: params
+        model_id_method = if params.is_a?(Hash) && (model_id_key = params.delete(:model_id_key))
+                            model_id_key
+                          end || :id
+
+        build app: app, model_name: model.class.name, model_id: model.send(model_id_method), params: params
       end
 
       # Create a new URI::GID from components with argument check.
