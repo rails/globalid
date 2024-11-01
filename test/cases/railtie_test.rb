@@ -9,6 +9,15 @@ end
 
 class RailtieTest < ActiveSupport::TestCase
   include ActiveSupport::Testing::Isolation
+  # Not every Rails version introduces a new version
+  KNOWN_CACHE_FORMATS = {
+    6.1 => 6.1,
+    7.0 => 7.0,
+    7.1 => 7.1,
+    7.2 => 7.1,
+    8.0 => 7.1,
+  }
+  KNOWN_CACHE_FORMATS.default = 7.1
 
   def setup
     Rails.env = 'development'
@@ -16,7 +25,7 @@ class RailtieTest < ActiveSupport::TestCase
     @app.config.eager_load = false
     @app.config.logger = Logger.new(nil)
     @app.config.secret_key_base = ('x' * 30)
-    @app.config.active_support.cache_format_version = Rails::VERSION::STRING.to_f
+    @app.config.active_support.cache_format_version = KNOWN_CACHE_FORMATS[Rails::VERSION::STRING.to_f]
   end
 
   test 'GlobalID.app for Blog::Application defaults to blog' do
