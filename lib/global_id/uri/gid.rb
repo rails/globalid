@@ -62,7 +62,7 @@ module URI
       #   URI.parse('gid://bcx')       # => URI::GID instance
       #   URI::GID.parse('gid://bcx/') # => raises URI::InvalidComponentError
       def parse(uri)
-        generic_components = URI.split(uri) << nil << true # nil parser, true arg_check
+        generic_components = URI.split(uri) << URI::RFC2396_Parser.new << true # RFC2396 parser, true arg_check
         new(*generic_components)
       end
 
