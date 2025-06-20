@@ -16,7 +16,13 @@ class RailtieTest < ActiveSupport::TestCase
     @app.config.eager_load = false
     @app.config.logger = Logger.new(nil)
     @app.config.secret_key_base = ('x' * 30)
-    @app.config.active_support.cache_format_version = Rails::VERSION::STRING.to_f
+    # Rails supports `cache_format` up to `7.1`.
+    # https://github.com/rails/rails/blob/aa66aece44f191e6330c04ce4942c3edf31d85d7/activesupport/lib/active_support/cache.rb#L800-L809
+    @app.config.active_support.cache_format_version = if Rails::VERSION::STRING.to_f < 8
+      Rails::VERSION::STRING.to_f
+    else
+      7.1
+    end
   end
 
   test 'GlobalID.app for Blog::Application defaults to blog' do
