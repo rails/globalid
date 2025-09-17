@@ -5,6 +5,9 @@ class GlobalID
     class InvalidModelIdError < StandardError; end
 
     class << self
+      # The default locator used when no app-specific locator is found.
+      attr_accessor :default_locator
+
       # Takes either a GlobalID or a string that can be turned into a GlobalID
       #
       # Options:
@@ -134,7 +137,7 @@ class GlobalID
 
       private
         def locator_for(gid)
-          @locators.fetch(normalize_app(gid.app)) { DEFAULT_LOCATOR }
+          @locators.fetch(normalize_app(gid.app)) { default_locator }
         end
 
         def find_allowed?(model_class, only = nil)
@@ -223,7 +226,8 @@ class GlobalID
             end
           end
       end
-      DEFAULT_LOCATOR = UnscopedLocator.new
+
+      self.default_locator = UnscopedLocator.new
 
       class BlockLocator
         def initialize(block)

@@ -32,6 +32,10 @@ class GlobalID
       @app = URI::GID.validate_app(app)
     end
 
+    def default_locator(default_locator)
+      Locator.default_locator = default_locator
+    end
+
     private
       def parse_encoded_gid(gid, options)
         new(Base64.urlsafe_decode64(gid), options) rescue nil
