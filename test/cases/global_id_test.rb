@@ -55,7 +55,7 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
     assert_equal Person::Child.find(@person_namespaced_gid.model_id), @person_namespaced_gid.find
     assert_equal PersonModel.find(@person_model_gid.model_id), @person_model_gid.find
     assert_equal CompositePrimaryKeyModel.find(@cpk_model_gid.model_id), @cpk_model_gid.find
-    assert_equal ConfigurableKeyModel.find(@ckm_model_gid.model_id), @ckm_model_gid.find
+    assert_equal ConfigurableKeyModel.find_by(external_id: @ckm_model_gid.model_id), @ckm_model_gid.find
   end
 
   test 'find with class' do
@@ -63,7 +63,7 @@ class GlobalIDCreationTest < ActiveSupport::TestCase
     assert_equal Person.find(@person_uuid_gid.model_id), @person_uuid_gid.find(only: Person)
     assert_equal PersonModel.find(@person_model_gid.model_id), @person_model_gid.find(only: PersonModel)
     assert_equal CompositePrimaryKeyModel.find(@cpk_model_gid.model_id), @cpk_model_gid.find(only: CompositePrimaryKeyModel)
-    assert_equal ConfigurableKeyModel.find(@ckm_model_gid.model_id), @ckm_model_gid.find(only: ConfigurableKeyModel)
+    assert_equal ConfigurableKeyModel.find_by(external_id: @ckm_model_gid.model_id), @ckm_model_gid.find(only: ConfigurableKeyModel)
   end
 
   test 'find with class no match' do
