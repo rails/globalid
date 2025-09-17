@@ -13,7 +13,11 @@ class ConfigurableKeyModel
       :id
     end
 
-    def find(external_id)
+    def find(_id)
+      raise ".find is not supported for ConfigurableKeyModel"
+    end
+
+    def find_by(external_id:)
       new external_id: external_id, id: "id-value"
     end
   end
