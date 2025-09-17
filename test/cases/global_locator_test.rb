@@ -388,9 +388,7 @@ class GlobalLocatorTest < ActiveSupport::TestCase
 
   test "can set default_locator" do
     class MyLocator
-      def locate(gid)
-        :my_locator
-      end
+      def locate(gid, options = {}); :my_locator; end
     end
 
     with_default_locator(MyLocator.new) do
