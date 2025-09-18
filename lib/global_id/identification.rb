@@ -1,3 +1,5 @@
+require "active_support/core_ext/class/attribute"
+
 class GlobalID
   # Mix `GlobalID::Identification` into any model with a `#find(id)` class
   # method. Support is automatically included in Active Record.
@@ -27,17 +29,7 @@ class GlobalID
   #   # => #<Person:0x007fae94bf6298 @id="1">
   module Identification
     def self.included(base)
-      base.extend(ClassMethods)
-    end
-
-    module ClassMethods
-      def global_id_column(column_name = nil)
-        @global_id_column ||= column_name
-      end
-    end
-
-    def global_id_method
-      self.class.global_id_column || :id
+      base.class_attribute :global_id_column, default: :id, instance_writer: false
     end
 
     # Returns the Global ID of the model.

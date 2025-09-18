@@ -6,7 +6,7 @@ class ConfigurableKeyModel
 
   attr_accessor :id, :external_id
 
-  global_id_column :external_id
+  self.global_id_column = :external_id
 
   class << self
     def primary_key
