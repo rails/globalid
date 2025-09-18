@@ -386,12 +386,29 @@ class GlobalLocatorTest < ActiveSupport::TestCase
     assert_equal 2, found.length
   end
 
+  test "can set default_locator" do
+    class MyLocator
+      def locate(gid, options = {}); :my_locator; end
+    end
+
+    with_default_locator(MyLocator.new) do
+      assert_equal :my_locator, GlobalID::Locator.locate('gid://app/Person/1')
+    end
+  end
+
   private
     def with_app(app)
       old_app, GlobalID.app = GlobalID.app, app
       yield
     ensure
       GlobalID.app = old_app
+    end
+
+    def with_default_locator(default_locator)
+      old_locator, GlobalID::Locator.default_locator = GlobalID::Locator.default_locator, default_locator
+      yield
+    ensure
+      GlobalID::Locator.default_locator = old_locator
     end
 end
 

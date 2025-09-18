@@ -31,8 +31,8 @@ class GlobalID
     #
     #   model = Person.new id: 1
     #   global_id = model.to_global_id
-    #   global_id.modal_class # => Person
-    #   global_id.modal_id # => "1"
+    #   global_id.model_class # => Person
+    #   global_id.model_id # => "1"
     #   global_id.to_param # => "Z2lkOi8vYm9yZGZvbGlvL1BlcnNvbi8x"
     def to_global_id(options = {})
       GlobalID.create(self, options)
@@ -52,8 +52,8 @@ class GlobalID
     #
     #   model = Person.new id: 1
     #   signed_global_id = model.to_signed_global_id
-    #   signed_global_id.modal_class # => Person
-    #   signed_global_id.modal_id # => "1"
+    #   signed_global_id.model_class # => Person
+    #   signed_global_id.model_id # => "1"
     #   signed_global_id.to_param # => "BAh7CEkiCGdpZAY6BkVUSSIiZ2..."
     #
     # ==== Expiration
