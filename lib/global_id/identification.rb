@@ -134,16 +134,30 @@ class GlobalID
       #   Person.build_global_id(Person) # => ArgumentError: Can't build a Global ID for Class
       #
       # An app is required to create a GlobalID. Pass the :app option or set the default GlobalID.app.
-
       def build_global_id(obj, options = {})
         return obj.to_global_id(options) if obj.respond_to?(:to_global_id)
         raise ArgumentError, "Can't build a Global ID for #{obj.class}" unless obj.is_a?(String) || obj.is_a?(Integer)
 
-        unless (app = options.fetch(:app) { GlobalID.app })
-          raise ArgumentError, "An app is required to create a GlobalID. Pass the :app option or set the default GlobalID.app."
-        end
+        struct = Struct.new(:id, :class).new(id: obj, class: self )
+        return GlobalID.create(struct, options)
+      end
 
-        GlobalID.new(URI::GID.build(app: app, model_name: name, model_id: obj, params: options.except(:app, :verifier, :for)))
+      # Build a Signed Global ID from the given object.
+      #
+      # If the object responds to `to_signed_global_id` it will return the result of that call.
+      #   Person.build_signed_global_id(Person.find(1)) # => <SignedGlobalID:0x008fde45df8937 ...>
+      # If the object is a string or an integer, it will build a GlobalID using that object.
+      #   Person.build_signed_global_id(1) # => <SignedGlobalID:0x008fde45df8937 ...>
+      # If the object is not a string or an integer, it will raise an ArgumentError.
+      #   Person.build_signed_global_id(Person) # => ArgumentError: Can't build a Signed Global ID for Class
+      #
+      # An app is required to create a SignedGlobalID. Pass the :app option or set the default GlobalID.app.
+      def build_signed_global_id(obj, options = {})
+        return obj.to_signed_global_id(options) if obj.respond_to?(:to_signed_global_id)
+        raise ArgumentError, "Can't build a Signed Global ID for #{obj.class}" unless obj.is_a?(String) || obj.is_a?(Integer)
+
+        struct = Struct.new(:id, :class).new(id: obj, class: self )
+        SignedGlobalID.create(struct, options)
       end
     end
   end
