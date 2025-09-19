@@ -138,8 +138,7 @@ class GlobalID
         return obj.to_global_id(options) if obj.respond_to?(:to_global_id)
         raise ArgumentError, "Can't build a Global ID for #{obj.class}" unless obj.is_a?(String) || obj.is_a?(Integer)
 
-        struct = Struct.new(:id, :class, keyword_init: false).new(obj, self)
-        return GlobalID.create(struct, options)
+        return GlobalID.create(new(id: obj), options)
       end
 
       # Build a Signed Global ID from the given object.
@@ -156,8 +155,7 @@ class GlobalID
         return obj.to_signed_global_id(options) if obj.respond_to?(:to_signed_global_id)
         raise ArgumentError, "Can't build a Signed Global ID for #{obj.class}" unless obj.is_a?(String) || obj.is_a?(Integer)
 
-        struct = Struct.new(:id, :class, keyword_init: false).new(obj, self)
-        SignedGlobalID.create(struct, options)
+        SignedGlobalID.create(new(id: obj), options)
       end
     end
   end
