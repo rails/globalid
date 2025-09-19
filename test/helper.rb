@@ -8,6 +8,7 @@ require 'global_id'
 require 'models/person'
 require 'models/person_model'
 require 'models/composite_primary_key_model'
+require 'models/configurable_key_model'
 
 require 'json'
 

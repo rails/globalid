@@ -162,7 +162,11 @@ class GlobalID
           model_class = gid.model_class
           model_class = model_class.includes(options[:includes]) if options[:includes]
 
-          model_class.find gid.model_id
+          if model_class.global_id_column == :id
+            model_class.find gid.model_id
+          else
+            model_class.find_by model_class.global_id_column => gid.model_id
+          end
         end
 
         def locate_many(gids, options = {})
