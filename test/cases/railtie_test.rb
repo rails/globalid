@@ -23,6 +23,7 @@ class RailtieTest < ActiveSupport::TestCase
     else
       7.1
     end
+    @app.config.active_support.to_time_preserves_timezone = :zone
   end
 
   test 'GlobalID.app for Blog::Application defaults to blog' do
