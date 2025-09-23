@@ -373,7 +373,7 @@ class GlobalLocatorTest < ActiveSupport::TestCase
     model = PersonWithoutPrimaryKey.new('id')
     gid = model.to_gid
     model2 = PersonWithoutPrimaryKey.new('id2')
-    gid2 = model.to_gid
+    gid2 = model2.to_gid
 
     found = GlobalID::Locator.locate(gid)
     assert_kind_of model.class, found
