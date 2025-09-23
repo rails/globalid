@@ -6,6 +6,8 @@ class URI::GIDTest <  ActiveSupport::TestCase
     @gid = URI::GID.parse(@gid_string)
     @cpk_gid_string = 'gid://bcx/CompositePrimaryKeyModel/tenant-key-value/id-value'
     @cpk_gid = URI::GID.parse(@cpk_gid_string)
+    @ckm_gid_string = 'gid://bcx/ConfigurableKeyModel/external-id-123'
+    @ckm_gid = URI::GID.parse(@ckm_gid_string)
   end
 
   test 'parsed' do
@@ -13,6 +15,9 @@ class URI::GIDTest <  ActiveSupport::TestCase
     assert_equal @gid.model_name, 'Person'
     assert_equal @gid.model_id, '5'
     assert_equal ["tenant-key-value", "id-value"], @cpk_gid.model_id
+    assert_equal @ckm_gid.app, 'bcx'
+    assert_equal @ckm_gid.model_name, 'ConfigurableKeyModel'
+    assert_equal @ckm_gid.model_id, 'external-id-123'
   end
 
   test 'parsed for non existing model class' do
@@ -39,6 +44,11 @@ class URI::GIDTest <  ActiveSupport::TestCase
     assert_equal @cpk_gid_string, URI::GID.create('bcx', model).to_s
   end
 
+  test 'create from a configurable key model' do
+    model = ConfigurableKeyModel.new(id: 'id-value', external_id: 'external-id-123')
+    assert_equal @ckm_gid_string, URI::GID.create('bcx', model).to_s
+  end
+
   test 'build' do
     array = URI::GID.build(['bcx', 'Person', '5', nil])
     assert array
@@ -63,6 +73,21 @@ class URI::GIDTest <  ActiveSupport::TestCase
 
     assert_equal array, hash
     assert_equal("gid://bcx/CompositePrimaryKeyModel/tenant-key-value/id-value", array.to_s)
+  end
+
+  # NOTE: I'm not sure if this test is valuable, it's pretty duplicative with the standard
+  #   test path, but with a different value passed in for `model_id:`
+  test 'build with a configurable key model' do
+    array = URI::GID.build(['bcx', 'ConfigurableKeyModel', 'external-id-123', nil])
+    gid = URI::GID.build(
+      app: 'bcx',
+      model_name: 'ConfigurableKeyModel',
+      model_id: 'external-id-123',
+      params: nil
+    )
+
+    assert_equal array, gid
+    assert_equal 'gid://bcx/ConfigurableKeyModel/external-id-123', array.to_s
   end
 
   test 'build with wrong ordered array creates a wrong ordered gid' do
