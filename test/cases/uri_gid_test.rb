@@ -4,7 +4,7 @@ class URI::GIDTest <  ActiveSupport::TestCase
   setup do
     @gid_string = 'gid://bcx/Person/5'
     @gid = URI::GID.parse(@gid_string)
-    @cpk_gid_string = 'gid://bcx/CompositePrimaryKeyModel/tenant-key-value/id-value'
+    @cpk_gid_string = 'gid://bcx/CompositePrimaryKeyModel/tenant_key-value/id-value'
     @cpk_gid = URI::GID.parse(@cpk_gid_string)
   end
 
@@ -12,7 +12,7 @@ class URI::GIDTest <  ActiveSupport::TestCase
     assert_equal @gid.app, 'bcx'
     assert_equal @gid.model_name, 'Person'
     assert_equal @gid.model_id, '5'
-    assert_equal ["tenant-key-value", "id-value"], @cpk_gid.model_id
+    assert_equal ["tenant_key-value", "id-value"], @cpk_gid.model_id
   end
 
   test 'parsed for non existing model class' do
@@ -20,8 +20,8 @@ class URI::GIDTest <  ActiveSupport::TestCase
     assert_equal("1", flat_id_gid.model_id)
     assert_equal("NonExistingModel", flat_id_gid.model_name)
 
-    composite_id_gid = URI::GID.parse("gid://bcx/NonExistingModel/tenant-key-value/id-value")
-    assert_equal(["tenant-key-value", "id-value"], composite_id_gid.model_id)
+    composite_id_gid = URI::GID.parse("gid://bcx/NonExistingModel/tenant_key-value/id-value")
+    assert_equal(["tenant_key-value", "id-value"], composite_id_gid.model_id)
     assert_equal("NonExistingModel", composite_id_gid.model_name)
   end
 
@@ -35,7 +35,7 @@ class URI::GIDTest <  ActiveSupport::TestCase
   end
 
   test 'create from a composite primary key model' do
-    model = CompositePrimaryKeyModel.new(id: ["tenant-key-value", "id-value"])
+    model = CompositePrimaryKeyModel.new(id: ["tenant_key-value", "id-value"])
     assert_equal @cpk_gid_string, URI::GID.create('bcx', model).to_s
   end
 
@@ -50,19 +50,19 @@ class URI::GIDTest <  ActiveSupport::TestCase
   end
 
   test 'build with a composite primary key' do
-    array = URI::GID.build(['bcx', 'CompositePrimaryKeyModel', ["tenant-key-value", "id-value"], nil])
+    array = URI::GID.build(['bcx', 'CompositePrimaryKeyModel', ["tenant_key-value", "id-value"], nil])
     assert array
 
     hash = URI::GID.build(
       app: 'bcx',
       model_name: 'CompositePrimaryKeyModel',
-      model_id: ["tenant-key-value", "id-value"],
+      model_id: ["tenant_key-value", "id-value"],
       params: nil
     )
     assert hash
 
     assert_equal array, hash
-    assert_equal("gid://bcx/CompositePrimaryKeyModel/tenant-key-value/id-value", array.to_s)
+    assert_equal("gid://bcx/CompositePrimaryKeyModel/tenant_key-value/id-value", array.to_s)
   end
 
   test 'build with wrong ordered array creates a wrong ordered gid' do
@@ -157,13 +157,17 @@ class URI::GIDAppValidationTest < ActiveSupport::TestCase
   end
 
   test 'apps containing non alphanumeric characters are invalid' do
-    assert_invalid_app 'foo&bar'
     assert_invalid_app 'foo:bar'
-    assert_invalid_app 'foo_bar'
   end
 
-  test 'app with hyphen is allowed' do
+  test 'app with hyphen and/or underscore is allowed' do
     assert_equal 'foo-bar', URI::GID.validate_app('foo-bar')
+    assert_equal 'foo_bar', URI::GID.validate_app('foo_bar')
+    assert_equal 'foo-bar_baz', URI::GID.validate_app('foo-bar_baz')
+
+    # RFC3986 allows ampersands in hostnames
+    # see: https://github.com/ruby/uri/issues/141#issuecomment-2541219003
+    assert_equal 'foo&bar', URI::GID.validate_app('foo&bar')
   end
 
   private
