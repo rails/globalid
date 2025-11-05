@@ -175,11 +175,11 @@ class GlobalID
         @locators[normalize_app(app)] = locator || BlockLocator.new(locator_block)
       end
 
-      private
-        def locator_for(gid)
-          @locators.fetch(normalize_app(gid.app)) { default_locator }
-        end
+      def locator_for(gid)
+        @locators.fetch(normalize_app(gid.app)) { default_locator }
+      end
 
+      private
         def find_allowed?(gid, only = nil)
           only ? Array(only).any? { |c| gid.model_class <= c } : true
         end
@@ -203,6 +203,10 @@ class GlobalID
       @locators = {}
 
       class BaseLocator
+        def model_class(gid)
+          gid.model_name.constantize
+        end
+
         def locate(gid, options = {})
           return unless model_id_is_valid?(gid)
           model_class = gid.model_class
@@ -278,6 +282,10 @@ class GlobalID
       class BlockLocator
         def initialize(block)
           @locator = block
+        end
+
+        def model_class(gid)
+          gid.model_name.constantize
         end
 
         def locate(gid, options = {})

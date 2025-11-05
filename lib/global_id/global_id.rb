@@ -55,8 +55,21 @@ class GlobalID
 
   def model_class
     @model_class ||= begin
-      model = model_name.constantize
-
+      locator = Locator.locator_for(self)
+      model = begin
+        locator.model_class(self)
+      rescue NoMethodError
+        if locator.respond_to?(:model_class)
+          raise
+        else
+          GlobalID.deprecator.warn <<~MSG.squish
+            Your locator #{locator.class.name} does not implement the
+            `model_class` method. Please add a `model_class(gid)` method
+            to your locator or inherit from `GlobalID::Locator::BaseLocator`.
+          MSG
+          model_name.constantize
+        end
+      end
       if model <= GlobalID
         raise ArgumentError, "GlobalID and SignedGlobalID cannot be used as model_class."
       end
