@@ -34,7 +34,7 @@ class GlobalID
       def locate(gid, options = {})
         gid = GlobalID.parse(gid)
 
-        return unless gid && find_allowed?(gid.model_class, options[:only])
+        return unless gid && find_allowed?(gid, options[:only])
 
         locator = locator_for(gid)
 
@@ -70,7 +70,7 @@ class GlobalID
       def fetch(gid, options = {})
         gid = GlobalID.parse(gid)
 
-        return unless gid && find_allowed?(gid.model_class, options[:only])
+        return unless gid && find_allowed?(gid, options[:only])
 
         fetch_record(gid, options.except(:only)) or raise RecordNotFound, "Couldn't find record for #{gid}"
       end
@@ -180,8 +180,8 @@ class GlobalID
           @locators.fetch(normalize_app(gid.app)) { default_locator }
         end
 
-        def find_allowed?(model_class, only = nil)
-          only ? Array(only).any? { |c| model_class <= c } : true
+        def find_allowed?(gid, only = nil)
+          only ? Array(only).any? { |c| gid.model_class <= c } : true
         end
 
         def fetch_record(gid, options)
@@ -191,7 +191,7 @@ class GlobalID
         end
 
         def parse_allowed(gids, only = nil)
-          gids.collect { |gid| GlobalID.parse(gid) }.compact.select { |gid| find_allowed?(gid.model_class, only) }
+          gids.collect { |gid| GlobalID.parse(gid) }.compact.select { |gid| find_allowed?(gid, only) }
         end
 
         def normalize_app(app)
