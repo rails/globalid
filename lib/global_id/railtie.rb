@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rails'
 require 'global_id'
 require 'active_support/core_ext/string/inflections'

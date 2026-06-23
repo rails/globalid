@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'helper'
 require 'minitest/mock' # for stubbing Time.now as #travel doesn't have subsecond precision.
 

@@ -1,4 +1,6 @@
+# frozen_string_literal: true
 require 'active_support'
+require 'global_id/version'
 require 'global_id/global_id'
 
 autoload :SignedGlobalID, 'global_id/signed_global_id'

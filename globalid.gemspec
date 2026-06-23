@@ -1,9 +1,10 @@
-version = '1.3.0'
+# frozen_string_literal: true
+require_relative "lib/global_id/version"
 
 Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.name        = 'globalid'
-  s.version     = version
+  s.version     = GlobalID::VERSION
   s.summary     = 'Refer to any model with a URI: gid://app/class/id'
   s.description = 'URIs for your models makes it easy to pass references around.'
 
@@ -25,9 +26,9 @@ Gem::Specification.new do |s|
 
   s.metadata = {
     "bug_tracker_uri"       => "https://github.com/rails/globalid/issues",
-    "changelog_uri"         => "https://github.com/rails/globalid/releases/tag/v#{version}",
+    "changelog_uri"         => "https://github.com/rails/globalid/releases/tag/v#{GlobalID::VERSION}",
     "mailing_list_uri"      => "https://discuss.rubyonrails.org/c/rubyonrails-talk",
-    "source_code_uri"       => "https://github.com/rails/globalid/tree/v#{version}",
+    "source_code_uri"       => "https://github.com/rails/globalid/tree/v#{GlobalID::VERSION}",
     "rubygems_mfa_required" => "true",
   }
 end

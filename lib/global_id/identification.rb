@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class GlobalID
   # Mix `GlobalID::Identification` into any model with a `#find(id)` class
   # method. Support is automatically included in Active Record.
