@@ -82,6 +82,57 @@ class GlobalLocatorTest < ActiveSupport::TestCase
     end
   end
 
+  test '#fetch returns the record' do
+    found = GlobalID::Locator.fetch(@gid)
+    assert_kind_of @gid.model_class, found
+    assert_equal @gid.model_id, found.id
+  end
+
+  test '#fetch a composite primary key model' do
+    found = GlobalID::Locator.fetch(@cpk_gid)
+    assert_kind_of @cpk_gid.model_class, found
+    assert_equal ["tenant-key-value", "id-value"], found.id
+  end
+
+  test '#fetch by GID string' do
+    found = GlobalID::Locator.fetch(@gid.to_s)
+    assert_kind_of @gid.model_class, found
+    assert_equal @gid.model_id, found.id
+  end
+
+  test '#fetch with only: restriction with match' do
+    found = GlobalID::Locator.fetch(@gid, only: Person)
+    assert_kind_of @gid.model_class, found
+    assert_equal @gid.model_id, found.id
+  end
+
+  test '#fetch with only: restriction with no match returns nil' do
+    assert_nil GlobalID::Locator.fetch(@gid, only: String)
+  end
+
+  test '#fetch by non-GID returns nil' do
+    assert_nil GlobalID::Locator.fetch('This is not a GID')
+  end
+
+  test '#fetch raises RecordNotFound when the record no longer exists' do
+    gid = Person.new(Person::HARDCODED_ID_FOR_MISSING_PERSON).to_gid
+
+    error = assert_raises(GlobalID::Locator::RecordNotFound) do
+      GlobalID::Locator.fetch(gid)
+    end
+    assert_kind_of GlobalID::Locator::Error, error
+  end
+
+  test '#fetch raises RecordUnavailable when the backend fails' do
+    gid = Person.new(Person::HARDCODED_ID_FOR_FIND_ERROR).to_gid
+
+    error = assert_raises(GlobalID::Locator::RecordUnavailable) do
+      GlobalID::Locator.fetch(gid)
+    end
+
+    assert_kind_of GlobalID::Locator::Error, error
+  end
+
   test 'by many GIDs of one class' do
     assert_equal [ Person.new('1'), Person.new('2') ],
       GlobalID::Locator.locate_many([ Person.new('1').to_gid, Person.new('2').to_gid ])

@@ -3,6 +3,17 @@ require 'active_support/core_ext/enumerable' # For Enumerable#index_by
 class GlobalID
   module Locator
     class InvalidModelIdError < StandardError; end
+    class Error < StandardError; end
+
+    # Raised by GlobalID::Locator.fetch when the GlobalID is valid but the
+    # record it references no longer exists. The record is gone for good, so
+    # retrying won't help.
+    class RecordNotFound < Error; end
+
+    # Raised by GlobalID::Locator.fetch when the record couldn't be located
+    # due to any other error in the backend, such as a database connection
+    # error. The record may still exist, so retrying may succeed.
+    class RecordUnavailable < Error; end
 
     class << self
       # The default locator used when no app-specific locator is found.
@@ -33,6 +44,35 @@ class GlobalID
         else
           locator.locate(gid, options.except(:only))
         end
+      end
+
+      # Like .locate, but instead of returning +nil+ or leaking the backend's
+      # own exceptions when the record can't be returned, it raises one of two
+      # GlobalID-specific errors so callers can tell the cases apart:
+      #
+      # * GlobalID::Locator::RecordNotFound when the record no longer exists.
+      #   Retrying won't help.
+      # * GlobalID::Locator::RecordUnavailable when the record couldn't be
+      #   located due to any other failure in the backend, like a database
+      #   connection error. The record may still exist, so retrying may succeed.
+      #
+      # The distinction is drawn without knowing the backend's exception
+      # classes: the record is looked up through a query that doesn't raise on
+      # missing records (like .locate_many's +:ignore_missing+), so an empty
+      # result means the record is gone, while an error from the query itself
+      # means the backend is unavailable.
+      #
+      # Returns +nil+ for a blank or unparseable GlobalID, or one disallowed by
+      # the +:only+ option, just like .locate, and accepts the same options.
+      #
+      # Note: custom locators registered with .use need to implement locate_many
+      # with support for the +:ignore_missing+ option for this method to work.
+      def fetch(gid, options = {})
+        gid = GlobalID.parse(gid)
+
+        return unless gid && find_allowed?(gid.model_class, options[:only])
+
+        fetch_record(gid, options.except(:only)) or raise RecordNotFound, "Couldn't find record for #{gid}"
       end
 
       # Takes an array of GlobalIDs or strings that can be turned into a GlobalIDs.
@@ -142,6 +182,12 @@ class GlobalID
 
         def find_allowed?(model_class, only = nil)
           only ? Array(only).any? { |c| model_class <= c } : true
+        end
+
+        def fetch_record(gid, options)
+          locator_for(gid).locate_many([gid], options.merge(ignore_missing: true)).first
+        rescue => error
+          raise RecordUnavailable, "Couldn't fetch record for #{gid}: #{error.message}"
         end
 
         def parse_allowed(gids, only = nil)

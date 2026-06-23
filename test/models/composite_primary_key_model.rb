@@ -24,7 +24,7 @@ class CompositePrimaryKeyModel
     end
   end
 
-  def where(conditions)
+  def self.where(conditions)
     keys = conditions.keys
     raise "only primary key condition was expected" if keys.size != 1
     pk = keys.first

@@ -37,6 +37,23 @@ GlobalID::Locator.locate person_gid
 # => #<Person:0x007fae94bf6298 @id="1">
 ```
 
+`locate` returns `nil` for a blank or unparseable Global ID, and lets the
+backend's own exceptions bubble up when a record can't be found. Use `fetch`
+when you want to tell apart a record that's gone for good from a transient
+backend failure:
+
+```ruby
+GlobalID::Locator.fetch person_gid
+# => #<Person:0x007fae94bf6298 @id="1">           # found
+# => raises GlobalID::Locator::RecordNotFound     # the record no longer exists
+# => raises GlobalID::Locator::RecordUnavailable  # the backend failed; retry may succeed
+```
+
+Both errors extend `GlobalID::Locator::Error`, so you can rescue either at
+once. This is useful, for example, to discard a background job whose argument
+points at a deleted record, without also discarding jobs that hit a temporary
+database error.
+
 ### Signed Global IDs
 
 For added security GlobalIDs can also be signed to ensure that the data hasn't been tampered with.

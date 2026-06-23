@@ -2,6 +2,7 @@ class Person
   include GlobalID::Identification
 
   HARDCODED_ID_FOR_MISSING_PERSON = '1000'
+  HARDCODED_ID_FOR_FIND_ERROR = '2000'
 
   attr_reader :id
 
@@ -18,6 +19,8 @@ class Person
 
       if id == HARDCODED_ID_FOR_MISSING_PERSON
         raise 'Person missing'
+      elsif id == HARDCODED_ID_FOR_FIND_ERROR
+        raise 'A random error happened'
       else
         new(id)
       end
@@ -25,6 +28,10 @@ class Person
   end
 
   def self.where(conditions)
+    if conditions[primary_key].include? HARDCODED_ID_FOR_FIND_ERROR
+      raise 'A random error happened'
+    end
+
     (conditions[primary_key] - [HARDCODED_ID_FOR_MISSING_PERSON]).collect { |id| new(id) }
   end
 
