@@ -332,6 +332,7 @@ class GlobalLocatorTest < ActiveSupport::TestCase
 
   test 'use locator with class' do
     class BarLocator
+      def model_class(gid); gid.model_name.constantize; end
       def locate(gid, options = {}); :bar; end
       def locate_many(gids, options = {}); gids.map(&:model_id); end
     end
@@ -346,6 +347,7 @@ class GlobalLocatorTest < ActiveSupport::TestCase
 
   test 'use locator with class and single argument' do
     class DeprecatedBarLocator
+      def model_class(gid); gid.model_name.constantize; end
       def locate(gid); :deprecated; end
       def locate_many(gids, options = {}); gids.map(&:model_id); end
     end
@@ -367,6 +369,39 @@ class GlobalLocatorTest < ActiveSupport::TestCase
 
     with_app 'insensitive' do
       assert_equal :insensitive, GlobalID::Locator.locate('gid://InSeNsItIvE/Person/1')
+    end
+  end
+
+  test 'locator with custom model_class derivation' do
+    class CustomModelLocator < GlobalID::Locator::BaseLocator
+      def model_class(_gid); Person; end
+    end
+
+    GlobalID::Locator.use :custom, CustomModelLocator.new
+
+    with_app 'custom' do
+      gid = GlobalID.new('gid://custom/Folk/5')
+
+      found = GlobalID::Locator.locate(gid)
+      assert_kind_of Person, found
+      assert_equal '5', found.id
+    end
+  end
+
+  test 'locator without model_class method shows deprecation warning' do
+    class LegacyLocator
+      # Intentionally doesn't implement model_class
+      def locate(gid, options = {}); Person.find(gid.model_id); end
+    end
+
+    GlobalID::Locator.use :legacy, LegacyLocator.new
+
+    with_app 'legacy' do
+      gid = Person.new('5').to_gid
+
+      assert_deprecated(nil, GlobalID.deprecator) do
+        assert_equal Person, gid.model_class
+      end
     end
   end
 
@@ -432,7 +467,7 @@ class GlobalLocatorTest < ActiveSupport::TestCase
   end
 
   test "can set default_locator" do
-    class MyLocator
+    class MyLocator < GlobalID::Locator::BaseLocator
       def locate(gid, options = {}); :my_locator; end
     end
 

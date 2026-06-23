@@ -216,16 +216,62 @@ end
 Using a class:
 
 ```ruby
-GlobalID::Locator.use :bar, BarLocator.new
 class BarLocator
   def locate(gid, options = {})
     @search_client.search name: gid.model_name, id: gid.model_id
   end
 end
+
+GlobalID::Locator.use :bar, BarLocator.new
+```
+
+It's recommended to inherit from `GlobalID::Locator::BaseLocator` (or `GlobalID::Locator::UnscopedLocator` for Active Record models) to get default implementations of `model_class` and `locate_many`:
+
+```ruby
+class BarLocator < GlobalID::Locator::BaseLocator
+  def locate(gid, options = {})
+    @search_client.search name: gid.model_name, id: gid.model_id
+  end
+end
+
+GlobalID::Locator.use :bar, BarLocator.new
 ```
 
 After defining locators as above, URIs like `gid://foo/Person/1` and `gid://bar/Person/1` will now use the foo block locator and `BarLocator` respectively.
 Other apps will still keep using the default locator.
+
+#### Custom Model Class Derivation
+
+By default, GlobalID derives the model class by calling `constantize` on the model name from the GID. Custom locators can override this behavior by implementing a `model_class` method. This is useful when the model name in the GID doesn't match the actual class name, or when you want to redirect to a different model.
+
+Inherit from `BaseLocator` and override `model_class`:
+
+```ruby
+class RemoteLocator < GlobalID::Locator::BaseLocator
+  def model_class(gid)
+    # Map remote model names to local models
+    case gid.model_name
+    when 'User'
+      RemoteUser
+    when 'Profile'
+      RemoteProfile
+    else
+      super # Fall back to default constantize behavior
+    end
+  end
+
+  def locate(gid, options = {})
+    # Use the mapped model class to find the record
+    model_class(gid).find_by(remote_id: gid.model_id)
+  end
+end
+
+GlobalID::Locator.use :remote, RemoteLocator.new
+```
+
+This allows you to work with Global IDs that reference models that don't exist in your application, redirecting them to the appropriate local models.
+
+**Note**: For backward compatibility, if a custom locator doesn't implement `model_class`, GlobalID will fall back to the default behavior (`constantize`) but will emit a deprecation warning. To avoid this, inherit from `GlobalID::Locator::BaseLocator` or `GlobalID::Locator::UnscopedLocator`.
 
 ### Custom Default Locator
 
@@ -238,7 +284,7 @@ class MyCustomLocator < UnscopedLocator
       super(gid, options)
     end
   end
-  
+
   def locate_many(gids, options = {})
     ActiveRecord::Base.connected_to(role: :reading) do
       super(gids, options)
