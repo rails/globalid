@@ -1,4 +1,7 @@
 # frozen_string_literal: true
+require 'active_support/concern'
+require 'active_support/core_ext/class/attribute'
+
 class GlobalID
   # Mix `GlobalID::Identification` into any model with a `#find(id)` class
   # method. Support is automatically included in Active Record.
@@ -27,6 +30,23 @@ class GlobalID
   #   GlobalID::Locator.locate person_gid
   #   # => #<Person:0x007fae94bf6298 @id="1">
   module Identification
+    extend ActiveSupport::Concern
+
+    included do
+      class_attribute :_global_id_app, instance_accessor: false
+    end
+
+    class_methods do
+      # Returns a class-specific app to use when creating Global IDs.
+      def global_id_app
+        _global_id_app
+      end
+
+      # Sets a class-specific app to use when creating Global IDs.
+      def global_id_app=(app)
+        self._global_id_app = URI::GID.validate_app(app)
+      end
+    end
 
     # Returns the Global ID of the model.
     #
@@ -36,16 +56,20 @@ class GlobalID
     #   global_id.model_id # => "1"
     #   global_id.to_param # => "Z2lkOi8vYm9yZGZvbGlvL1BlcnNvbi8x"
     def to_global_id(options = {})
-      GlobalID.create(self, options)
+      GlobalID.create(self, global_id_options(options))
     end
-    alias to_gid to_global_id
+
+    # Returns the Global ID of the model. Shortcut for `#to_global_id`.
+    def to_gid(...)
+      to_global_id(...)
+    end
 
     # Returns the Global ID parameter of the model.
     #
     #   model = Person.new id: 1
     #   model.to_gid_param # => ""Z2lkOi8vYm9yZGZvbGlvL1BlcnNvbi8x"
-    def to_gid_param(options = {})
-      to_global_id(options).to_param
+    def to_gid_param(...)
+      to_global_id(...).to_param
     end
 
     # Returns the Signed Global ID of the model.
@@ -106,16 +130,30 @@ class GlobalID
     #   GlobalID::Locator.locate_signed(signup_person_sgid.to_s, for: 'signup_form')
     #   => #<Person:0x007fae94bf6298 @id="1">
     def to_signed_global_id(options = {})
-      SignedGlobalID.create(self, options)
+      SignedGlobalID.create(self, global_id_options(options))
     end
-    alias to_sgid to_signed_global_id
+
+    # Returns the Signed Global ID of the model. Shortcut for `#to_signed_global_id`.
+    def to_sgid(...)
+      to_signed_global_id(...)
+    end
 
     # Returns the Signed Global ID parameter.
     #
     #   model = Person.new id: 1
     #   model.to_sgid_param # => "BAh7CEkiCGdpZAY6BkVUSSIiZ2..."
-    def to_sgid_param(options = {})
-      to_signed_global_id(options).to_param
+    def to_sgid_param(...)
+      to_signed_global_id(...).to_param
     end
+
+    private
+      def global_id_options(options)
+        return options if options.key?(:app)
+
+        app = self.class.global_id_app
+        return options unless app
+
+        options.merge(app: app)
+      end
   end
 end
