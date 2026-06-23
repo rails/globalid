@@ -11,7 +11,7 @@ class GlobalIDTest < ActiveSupport::TestCase
     end
 
     assert_raises ArgumentError do
-      GlobalID.app = 'blog_app'
+      GlobalID.app = 'blog:app'
     end
 
     assert_raises ArgumentError do

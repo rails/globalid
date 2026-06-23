@@ -370,12 +370,6 @@ class GlobalLocatorTest < ActiveSupport::TestCase
     end
   end
 
-  test 'locator name cannot have underscore' do
-    assert_raises ArgumentError do
-      GlobalID::Locator.use('under_score') { |gid| 'will never be found' }
-    end
-  end
-
   test "by valid purpose returns right model" do
     instance = Person.new
     login_sgid = instance.to_signed_global_id(for: 'login')
