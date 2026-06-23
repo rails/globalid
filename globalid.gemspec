@@ -21,6 +21,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'activesupport', '>= 6.1'
 
   s.add_development_dependency 'rake'
+  s.add_development_dependency 'minitest', '< 6'
 
   s.metadata = {
     "bug_tracker_uri"       => "https://github.com/rails/globalid/issues",
