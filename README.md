@@ -20,9 +20,10 @@ IDs, we have a universal identifier that works for objects of both classes.
 
 ## Usage
 
-Mix `GlobalID::Identification` into any model with a `.find(id)` class method that returns
-an instance of the model, and a `.where(id:)` class method that returns an enumerable of
-instance(s). Support is automatically included in Active Record.
+Mix `GlobalID::Identification` into any model with a `.find(id_or_ids)` class method that
+returns one instance for a single ID and an enumerable for multiple IDs. A `.where(id:)`
+class method is optional and enables `ignore_missing: true` lookups without raising.
+Support is automatically included in Active Record.
 
 ```ruby
 person_gid = Person.find(1).to_global_id
@@ -156,8 +157,8 @@ GlobalID::Locator.locate_signed(signup_person_sgid.to_s, for: 'signup_form')
 When needing to locate many Global IDs use `GlobalID::Locator.locate_many` or `GlobalID::Locator.locate_many_signed` for Signed Global IDs to allow loading
 Global IDs more efficiently.
 
-For instance, the default locator passes every `model_id` per `model_name` thus
-using `model_name.where(id: model_ids)` versus `GlobalID::Locator.locate`'s `model_name.find(id)`.
+For instance, the default locator passes every `model_id` per `model_name` to
+`model_name.find(model_ids)`, versus `GlobalID::Locator.locate`'s `model_name.find(id)`.
 
 In the case of looking up Global IDs from a database, it's only necessary to query
 once per `model_name` as shown here:
