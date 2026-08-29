@@ -70,7 +70,7 @@ class SignedGlobalID < GlobalID
   alias to_param to_s
 
   def ==(other)
-    super && @purpose == other.purpose
+    super && (!other.is_a?(SignedGlobalID) || @purpose == other.purpose)
   end
 
   def inspect # :nodoc:

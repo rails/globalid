@@ -81,10 +81,13 @@ class GlobalID
   def ==(other)
     other.is_a?(GlobalID) && @uri == other.uri
   end
-  alias_method :eql?, :==
+
+  def eql?(other)
+    self == other
+  end
 
   def hash
-    self.class.hash | @uri.hash
+    GlobalID.hash ^ @uri.hash
   end
 
   def to_param
