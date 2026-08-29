@@ -164,7 +164,6 @@ module URI
         if model_id
           model_id_parts = model_id
             .split(COMPOSITE_MODEL_ID_DELIMITER, COMPOSITE_MODEL_ID_MAX_SIZE)
-            .reject(&:blank?)
 
           model_id_parts.map! do |id|
             validate_model_id(id)
@@ -190,7 +189,7 @@ module URI
       end
 
       def validate_model_id(model_id_part)
-        return unless model_id_part.include?('/')
+        return unless model_id_part.blank? || model_id_part.include?('/')
 
         raise InvalidModelIdError, "Unable to create a Global ID for " \
           "#{model_name} with a malformed model id."
