@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require 'uri/generic'
+require 'cgi/escape'
 require 'active_support/core_ext/module/aliasing'
 require 'active_support/core_ext/object/blank'
 require 'active_support/core_ext/hash/indifferent_access'
