@@ -236,7 +236,7 @@ class GlobalID
             records_by_model_name_and_id[model.name] = records_by_id
           end
 
-          gids.filter_map { |gid| records_by_model_name_and_id[gid.model_name][gid.model_id] }
+          gids.filter_map { |gid| records_by_model_name_and_id.dig(gid.model_name, gid.model_id) }
         end
 
         private
