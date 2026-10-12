@@ -352,6 +352,16 @@ class GlobalLocatorTest < ActiveSupport::TestCase
     assert_nil GlobalID::Locator.locate 'gid://app/CompositePrimaryKeyModel/tenant-key-value'
   end
 
+  test '#locate_many skips GIDs with a mismatching model_id' do
+    assert_equal [], GlobalID::Locator.locate_many([ 'gid://app/Person/1/2' ])
+    assert_equal [], GlobalID::Locator.locate_many([ 'gid://app/CompositePrimaryKeyModel/tenant-key-value' ])
+    assert_equal [ @gid.find ], GlobalID::Locator.locate_many([ @gid, 'gid://app/CompositePrimaryKeyModel/tenant-key-value' ])
+  end
+
+  test '#fetch raises RecordNotFound for a GID with a mismatching model_id' do
+    assert_raises(GlobalID::Locator::RecordNotFound) { GlobalID::Locator.fetch 'gid://app/Person/1/2' }
+  end
+
   test 'use locator with block' do
     GlobalID::Locator.use :foo do |gid|
       :foo
