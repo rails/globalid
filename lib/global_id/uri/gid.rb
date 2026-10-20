@@ -93,7 +93,7 @@ module URI
       def build(args)
         parts = Util.make_components_hash(self, args)
         parts[:host] = parts[:app]
-        model_id_segment = Array(parts[:model_id]).map { |p| CGI.escape(p.to_s) }.join(COMPOSITE_MODEL_ID_DELIMITER)
+        model_id_segment = Array(parts[:model_id]).map { |p| CGI.escape(serialize_id_part(p)) }.join(COMPOSITE_MODEL_ID_DELIMITER)
         parts[:path] = "/#{parts[:model_name]}/#{model_id_segment}"
 
         if parts[:params] && !parts[:params].empty?
@@ -102,6 +102,7 @@ module URI
 
         super parts
       end
+
     end
 
     def to_s
@@ -199,6 +200,10 @@ module URI
 
       def parse_query_params(query)
         Hash[URI.decode_www_form(query)].with_indifferent_access if query
+      end
+
+      def serialize_id_part(part)
+        part.respond_to?(:iso8601) ? part.iso8601(9) : part.to_s
       end
   end
 
