@@ -75,7 +75,16 @@ module URI
       #
       #   URI::GID.create('bcx', Person.find(5), database: 'superhumans')
       def create(app, model, params = nil)
-        build app: app, model_name: model.class.name, model_id: model.id, params: params
+        build app: app, model_name: model_name_for(model.class), model_id: model.id, params: params
+      end
+
+      # Subclasses keep their class name, since their +polymorphic_name+ is the base class's.
+      def model_name_for(model_class) # :nodoc:
+        if GlobalID.use_polymorphic_name && model_class.respond_to?(:polymorphic_name) && base_class?(model_class)
+          model_class.polymorphic_name
+        else
+          model_class.name
+        end
       end
 
       # Create a new URI::GID from components with argument check.
@@ -102,6 +111,11 @@ module URI
 
         super parts
       end
+
+      private
+        def base_class?(model_class)
+          !model_class.respond_to?(:base_class) || model_class.base_class == model_class
+        end
     end
 
     def to_s
