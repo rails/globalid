@@ -44,16 +44,29 @@ class RailtieTest < ActiveSupport::TestCase
     assert_nil SignedGlobalID.expires_in
   end
 
+  test 'URI::GID.use_polymorphic_name is off by default' do
+    @app.initialize!
+    assert_equal false, URI::GID.use_polymorphic_name
+  end
+
+  test 'URI::GID.use_polymorphic_name can be set with config.global_id.use_polymorphic_name =' do
+    @app.config.global_id.use_polymorphic_name = true
+    @app.initialize!
+    assert_equal true, URI::GID.use_polymorphic_name
+  end
+
   test 'config.global_id can be used to set configurations after the railtie has been loaded' do
     @app.config.eager_load = true
     @app.config.before_eager_load do
       @app.config.global_id.app = 'foobar'
       @app.config.global_id.expires_in = 1.year
+      @app.config.global_id.use_polymorphic_name = true
     end
 
     @app.initialize!
     assert_equal 'foobar', GlobalID.app
     assert_equal 1.year, SignedGlobalID.expires_in
+    assert_equal true, URI::GID.use_polymorphic_name
   end
 
   test 'config.global_id can be used to explicitly set SignedGlobalID.expires_in to nil after the railtie has been loaded' do

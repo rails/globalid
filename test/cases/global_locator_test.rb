@@ -444,6 +444,30 @@ class GlobalLocatorTest < ActiveSupport::TestCase
     end
   end
 
+  test 'locator resolving a polymorphic_name that has no constant' do
+    class RenamedModelLocator < GlobalID::Locator::UnscopedLocator
+      def model_class(gid)
+        gid.model_name == 'Freelancer' ? Contractor : super
+      end
+    end
+
+    GlobalID::Locator.use :renamed, RenamedModelLocator.new
+
+    with_app 'renamed' do
+      with_use_polymorphic_name do
+        gid = Contractor.new('5').to_gid
+        assert_equal 'gid://renamed/Freelancer/5', gid.to_s
+        assert_nil 'Freelancer'.safe_constantize
+
+        found = GlobalID::Locator.locate(gid)
+        assert_kind_of Contractor, found
+        assert_equal '5', found.id
+
+        assert_equal [ found ], GlobalID::Locator.locate_many([ gid ])
+      end
+    end
+  end
+
   test 'locator without model_class method shows deprecation warning' do
     class LegacyLocator
       # Intentionally doesn't implement model_class
@@ -538,6 +562,13 @@ class GlobalLocatorTest < ActiveSupport::TestCase
       yield
     ensure
       GlobalID.app = old_app
+    end
+
+    def with_use_polymorphic_name(use_polymorphic_name = true)
+      old_use_polymorphic_name, URI::GID.use_polymorphic_name = URI::GID.use_polymorphic_name, use_polymorphic_name
+      yield
+    ensure
+      URI::GID.use_polymorphic_name = old_use_polymorphic_name
     end
 
     def with_default_locator(default_locator)
