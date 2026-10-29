@@ -101,6 +101,12 @@ class GlobalLocatorTest < ActiveSupport::TestCase
     assert_equal @gid.model_id, found.id
   end
 
+  test '#fetch by GID of a renamed class' do
+    found = GlobalID::Locator.fetch('gid://bcx/OldPerson/1')
+    assert_kind_of Person, found
+    assert_equal '1', found.id
+  end
+
   test '#fetch with only: restriction with match' do
     found = GlobalID::Locator.fetch(@gid, only: Person)
     assert_kind_of @gid.model_class, found
@@ -196,6 +202,11 @@ class GlobalLocatorTest < ActiveSupport::TestCase
   test 'by many GIDs of mixed classes' do
     assert_equal [ Person.new('1'), Person::Child.new('1'), Person.new('2') ],
       GlobalID::Locator.locate_many([ Person.new('1').to_gid, Person::Child.new('1').to_gid, Person.new('2').to_gid ])
+  end
+
+  test 'by many GIDs of a renamed class' do
+    assert_equal [ Person.new('1'), Person.new('2') ],
+      GlobalID::Locator.locate_many([ 'gid://bcx/OldPerson/1', Person.new('2').to_gid ])
   end
 
   test 'by many GIDs with only: restriction to match subclass' do
@@ -427,6 +438,33 @@ class GlobalLocatorTest < ActiveSupport::TestCase
       found = GlobalID::Locator.locate(gid)
       assert_kind_of Person, found
       assert_equal '5', found.id
+
+      assert_equal [ found ], GlobalID::Locator.locate_many([ gid ])
+      assert_equal found, GlobalID::Locator.fetch(gid)
+    end
+  end
+
+  test 'locator resolving a polymorphic_name that has no constant' do
+    class RenamedModelLocator < GlobalID::Locator::UnscopedLocator
+      def model_class(gid)
+        gid.model_name == 'Freelancer' ? Contractor : super
+      end
+    end
+
+    GlobalID::Locator.use :renamed, RenamedModelLocator.new
+
+    with_app 'renamed' do
+      with_use_polymorphic_name do
+        gid = Contractor.new('5').to_gid
+        assert_equal 'gid://renamed/Freelancer/5', gid.to_s
+        assert_nil 'Freelancer'.safe_constantize
+
+        found = GlobalID::Locator.locate(gid)
+        assert_kind_of Contractor, found
+        assert_equal '5', found.id
+
+        assert_equal [ found ], GlobalID::Locator.locate_many([ gid ])
+      end
     end
   end
 
@@ -524,6 +562,13 @@ class GlobalLocatorTest < ActiveSupport::TestCase
       yield
     ensure
       GlobalID.app = old_app
+    end
+
+    def with_use_polymorphic_name(use_polymorphic_name = true)
+      old_use_polymorphic_name, URI::GID.use_polymorphic_name = URI::GID.use_polymorphic_name, use_polymorphic_name
+      yield
+    ensure
+      URI::GID.use_polymorphic_name = old_use_polymorphic_name
     end
 
     def with_default_locator(default_locator)

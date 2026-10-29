@@ -45,6 +45,28 @@ class Person
   end
 end
 
+# The name Person had before a rename, kept so GIDs stored under it still resolve.
+OldPerson = Person
+
+class Employee < Person
+  def self.polymorphic_name
+    'Worker'
+  end
+
+  def self.base_class
+    Employee
+  end
+end
+
+class Employee::Manager < Employee
+end
+
+class Contractor < Person
+  def self.polymorphic_name
+    'Freelancer'
+  end
+end
+
 class PersonUuid < Person
   def self.primary_key
     :uuid

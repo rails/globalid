@@ -274,6 +274,65 @@ This allows you to work with Global IDs that reference models that don't exist i
 
 **Note**: For backward compatibility, if a custom locator doesn't implement `model_class`, GlobalID will fall back to the default behavior (`constantize`) but will emit a deprecation warning. To avoid this, inherit from `GlobalID::Locator::BaseLocator` or `GlobalID::Locator::UnscopedLocator`.
 
+### Naming models by `polymorphic_name`
+
+Active Record names a model in polymorphic associations by `polymorphic_name`,
+which the model can override to keep its stored name across a rename:
+
+```ruby
+class Person < ApplicationRecord
+  # Renamed from Human
+  def self.polymorphic_name
+    "Human"
+  end
+end
+```
+
+Set `config.global_id.use_polymorphic_name` to name models in Global IDs the
+same way, so a rename keeps their Global IDs stable too:
+
+```ruby
+# config/application.rb
+config.global_id.use_polymorphic_name = true
+```
+
+```ruby
+Person.find(1).to_global_id.to_s
+# => "gid://app/Human/1"
+```
+
+Outside Rails, set it like so:
+
+```ruby
+URI::GID.use_polymorphic_name = true
+```
+
+Only models whose `polymorphic_name` differs from their class name get
+different Global IDs. A single table inheritance subclass keeps its class name,
+since its `polymorphic_name` is its base class's. With
+`store_full_class_name = false`, Global IDs carry the short name too, so the
+app's locator has to resolve it. Fixture Global IDs
+(`global_id("people", :david)` in a fixture file) follow the same rule.
+
+Resolving the old name is the app's job. Map it in a custom locator's
+`model_class`:
+
+```ruby
+class PersonLocator < GlobalID::Locator::UnscopedLocator
+  def model_class(gid)
+    gid.model_name == "Human" ? Person : super
+  end
+end
+
+GlobalID::Locator.use :app, PersonLocator.new
+```
+
+or keep a constant alias for the old name:
+
+```ruby
+Human = Person
+```
+
 ### Custom Default Locator
 
 A custom default locator can be set for an app by calling `GlobalID::Locator.default_locator=` and providing a default locator to use for that app.

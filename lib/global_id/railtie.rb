@@ -16,10 +16,12 @@ class GlobalID
       default_app_name = app.railtie_name.remove('_application').dasherize
 
       GlobalID.app = app.config.global_id.app ||= default_app_name
+      URI::GID.use_polymorphic_name = app.config.global_id.fetch(:use_polymorphic_name, false)
       SignedGlobalID.expires_in = app.config.global_id.fetch(:expires_in, default_expires_in)
 
       config.after_initialize do
         GlobalID.app = app.config.global_id.app ||= default_app_name
+        URI::GID.use_polymorphic_name = app.config.global_id.fetch(:use_polymorphic_name, false)
         SignedGlobalID.expires_in = app.config.global_id.fetch(:expires_in, default_expires_in)
 
         app.config.global_id.verifier ||= begin

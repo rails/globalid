@@ -80,6 +80,35 @@ class URI::GIDTest <  ActiveSupport::TestCase
   end
 end
 
+class URI::GIDPolymorphicNameTest < ActiveSupport::TestCase
+  setup do
+    @use_polymorphic_name, URI::GID.use_polymorphic_name = URI::GID.use_polymorphic_name, true
+  end
+
+  teardown do
+    URI::GID.use_polymorphic_name = @use_polymorphic_name
+  end
+
+  test 'create names the model by its class when off' do
+    URI::GID.use_polymorphic_name = false
+    assert_equal 'gid://bcx/Employee/5', URI::GID.create('bcx', Employee.new('5')).to_s
+  end
+
+  test 'create names the model by its polymorphic_name' do
+    assert_equal 'gid://bcx/Worker/5', URI::GID.create('bcx', Employee.new('5')).to_s
+    assert_equal 'gid://bcx/Freelancer/5', URI::GID.create('bcx', Contractor.new('5')).to_s
+  end
+
+  test 'create names a single table inheritance subclass by its class' do
+    assert_equal 'gid://bcx/Employee::Manager/5', URI::GID.create('bcx', Employee::Manager.new('5')).to_s
+  end
+
+  test 'create names a model without polymorphic_name by its class' do
+    assert_equal 'gid://bcx/Person/5', URI::GID.create('bcx', Person.new('5')).to_s
+    assert_equal 'gid://bcx/PersonModel/5', URI::GID.create('bcx', PersonModel.new(id: '5')).to_s
+  end
+end
+
 class URI::GIDModelIDEncodingTest < ActiveSupport::TestCase
   test 'alphanumeric' do
     model = Person.new('John123')
