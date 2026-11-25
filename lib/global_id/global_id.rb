@@ -8,6 +8,7 @@ require 'global_id/uri/gid'
 class GlobalID
   class << self
     attr_reader :app
+    attr_accessor :use_polymorphic_name
 
     def create(model, options = {})
       if app = options.fetch(:app) { GlobalID.app }
