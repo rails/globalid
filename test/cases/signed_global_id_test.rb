@@ -180,6 +180,30 @@ class SignedGlobalIDExpirationTest < ActiveSupport::TestCase
     assert_not_nil SignedGlobalID.parse(sgid.to_s)
   end
 
+  test 'create does not store expires_in in the params' do
+    sgid = SignedGlobalID.create(Person.new(5), expires_in: 1.hour)
+
+    assert_equal 'gid://bcx/Person/5', sgid.uri.to_s
+    assert_nil sgid.params
+  end
+
+  test 'create does not store expires_at in the params' do
+    sgid = SignedGlobalID.create(Person.new(5), expires_at: Date.tomorrow.end_of_day)
+
+    assert_equal 'gid://bcx/Person/5', sgid.uri.to_s
+    assert_nil sgid.params
+  end
+
+  test 'to_sgid with expires_in nil does not store it in the params' do
+    with_expiration_in 1.hour do
+      sgid = Person.new(5).to_sgid(expires_in: nil)
+
+      assert_equal 'gid://bcx/Person/5', sgid.uri.to_s
+      assert_nil sgid.params
+      assert_nil sgid.expires_at
+    end
+  end
+
   private
     def with_expiration_in(expires_in)
       old_expires, SignedGlobalID.expires_in = SignedGlobalID.expires_in, expires_in
