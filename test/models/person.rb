@@ -45,6 +45,9 @@ class Person
   end
 end
 
+# The name Person had before a rename, kept so GIDs stored under it still resolve.
+OldPerson = Person
+
 class PersonUuid < Person
   def self.primary_key
     :uuid

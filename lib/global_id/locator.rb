@@ -224,7 +224,7 @@ class GlobalID
             ids_by_model[gid.model_class] << gid.model_id
           end
 
-          records_by_model_name_and_id = {}
+          records_by_model_and_id = {}
 
           ids_by_model.each do |model, ids|
             records = find_records(model, ids, ignore_missing: options[:ignore_missing], includes: options[:includes])
@@ -233,10 +233,10 @@ class GlobalID
               record.id.is_a?(Array) ? record.id.map(&:to_s) : record.id.to_s
             end
 
-            records_by_model_name_and_id[model.name] = records_by_id
+            records_by_model_and_id[model] = records_by_id
           end
 
-          gids.filter_map { |gid| records_by_model_name_and_id.dig(gid.model_name, gid.model_id) }
+          gids.filter_map { |gid| records_by_model_and_id.dig(gid.model_class, gid.model_id) }
         end
 
         private
